@@ -38,26 +38,43 @@ class BaseCrawler(ABC):
             return []
 
     def fetch(self, url, method="GET", data=None, timeout=None, retries=2):
-        """Fetch a URL with retry logic and polite delay."""
+        """Fetch a URL with retry logic and polite delay.
+
+        PDFs are streamed in chunks to avoid read timeouts on large files.
+        """
+        is_pdf = url.lower().endswith(".pdf")
         if timeout is None:
-            timeout = config.PDF_TIMEOUT if url.lower().endswith(".pdf") else config.REQUEST_TIMEOUT
+            timeout = config.PDF_TIMEOUT if is_pdf else config.REQUEST_TIMEOUT
         for attempt in range(1, retries + 1):
             time.sleep(config.DELAY_BETWEEN_REQUESTS)
             try:
                 if method == "POST":
                     resp = self.session.post(url, data=data, timeout=timeout)
+                elif is_pdf:
+                    resp = self._stream_download(url, timeout)
                 else:
                     resp = self.session.get(url, timeout=timeout)
                 resp.raise_for_status()
                 return resp
             except requests.RequestException as e:
                 if attempt < retries:
-                    wait = attempt * 3
+                    wait = attempt * 5
                     print(f"  [RETRY] Attempt {attempt} failed for {url.split('/')[-1]}, retrying in {wait}s...")
                     time.sleep(wait)
                 else:
                     print(f"  [ERROR] Failed to fetch {url}: {e}")
                     return None
+
+    def _stream_download(self, url, timeout):
+        """Download a file in chunks using streaming to avoid read timeouts."""
+        # connect timeout = 15s, per-chunk read timeout = timeout
+        resp = self.session.get(url, stream=True, timeout=(15, timeout))
+        resp.raise_for_status()
+        chunks = []
+        for chunk in resp.iter_content(chunk_size=64 * 1024):
+            chunks.append(chunk)
+        resp._content = b"".join(chunks)
+        return resp
 
     def parse_html(self, html):
         """Parse HTML content into BeautifulSoup object."""
