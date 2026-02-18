@@ -21,12 +21,18 @@ import sys
 import config
 from crawlers.rbi import RBICrawler
 from crawlers.sebi import SEBICrawler
+from crawlers.mca import MCACrawler
+from crawlers.irdai import IRDAICrawler
+from crawlers.egazette import EGazetteCrawler
 from crawlers.generic import GenericGovCrawler
 
 
 CRAWLERS = {
     "rbi": RBICrawler,
     "sebi": SEBICrawler,
+    "mca": MCACrawler,
+    "irdai": IRDAICrawler,
+    "egazette": EGazetteCrawler,
 }
 
 
