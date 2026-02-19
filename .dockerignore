@@ -1,0 +1,8 @@
+.git
+.env
+__pycache__
+*.pyc
+rag_app/qdrant_data
+rag_app/embedding_cache.pkl
+.claude
+*.csv

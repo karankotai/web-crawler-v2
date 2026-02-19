@@ -35,7 +35,8 @@ class EGazetteCrawler(BaseCrawler):
 
     name = "egazette_notifications"
     BASE_URL = "https://egazette.gov.in"
-    MAX_PAGES = 20  # safety limit per gazette type
+    MAX_PAGES = 1  # safety limit per gazette type
+    MAX_RECORDS = 15  # max records per gazette type
 
     def crawl(self):
         for postback_target, label in GAZETTE_TYPES:
@@ -49,6 +50,7 @@ class EGazetteCrawler(BaseCrawler):
 
     def _crawl_gazette_type(self, postback_target, label):
         """Navigate to a gazette listing and paginate through all pages."""
+        count = 0
         # Step 1: GET homepage to start a session
         print(f"  Loading eGazette homepage for {label} gazettes...")
         resp = self.fetch(self.BASE_URL)
@@ -84,13 +86,16 @@ class EGazetteCrawler(BaseCrawler):
 
             found = 0
             for row in rows:
+                if count >= self.MAX_RECORDS:
+                    break
                 record = self._parse_row(row, label)
                 if record:
                     self.results.append(record)
                     found += 1
+                    count += 1
 
             print(f"  {label} page {page_num}: found {found} gazettes.")
-            if found == 0:
+            if found == 0 or count >= self.MAX_RECORDS:
                 break
 
             # Check if next page exists

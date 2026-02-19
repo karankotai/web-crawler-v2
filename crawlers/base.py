@@ -143,6 +143,22 @@ class BaseCrawler(ABC):
                         writer.writerow(csv_row)
                 print(f"  Saved {len(self.results)} records to {path}")
 
+        # Save to MongoDB if configured
+        mongodb_uri = os.environ.get("MONGODB_URI", "")
+        if mongodb_uri:
+            from pymongo import MongoClient
+
+            client = MongoClient(mongodb_uri)
+            db = client["gov_circulars"]
+            collection = db[self.name]
+            for record in self.results:
+                if record.get("link"):
+                    collection.update_one({"link": record["link"]}, {"$set": record}, upsert=True)
+                else:
+                    collection.insert_one(record)
+            client.close()
+            print(f"  Saved {len(self.results)} records to MongoDB collection: {self.name}")
+
     def run(self):
         """Full pipeline: load existing + crawl + dedup + deep crawl + save."""
         print(f"\n{'='*60}")
