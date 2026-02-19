@@ -2,3 +2,5 @@ output/
 __pycache__/
 *.pyc
 .env
+rag_app/qdrant_data/
+rag_app/embedding_cache.pkl
