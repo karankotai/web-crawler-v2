@@ -4,3 +4,5 @@ __pycache__/
 .env
 rag_app/qdrant_data/
 rag_app/embedding_cache.pkl
+eval_results_*.json
+.DS_Store
