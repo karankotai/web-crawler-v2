@@ -5,6 +5,7 @@ from urllib.parse import urljoin
 
 import pdfplumber
 
+import config
 from crawlers.base import BaseCrawler
 
 
@@ -86,41 +87,75 @@ class SEBICrawler(BaseCrawler):
             print(f"    [ERROR] Failed to parse PDF: {e}")
             return ""
 
-    def _crawl_listing_page(self, url, label):
-        """Crawl a SEBI listing page."""
-        print(f"  Fetching SEBI {label}...")
-        resp = self.fetch(url)
-        if not resp:
-            return
+    def _crawl_listing_page(self, base_url, label):
+        """Crawl a SEBI listing page with pagination."""
+        page_num = 1
+        while page_num <= config.MAX_PAGES:
+            url = f"{base_url}&pageNo={page_num}" if page_num > 1 else base_url
+            print(f"  Fetching SEBI {label} page {page_num}...")
+            resp = self.fetch(url)
+            if not resp:
+                break
 
-        soup = self.parse_html(resp.text)
+            soup = self.parse_html(resp.text)
 
-        rows = soup.select("table tr")
-        for row in rows:
-            cells = row.find_all("td")
-            if len(cells) < 2:
-                continue
+            before = len(self.results)
+            rows = soup.select("table tr")
+            for row in rows:
+                cells = row.find_all("td")
+                if len(cells) < 2:
+                    continue
 
-            link_tag = row.find("a", href=True)
-            link = ""
-            title = ""
-            if link_tag:
-                link = link_tag.get("href", "")
-                if link and not link.startswith("http"):
-                    link = f"{self.BASE_URL}{link}" if link.startswith("/") else f"{self.BASE_URL}/{link}"
-                title = link_tag.get_text(strip=True)
+                link_tag = row.find("a", href=True)
+                link = ""
+                title = ""
+                if link_tag:
+                    link = link_tag.get("href", "")
+                    if link and not link.startswith("http"):
+                        link = f"{self.BASE_URL}{link}" if link.startswith("/") else f"{self.BASE_URL}/{link}"
+                    title = link_tag.get_text(strip=True)
 
-            texts = [c.get_text(strip=True) for c in cells]
-            date = texts[0] if texts else ""
+                texts = [c.get_text(strip=True) for c in cells]
+                date = texts[0] if texts else ""
 
-            if title and len(title) > 5:
-                self.results.append({
-                    "source": "SEBI",
-                    "title": title,
-                    "date": date,
-                    "department": "",
-                    "link": link,
-                    "details": " | ".join(t for t in texts if t),
-                })
+                if title and len(title) > 5:
+                    self.results.append({
+                        "source": "SEBI",
+                        "title": title,
+                        "date": date,
+                        "department": "",
+                        "link": link,
+                        "details": " | ".join(t for t in texts if t),
+                    })
 
-        print(f"  Found {len(self.results)} SEBI records so far.")
+            found = len(self.results) - before
+            print(f"  SEBI {label} page {page_num}: {found} records")
+            self.save_progress()
+
+            if found == 0:
+                break
+
+            if not self._has_next_page(soup, page_num):
+                break
+            page_num += 1
+
+    def _has_next_page(self, soup, current_page):
+        """Check if there's a next page link in the SEBI pagination."""
+        for a in soup.find_all("a", href=True):
+            text = a.get_text(strip=True).lower()
+            if text in ("next", "next >", ">>"):
+                return True
+            href = a.get("href", "")
+            if f"pageNo={current_page + 1}" in href:
+                return True
+        # Also check for page number links higher than current
+        for a in soup.find_all("a", href=True):
+            href = a.get("href", "")
+            if "pageNo=" in href:
+                try:
+                    pn = int(href.split("pageNo=")[1].split("&")[0])
+                    if pn > current_page:
+                        return True
+                except (ValueError, IndexError):
+                    pass
+        return False

@@ -13,3 +13,4 @@ REQUEST_TIMEOUT = 60
 PDF_TIMEOUT = 120  # longer timeout for PDF downloads
 DELAY_BETWEEN_REQUESTS = 2  # seconds, be polite to servers
 DEEP_CRAWL = False  # follow links and extract full notification content
+MAX_PAGES = 50  # max pages to crawl per listing (safety limit)

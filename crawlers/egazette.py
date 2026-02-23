@@ -20,6 +20,7 @@ from urllib.parse import urljoin
 
 import pdfplumber
 
+import config
 from crawlers.base import BaseCrawler
 
 
@@ -35,8 +36,6 @@ class EGazetteCrawler(BaseCrawler):
 
     name = "egazette_notifications"
     BASE_URL = "https://egazette.gov.in"
-    MAX_PAGES = 1  # safety limit per gazette type
-    MAX_RECORDS = 15  # max records per gazette type
 
     def crawl(self):
         for postback_target, label in GAZETTE_TYPES:
@@ -78,7 +77,7 @@ class EGazetteCrawler(BaseCrawler):
 
         # Step 3: Parse page 1 and paginate
         page_num = 1
-        while page_num <= self.MAX_PAGES:
+        while page_num <= config.MAX_PAGES:
             soup = self.parse_html(resp.text)
             rows = self._find_data_rows(soup)
             if not rows:
@@ -86,8 +85,6 @@ class EGazetteCrawler(BaseCrawler):
 
             found = 0
             for row in rows:
-                if count >= self.MAX_RECORDS:
-                    break
                 record = self._parse_row(row, label)
                 if record:
                     self.results.append(record)
@@ -95,7 +92,9 @@ class EGazetteCrawler(BaseCrawler):
                     count += 1
 
             print(f"  {label} page {page_num}: found {found} gazettes.")
-            if found == 0 or count >= self.MAX_RECORDS:
+            self.save_progress()
+
+            if found == 0:
                 break
 
             # Check if next page exists

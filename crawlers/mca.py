@@ -70,6 +70,7 @@ class MCACrawler(BaseCrawler):
 
             for tab_class, label in MCA_TABS.items():
                 self._crawl_tab(page, tab_class, label)
+                self.save_progress()
                 time.sleep(config.DELAY_BETWEEN_REQUESTS)
 
             # Deep crawl: download PDFs and extract text while browser is still open

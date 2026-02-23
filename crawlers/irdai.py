@@ -9,6 +9,7 @@ from urllib.parse import urljoin
 
 import pdfplumber
 
+import config
 from crawlers.base import BaseCrawler
 
 
@@ -26,12 +27,10 @@ class IRDAICrawler(BaseCrawler):
         f"&{PORTLET_NS}resetCur=false"
     )
 
-    MAX_PAGES = 15  # safety limit
-
     def crawl(self):
         seen_links = set()
         page = 1
-        while page <= self.MAX_PAGES:
+        while page <= config.MAX_PAGES:
             url = f"{self.CIRCULARS_URL}&{self.PORTLET_NS}cur={page}"
             print(f"  Fetching IRDAI circulars page {page}...")
             resp = self.fetch(url)
@@ -60,6 +59,8 @@ class IRDAICrawler(BaseCrawler):
                 found += 1
 
             print(f"  Page {page}: found {found} new circulars.")
+            self.save_progress()
+
             if found == 0:
                 break
 

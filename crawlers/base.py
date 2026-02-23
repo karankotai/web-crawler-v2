@@ -80,6 +80,22 @@ class BaseCrawler(ABC):
         """Parse HTML content into BeautifulSoup object."""
         return BeautifulSoup(html, "lxml")
 
+    def save_progress(self):
+        """Incremental save: merge current results with existing and write JSON.
+        Called by crawlers after each page to guard against mid-crawl crashes."""
+        if not self.results:
+            return
+        os.makedirs(config.OUTPUT_DIR, exist_ok=True)
+        path = os.path.join(config.OUTPUT_DIR, f"{self.name}.json")
+
+        all_links = {r.get("link") for r in self._existing if r.get("link")}
+        unique_new = [r for r in self.results if r.get("link") not in all_links]
+        merged = unique_new + self._existing
+
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(merged, f, indent=2, ensure_ascii=False)
+        print(f"  [checkpoint] Saved {len(merged)} records ({len(unique_new)} new)")
+
     @abstractmethod
     def crawl(self):
         """Crawl the target website. Must be implemented by subclasses."""
@@ -165,7 +181,7 @@ class BaseCrawler(ABC):
         print(f"  Crawling: {self.name}")
         print(f"{'='*60}")
 
-        existing = self.load_existing()
+        self._existing = self.load_existing()
 
         self.crawl()
 
@@ -180,6 +196,6 @@ class BaseCrawler(ABC):
             self.crawl_details()
 
         # Merge: new results first (most recent), then existing
-        self.results = self.results + existing
+        self.results = self.results + self._existing
         self.save()
         return self.results

@@ -64,10 +64,18 @@ def main():
         action="store_true",
         help="Follow each link and extract full notification content",
     )
+    parser.add_argument(
+        "--max-pages",
+        type=int,
+        default=None,
+        help="Max pages to paginate per source listing (default: 50)",
+    )
     args = parser.parse_args()
 
     config.OUTPUT_FORMAT = args.format
     config.DEEP_CRAWL = args.deep
+    if args.max_pages is not None:
+        config.MAX_PAGES = args.max_pages
 
     total = 0
 
