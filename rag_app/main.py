@@ -4,7 +4,16 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from rag_app.config import settings
-from rag_app.models.schemas import AskRequest, AskResponse, IndexRequest, IndexResponse
+from rag_app.models.schemas import (
+    AskRequest,
+    AskResponse,
+    EvalQuestion,
+    EvalRequest,
+    EvalResponse,
+    IndexRequest,
+    IndexResponse,
+)
+from rag_app.services.eval_service import EvalService
 from rag_app.services.rag_pipeline import RAGPipeline
 
 pipeline: RAGPipeline | None = None
@@ -52,6 +61,25 @@ async def ask_question(request: AskRequest):
             detail="No documents indexed yet. Call POST /index first.",
         )
     return pipeline.ask(request)
+
+
+@app.post("/evaluate", response_model=EvalResponse)
+async def evaluate_question(request: EvalRequest):
+    """Evaluate RAG vs vanilla LLM on a single question."""
+    info = pipeline.vector_store.collection_info()
+    if not info.get("points_count", 0):
+        raise HTTPException(
+            status_code=400,
+            detail="No documents indexed yet. Call POST /index first.",
+        )
+    eval_service = EvalService(pipeline)
+    q = EvalQuestion(
+        question=request.question,
+        ground_truth=request.ground_truth,
+        source_filter=request.source_filter,
+    )
+    result = eval_service.evaluate_question(q)
+    return EvalResponse(result=result)
 
 
 @app.get("/health")

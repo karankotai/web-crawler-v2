@@ -132,17 +132,21 @@ class VectorStore:
         score_threshold: float = settings.SCORE_THRESHOLD,
         source_filter: str | None = None,
     ) -> list[dict]:
-        """Vector search with keyword filter on text payload."""
-        must_conditions = [
+        """Vector search with keyword filter on text payload (OR logic for keywords)."""
+        keyword_conditions = [
             FieldCondition(key="text", match=MatchText(text=kw))
             for kw in keywords
         ]
+        must_conditions = []
         if source_filter:
             must_conditions.append(
                 FieldCondition(key="source", match=MatchValue(value=source_filter))
             )
 
-        query_filter = Filter(must=must_conditions)
+        query_filter = Filter(
+            should=keyword_conditions,
+            must=must_conditions if must_conditions else None,
+        )
 
         try:
             results = self.client.query_points(

@@ -9,6 +9,7 @@ from rag_app.models.schemas import (
     AskResponse,
     ChunkMetadata,
     IndexResponse,
+    RetrievedChunk,
     SourceReference,
 )
 from rag_app.services.chunker import chunk_document
@@ -157,11 +158,23 @@ class RAGPipeline:
         )
         sources = self._extract_sources(results)
 
+        retrieved_chunks = [
+            RetrievedChunk(
+                text=r["text"],
+                source=r["metadata"]["source"],
+                title=r["metadata"]["title"],
+                circular_number=r["metadata"].get("circular_number", ""),
+                relevance_score=round(r["score"], 4),
+            )
+            for r in results
+        ]
+
         return AskResponse(
             answer=answer,
             sources=sources,
             query_used=rewritten,
             chunks_retrieved=len(results),
+            retrieved_chunks=retrieved_chunks,
         )
 
     def _rewrite_query(self, question: str) -> str:
@@ -195,25 +208,54 @@ class RAGPipeline:
         context_parts = []
         for i, result in enumerate(results, 1):
             meta = result["metadata"]
-            header = (
-                f"[Source: {meta['source']} | Title: {meta['title']} | "
-                f"Date: {meta['date']} | Link: {meta['link']}]"
-            )
-            context_parts.append(f"--- Document {i} ---\n{header}\n{result['text']}")
+            header_items = [f"Source: {meta['source']}"]
+            if meta.get("circular_number"):
+                header_items.append(f"Circular No: {meta['circular_number']}")
+            header_items.append(f"Title: {meta['title']}")
+            if meta.get("date"):
+                header_items.append(f"Date: {meta['date']}")
+            if meta.get("link"):
+                header_items.append(f"Link: {meta['link']}")
+            chunk_idx = meta.get("chunk_index", 0)
+            total_chunks = meta.get("total_chunks", 0)
+            if total_chunks > 1:
+                header_items.append(f"Part {chunk_idx + 1} of {total_chunks}")
+            header = " | ".join(header_items)
+            context_parts.append(f"--- Document {i} ---\n[{header}]\n{result['text']}")
         return "\n\n".join(context_parts)
 
     def _generate_answer(self, question: str, context: str, matched_circular: str | None = None) -> str:
         """Generate a grounded answer from context."""
         system_prompt = (
-            "You are a helpful assistant that answers questions about Indian government "
-            "regulatory circulars from RBI, SEBI, IRDAI, and MCA.\n\n"
-            "RULES:\n"
-            "1. Answer ONLY based on the provided context documents.\n"
-            "2. Cite the source (e.g., RBI, SEBI) and circular title when referencing information.\n"
-            "3. If the context doesn't contain enough information to answer, say "
-            "\"I don't have enough information in the indexed circulars to answer this question.\"\n"
-            "4. Be precise and factual. Do not speculate or add information not in the context.\n"
-            "5. If multiple circulars are relevant, synthesize the information and cite each.\n"
+            "You are an expert analyst of Indian government regulatory circulars "
+            "(RBI, SEBI, IRDAI, MCA). You provide authoritative, well-structured answers "
+            "strictly grounded in the provided context documents.\n\n"
+            "CRITICAL RULES:\n"
+            "1. ONLY state facts, obligations, dates, and provisions that are explicitly "
+            "written in the context documents below. Quote or closely paraphrase the source text.\n"
+            "2. NEVER add information from your general knowledge. If a detail is not in the "
+            "context, do not include it — even if you know it to be true.\n"
+            "3. Always cite the source regulator, circular number, and circular title "
+            "exactly as they appear in the context documents.\n"
+            "4. Do NOT fabricate or infer circular numbers, dates, penalty amounts, "
+            "thresholds, or regulatory provisions that are not explicitly stated.\n"
+            "5. If the context only partially addresses the question, present ONLY the "
+            "information that IS in the context, then state: \"The available documents "
+            "do not contain information about [specific gap].\"\n"
+            "6. If multiple circulars are relevant, synthesize and cross-reference them "
+            "with exact citations.\n\n"
+            "ANSWER FORMAT:\n"
+            "Structure your response with these sections as applicable "
+            "(skip sections that do not apply):\n\n"
+            "**Overview**: Brief summary based on the context documents.\n\n"
+            "**Key Obligations & Requirements**: Bullet each compliance requirement, "
+            "mandatory action, or prohibition found in the context. Include who it applies to.\n\n"
+            "**Important Dates & Deadlines**: List any effective dates, compliance deadlines, "
+            "or transition periods explicitly mentioned in the context.\n\n"
+            "**Exceptions & Conditions**: Note any exemptions, carve-outs, thresholds, "
+            "or applicability limitations stated in the context.\n\n"
+            "**Additional Context**: Any other relevant details from the context, including "
+            "references to related circulars or master directions.\n"
         )
         if matched_circular:
             system_prompt += (
@@ -225,7 +267,7 @@ class RAGPipeline:
             )
 
         response = self.openai_client.chat.completions.create(
-            model=settings.GENERATION_MODEL,
+            model=settings.ANSWER_MODEL,
             messages=[
                 {"role": "system", "content": system_prompt},
                 {
@@ -233,8 +275,8 @@ class RAGPipeline:
                     "content": f"Context:\n{context}\n\nQuestion: {question}",
                 },
             ],
-            temperature=0.1,
-            max_tokens=1000,
+            temperature=0,
+            max_tokens=2000,
         )
         return response.choices[0].message.content.strip()
 
@@ -314,6 +356,6 @@ class RAGPipeline:
         ranked = sorted(seen.values(), key=lambda x: x.relevance_score, reverse=True)
         if not ranked:
             return ranked
-        # Only keep sources within 85% of the top score
-        cutoff = ranked[0].relevance_score * 0.85
+        # Only keep sources within 65% of the top score
+        cutoff = ranked[0].relevance_score * 0.65
         return [s for s in ranked if s.relevance_score >= cutoff]

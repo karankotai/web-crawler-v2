@@ -36,7 +36,7 @@ class IndexResponse(BaseModel):
 
 class AskRequest(BaseModel):
     question: str
-    top_k: int = Field(default=8, ge=1, le=20)
+    top_k: int = Field(default=12, ge=1, le=20)
     source_filter: Optional[str] = None
 
 
@@ -50,8 +50,75 @@ class SourceReference(BaseModel):
     pdf_links: list[str] = []
 
 
+class RetrievedChunk(BaseModel):
+    text: str
+    source: str
+    title: str
+    circular_number: str
+    relevance_score: float
+
+
 class AskResponse(BaseModel):
     answer: str
     sources: list[SourceReference]
     query_used: str
     chunks_retrieved: int
+    retrieved_chunks: list[RetrievedChunk] = []
+
+
+# ── Eval schemas ──────────────────────────────────────────────
+
+
+class EvalQuestion(BaseModel):
+    question: str
+    ground_truth: Optional[str] = None
+    source_filter: Optional[str] = None
+
+
+class CriterionScore(BaseModel):
+    criterion: str
+    score: int = Field(ge=1, le=5)
+    reasoning: str
+
+
+class SingleAnswerEval(BaseModel):
+    answer: str
+    scores: list[CriterionScore]
+    total_score: int
+    average_score: float
+
+
+class QuestionEvalResult(BaseModel):
+    question: str
+    ground_truth: Optional[str] = None
+    rag_eval: SingleAnswerEval
+    vanilla_eval: SingleAnswerEval
+    rag_sources: list[SourceReference]
+    rag_advantage: float  # rag avg - vanilla avg
+
+
+class EvalRequest(BaseModel):
+    question: str
+    ground_truth: Optional[str] = None
+    source_filter: Optional[str] = None
+
+
+class EvalResponse(BaseModel):
+    result: QuestionEvalResult
+
+
+class EvalSummary(BaseModel):
+    total_questions: int
+    rag_average: float
+    vanilla_average: float
+    rag_advantage: float
+    per_criterion_rag: dict[str, float]
+    per_criterion_vanilla: dict[str, float]
+    wins: int  # questions where RAG scored higher
+    losses: int  # questions where vanilla scored higher
+    ties: int
+
+
+class BatchEvalResponse(BaseModel):
+    results: list[QuestionEvalResult]
+    summary: EvalSummary

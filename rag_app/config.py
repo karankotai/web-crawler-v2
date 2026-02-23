@@ -8,7 +8,9 @@ class Settings(BaseSettings):
     # Models
     EMBEDDING_MODEL: str = "text-embedding-3-small"
     EMBEDDING_DIMENSION: int = 1536
-    GENERATION_MODEL: str = "gpt-4o-mini"
+    GENERATION_MODEL: str = "gpt-4o-mini"  # Used for query rewriting
+    ANSWER_MODEL: str = "gpt-4o"  # Used for answer generation
+    EVAL_JUDGE_MODEL: str = "gpt-4o"
 
     # Qdrant
     QDRANT_URL: str = ""  # When set (e.g. http://qdrant:6333), use remote; when empty, use local path
@@ -32,8 +34,8 @@ class Settings(BaseSettings):
     CHUNK_OVERLAP_TOKENS: int = 50
 
     # Retrieval
-    TOP_K: int = 8
-    SCORE_THRESHOLD: float = 0.45
+    TOP_K: int = 12
+    SCORE_THRESHOLD: float = 0.35
 
     model_config = {"env_file": ".env", "env_file_encoding": "utf-8", "extra": "ignore"}
 
