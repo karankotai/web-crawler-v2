@@ -20,6 +20,7 @@ from rag_app.services.loader import (
     build_document_text,
     load_all_records,
     load_all_records_from_db,
+    load_all_records_from_pg,
 )
 from rag_app.services.vector_store import VectorStore
 
@@ -48,7 +49,9 @@ class RAGPipeline:
                 )
 
         # Load records
-        if settings.MONGODB_URI:
+        if settings.DATABASE_URL:
+            records = load_all_records_from_pg(settings.DATABASE_URL)
+        elif settings.MONGODB_URI:
             records = load_all_records_from_db(settings.MONGODB_URI, settings.MONGODB_DB_NAME)
         else:
             records = load_all_records("output")

@@ -23,6 +23,35 @@ def load_all_records(output_dir: str = "output") -> list[dict]:
     return records
 
 
+def load_all_records_from_pg(database_url: str) -> list[dict]:
+    """Load all scraped records from PostgreSQL."""
+    import psycopg2
+    import psycopg2.extras
+
+    conn = psycopg2.connect(database_url)
+    records = []
+    try:
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+            cur.execute("SELECT * FROM scraped_documents ORDER BY id")
+            for row in cur:
+                record = dict(row)
+                # Merge extra JSONB back into the record dict
+                extra = record.pop("extra", {}) or {}
+                if isinstance(extra, str):
+                    extra = json.loads(extra)
+                record.update(extra)
+                # Remove internal columns not needed by the RAG pipeline
+                record.pop("id", None)
+                record.pop("created_at", None)
+                record.pop("updated_at", None)
+                # Set _file_name from crawler for compatibility
+                record["_file_name"] = record.get("crawler", "")
+                records.append(record)
+    finally:
+        conn.close()
+    return records
+
+
 def load_all_records_from_db(uri: str, db_name: str) -> list[dict]:
     """Load all circular records from MongoDB."""
     from pymongo import MongoClient

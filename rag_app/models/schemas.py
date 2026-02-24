@@ -92,15 +92,18 @@ class QuestionEvalResult(BaseModel):
     question: str
     ground_truth: Optional[str] = None
     rag_eval: SingleAnswerEval
-    vanilla_eval: SingleAnswerEval
+    vanilla_gpt_eval: Optional[SingleAnswerEval] = None
+    vanilla_gemini_eval: Optional[SingleAnswerEval] = None
     rag_sources: list[SourceReference]
-    rag_advantage: float  # rag avg - vanilla avg
+    rag_advantage_vs_gpt: Optional[float] = None
+    rag_advantage_vs_gemini: Optional[float] = None
 
 
 class EvalRequest(BaseModel):
     question: str
     ground_truth: Optional[str] = None
     source_filter: Optional[str] = None
+    baselines: list[str] = Field(default=["gpt", "gemini"])
 
 
 class EvalResponse(BaseModel):
@@ -110,15 +113,41 @@ class EvalResponse(BaseModel):
 class EvalSummary(BaseModel):
     total_questions: int
     rag_average: float
-    vanilla_average: float
-    rag_advantage: float
+    vanilla_gpt_average: Optional[float] = None
+    vanilla_gemini_average: Optional[float] = None
+    rag_advantage_vs_gpt: Optional[float] = None
+    rag_advantage_vs_gemini: Optional[float] = None
     per_criterion_rag: dict[str, float]
-    per_criterion_vanilla: dict[str, float]
-    wins: int  # questions where RAG scored higher
-    losses: int  # questions where vanilla scored higher
-    ties: int
+    per_criterion_vanilla_gpt: Optional[dict[str, float]] = None
+    per_criterion_vanilla_gemini: Optional[dict[str, float]] = None
+    wins_vs_gpt: Optional[int] = None
+    losses_vs_gpt: Optional[int] = None
+    ties_vs_gpt: Optional[int] = None
+    wins_vs_gemini: Optional[int] = None
+    losses_vs_gemini: Optional[int] = None
+    ties_vs_gemini: Optional[int] = None
 
 
 class BatchEvalResponse(BaseModel):
     results: list[QuestionEvalResult]
     summary: EvalSummary
+
+
+# ── Crawl schemas ─────────────────────────────────────────────
+
+
+class CrawlRequest(BaseModel):
+    source: str = Field(
+        default="all",
+        description="Which source to crawl: rbi, sebi, mca, irdai, egazette, or all",
+    )
+    max_pages: int = Field(default=50, ge=1, le=500)
+    deep_crawl: bool = False
+    output_format: str = Field(default="both", pattern="^(json|csv|both)$")
+
+
+class CrawlResponse(BaseModel):
+    status: str
+    task_id: str
+    source: str
+    message: str

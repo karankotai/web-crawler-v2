@@ -1,6 +1,8 @@
 """Crawler for RBI (Reserve Bank of India) circulars and notifications."""
 
 import re
+import time
+from datetime import datetime
 from urllib.parse import urljoin
 
 import config
@@ -15,33 +17,69 @@ class RBICrawler(BaseCrawler):
     NOTIFICATIONS_URL = f"{BASE_URL}/Scripts/NotificationUser.aspx"
     CIRCULARS_URL = f"{BASE_URL}/Scripts/BS_CircularIndexDisplay.aspx"
 
+    # Year range: current year down to START_YEAR (controlled by --max-pages as year count)
+    START_YEAR = 2016
+
     def crawl(self):
-        self._crawl_notifications()
-        self._crawl_circulars()
+        current_year = datetime.now().year
+        end_year = max(self.START_YEAR, current_year - config.MAX_PAGES + 1)
+        years = list(range(current_year, end_year - 1, -1))
+
+        self._crawl_by_year(self.NOTIFICATIONS_URL, years, source="notification")
+        self._crawl_by_year(self.CIRCULARS_URL, years, source="circular")
+
+    def _crawl_by_year(self, url, years, source):
+        """Crawl an RBI listing page year by year using the hdnYear form POST."""
+        label = "notifications" if source == "notification" else "circulars"
+        print(f"  Fetching RBI {label}...")
+
+        # Initial GET to establish session and get form fields
+        resp = self.fetch(url)
+        if not resp:
+            return
+
+        for year in years:
+            soup = self.parse_html(resp.text)
+            form_data = self._get_hidden_fields(soup)
+            form_data["hdnYear"] = str(year)
+            form_data["hdnMonth"] = "0"  # All months
+            form_data["UsrFontCntr$btn"] = ""
+
+            time.sleep(config.DELAY_BETWEEN_REQUESTS)
+            try:
+                resp = self.session.post(url, data=form_data, timeout=config.REQUEST_TIMEOUT)
+                resp.raise_for_status()
+            except Exception as e:
+                print(f"  [ERROR] Failed to fetch {label} for {year}: {e}")
+                continue
+
+            soup = self.parse_html(resp.text)
+            rows = soup.select("table.tablebg tr") or soup.select("#divContent table tr")
+
+            before = len(self.results)
+            if rows:
+                self._parse_table_rows(rows, source=source)
+            else:
+                self._parse_link_listing(soup, source=source)
+
+            found = len(self.results) - before
+            print(f"  {label.capitalize()} {year}: {found} records")
+            if found > 0:
+                self.save_progress()
 
     def parse_detail_page(self, soup, url):
-        """Extract full content from an RBI notification/circular detail page.
-
-        RBI detail pages have content in div#example-min containing:
-        - Title, RBI reference number, date, addressed-to
-        - Full body text of the circular
-        - PDF download links
-        """
+        """Extract full content from an RBI notification/circular detail page."""
         detail = {"content": "", "circular_number": "", "date": "", "addressed_to": "", "pdf_links": []}
 
-        # Main content lives in div#example-min
         content_div = soup.select_one("#example-min") or soup.select_one("#doublescroll")
         if not content_div:
-            # fallback
             content_div = soup.select_one("#pnlDetails") or soup.body
 
         if not content_div:
             return detail
 
-        # Extract full text
         detail["content"] = content_div.get_text(separator="\n", strip=True)
 
-        # Extract PDF links
         for a in content_div.find_all("a", href=True):
             href = a["href"]
             if ".pdf" in href.lower():
@@ -49,14 +87,11 @@ class RBICrawler(BaseCrawler):
                     href = urljoin(url, href)
                 detail["pdf_links"].append(href)
 
-        # Try to parse structured fields from the text
         lines = detail["content"].split("\n")
         for line in lines:
             line = line.strip()
-            # RBI reference: RBI/2025-26/207
             if line.startswith("RBI/") and not detail["circular_number"]:
                 detail["circular_number"] = line
-            # Date line: February 11, 2026
             if not detail["date"]:
                 for month in ["January", "February", "March", "April", "May", "June",
                               "July", "August", "September", "October", "November", "December"]:
@@ -65,84 +100,6 @@ class RBICrawler(BaseCrawler):
                         break
 
         return detail
-
-    def _crawl_notifications(self):
-        """Crawl the notifications listing page with ASP.NET pagination."""
-        print("  Fetching RBI notifications...")
-        resp = self.fetch(self.NOTIFICATIONS_URL)
-        if not resp:
-            return
-
-        page_num = 1
-        current_url = self.NOTIFICATIONS_URL
-        while page_num <= config.MAX_PAGES:
-            soup = self.parse_html(resp.text)
-            rows = soup.select("table.tablebg tr") or soup.select("#divContent table tr")
-
-            before = len(self.results)
-            if rows:
-                self._parse_table_rows(rows, source="notification")
-            else:
-                self._parse_link_listing(soup, source="notification")
-
-            found = len(self.results) - before
-            print(f"  Notifications page {page_num}: {found} records")
-            self.save_progress()
-
-            if found == 0:
-                break
-
-            next_link = self._find_next_page(soup, page_num + 1)
-            if not next_link:
-                break
-
-            form_data = self._get_hidden_fields(soup)
-            form_data["__EVENTTARGET"] = next_link["target"]
-            form_data["__EVENTARGUMENT"] = next_link["argument"]
-
-            resp = self.session.post(
-                current_url, data=form_data, timeout=config.REQUEST_TIMEOUT
-            )
-            page_num += 1
-
-    def _crawl_circulars(self):
-        """Crawl the circulars index page with ASP.NET pagination."""
-        print("  Fetching RBI circulars...")
-        resp = self.fetch(self.CIRCULARS_URL)
-        if not resp:
-            return
-
-        page_num = 1
-        current_url = self.CIRCULARS_URL
-        while page_num <= config.MAX_PAGES:
-            soup = self.parse_html(resp.text)
-            rows = soup.select("table.tablebg tr") or soup.select("#divContent table tr")
-
-            before = len(self.results)
-            if rows:
-                self._parse_table_rows(rows, source="circular")
-            else:
-                self._parse_link_listing(soup, source="circular")
-
-            found = len(self.results) - before
-            print(f"  Circulars page {page_num}: {found} records")
-            self.save_progress()
-
-            if found == 0:
-                break
-
-            next_link = self._find_next_page(soup, page_num + 1)
-            if not next_link:
-                break
-
-            form_data = self._get_hidden_fields(soup)
-            form_data["__EVENTTARGET"] = next_link["target"]
-            form_data["__EVENTARGUMENT"] = next_link["argument"]
-
-            resp = self.session.post(
-                current_url, data=form_data, timeout=config.REQUEST_TIMEOUT
-            )
-            page_num += 1
 
     def _parse_table_rows(self, rows, source):
         """Parse table rows from RBI pages."""
@@ -223,30 +180,6 @@ class RBICrawler(BaseCrawler):
                 "link": href,
                 "details": "",
             })
-
-        print(f"  Found {len(self.results)} RBI records so far.")
-
-    def _find_next_page(self, soup, next_page_num):
-        """Find ASP.NET postback link for the next page.
-
-        Looks for page number links containing __doPostBack or a 'Next' anchor.
-        Returns dict with 'target' and 'argument' keys, or None.
-        """
-        for a in soup.find_all("a", href=True):
-            href = a["href"]
-            if "__doPostBack" not in href:
-                continue
-            # Match page number links like __doPostBack('GridView1','Page$3')
-            match = re.search(r"__doPostBack\('([^']+)','Page\$(\d+)'\)", href)
-            if match and int(match.group(2)) == next_page_num:
-                return {"target": match.group(1), "argument": f"Page${next_page_num}"}
-            # Match "Next" links
-            text = a.get_text(strip=True).lower()
-            if text in ("next", ">>", ">", "..."):
-                match = re.search(r"__doPostBack\('([^']+)','([^']*)'\)", href)
-                if match:
-                    return {"target": match.group(1), "argument": match.group(2)}
-        return None
 
     def _get_hidden_fields(self, soup):
         """Extract all hidden form fields for ASP.NET postback."""

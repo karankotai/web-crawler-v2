@@ -4,18 +4,23 @@ from pydantic_settings import BaseSettings
 class Settings(BaseSettings):
     # API
     OPENAI_API_KEY: str = ""
+    GEMINI_API_KEY: str = ""
 
     # Models
     EMBEDDING_MODEL: str = "text-embedding-3-small"
     EMBEDDING_DIMENSION: int = 1536
-    GENERATION_MODEL: str = "gpt-4o-mini"  # Used for query rewriting
+    GENERATION_MODEL: str = "gpt-4o-mini"  # Used for query rewriting & vanilla GPT
     ANSWER_MODEL: str = "gpt-4o"  # Used for answer generation
     EVAL_JUDGE_MODEL: str = "gpt-4o"
+    GEMINI_MODEL: str = "gemini-2.0-flash"  # Used for vanilla Gemini baseline
 
     # Qdrant
     QDRANT_URL: str = ""  # When set (e.g. http://qdrant:6333), use remote; when empty, use local path
     QDRANT_PATH: str = "rag_app/qdrant_data"
     COLLECTION_NAME: str = "gov_circulars"
+
+    # PostgreSQL
+    DATABASE_URL: str = ""  # When set, load records from PostgreSQL
 
     # MongoDB
     MONGODB_URI: str = ""  # When set, load records from MongoDB; when empty, use JSON files

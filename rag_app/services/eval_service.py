@@ -1,5 +1,6 @@
 import json
 
+import google.generativeai as genai
 from openai import OpenAI
 
 from rag_app.config import settings
@@ -115,9 +116,19 @@ class EvalService:
     def __init__(self, pipeline: RAGPipeline):
         self.pipeline = pipeline
         self.client = OpenAI(api_key=settings.OPENAI_API_KEY)
+        genai.configure(api_key=settings.GEMINI_API_KEY)
+        self.gemini_model = genai.GenerativeModel(
+            settings.GEMINI_MODEL,
+            system_instruction=VANILLA_SYSTEM_PROMPT,
+        )
 
-    def evaluate_question(self, q: EvalQuestion) -> QuestionEvalResult:
-        """Evaluate a single question: RAG vs vanilla LLM."""
+    def evaluate_question(
+        self, q: EvalQuestion, baselines: list[str] | None = None,
+    ) -> QuestionEvalResult:
+        """Evaluate a single question: RAG vs selected vanilla baselines."""
+        if baselines is None:
+            baselines = ["gpt", "gemini"]
+
         # 1. Get RAG answer
         ask_req = AskRequest(
             question=q.question,
@@ -128,13 +139,10 @@ class EvalService:
         rag_sources = rag_response.sources
         rag_chunks = rag_response.retrieved_chunks
 
-        # 2. Get vanilla LLM answer (no context)
-        vanilla_answer = self._vanilla_answer(q.question)
-
-        # 3. Build source text for judge (with chunk text for verification)
+        # 2. Build source text for judge (with chunk text for verification)
         source_text = self._format_sources_for_judge(rag_sources, rag_chunks)
 
-        # 4. Judge RAG answer (with sources)
+        # 3. Judge RAG answer (always)
         rag_scores = self._judge_answer(
             question=q.question,
             answer=rag_answer,
@@ -142,41 +150,68 @@ class EvalService:
             source_text=source_text,
             is_rag=True,
         )
-
-        # 5. Judge vanilla answer (no sources)
-        vanilla_scores = self._judge_answer(
-            question=q.question,
-            answer=vanilla_answer,
-            ground_truth=q.ground_truth,
-            source_text=None,
-            is_rag=False,
-        )
-
         rag_eval = self._build_eval(rag_answer, rag_scores)
-        vanilla_eval = self._build_eval(vanilla_answer, vanilla_scores)
+
+        # 4. Conditionally evaluate GPT baseline
+        vanilla_gpt_eval = None
+        rag_advantage_vs_gpt = None
+        if "gpt" in baselines:
+            gpt_answer = self._vanilla_answer_gpt(q.question)
+            gpt_scores = self._judge_answer(
+                question=q.question,
+                answer=gpt_answer,
+                ground_truth=q.ground_truth,
+                source_text=None,
+                is_rag=False,
+            )
+            vanilla_gpt_eval = self._build_eval(gpt_answer, gpt_scores)
+            rag_advantage_vs_gpt = round(
+                rag_eval.average_score - vanilla_gpt_eval.average_score, 2
+            )
+
+        # 5. Conditionally evaluate Gemini baseline
+        vanilla_gemini_eval = None
+        rag_advantage_vs_gemini = None
+        if "gemini" in baselines:
+            gemini_answer = self._vanilla_answer_gemini(q.question)
+            gemini_scores = self._judge_answer(
+                question=q.question,
+                answer=gemini_answer,
+                ground_truth=q.ground_truth,
+                source_text=None,
+                is_rag=False,
+            )
+            vanilla_gemini_eval = self._build_eval(gemini_answer, gemini_scores)
+            rag_advantage_vs_gemini = round(
+                rag_eval.average_score - vanilla_gemini_eval.average_score, 2
+            )
 
         return QuestionEvalResult(
             question=q.question,
             ground_truth=q.ground_truth,
             rag_eval=rag_eval,
-            vanilla_eval=vanilla_eval,
+            vanilla_gpt_eval=vanilla_gpt_eval,
+            vanilla_gemini_eval=vanilla_gemini_eval,
             rag_sources=rag_sources,
-            rag_advantage=round(rag_eval.average_score - vanilla_eval.average_score, 2),
+            rag_advantage_vs_gpt=rag_advantage_vs_gpt,
+            rag_advantage_vs_gemini=rag_advantage_vs_gemini,
         )
 
-    def evaluate_batch(self, questions: list[EvalQuestion]) -> BatchEvalResponse:
+    def evaluate_batch(
+        self, questions: list[EvalQuestion], baselines: list[str] | None = None,
+    ) -> BatchEvalResponse:
         """Evaluate a batch of questions and compute summary statistics."""
         results = []
         for i, q in enumerate(questions, 1):
             print(f"[{i}/{len(questions)}] Evaluating: {q.question[:80]}...")
-            result = self.evaluate_question(q)
+            result = self.evaluate_question(q, baselines=baselines)
             results.append(result)
 
         summary = self._compute_summary(results)
         return BatchEvalResponse(results=results, summary=summary)
 
-    def _vanilla_answer(self, question: str) -> str:
-        """Get an answer from the LLM without any RAG context."""
+    def _vanilla_answer_gpt(self, question: str) -> str:
+        """Get an answer from GPT without any RAG context."""
         response = self.client.chat.completions.create(
             model=settings.GENERATION_MODEL,
             messages=[
@@ -187,6 +222,17 @@ class EvalService:
             max_tokens=1000,
         )
         return response.choices[0].message.content.strip()
+
+    def _vanilla_answer_gemini(self, question: str) -> str:
+        """Get an answer from Gemini without any RAG context."""
+        response = self.gemini_model.generate_content(
+            question,
+            generation_config=genai.types.GenerationConfig(
+                temperature=0.1,
+                max_output_tokens=1000,
+            ),
+        )
+        return response.text.strip()
 
     def _judge_answer(
         self,
@@ -275,48 +321,70 @@ class EvalService:
     def _compute_summary(results: list[QuestionEvalResult]) -> EvalSummary:
         n = len(results)
         if n == 0:
-            return EvalSummary(
-                total_questions=0,
-                rag_average=0,
-                vanilla_average=0,
-                rag_advantage=0,
-                per_criterion_rag={},
-                per_criterion_vanilla={},
-                wins=0,
-                losses=0,
-                ties=0,
-            )
+            return EvalSummary(total_questions=0, rag_average=0, per_criterion_rag={})
 
         rag_avgs = [r.rag_eval.average_score for r in results]
-        van_avgs = [r.vanilla_eval.average_score for r in results]
+        overall_rag = round(sum(rag_avgs) / n, 2)
 
-        # Per-criterion averages
+        # Per-criterion RAG averages (always present)
         per_crit_rag: dict[str, list[float]] = {}
-        per_crit_van: dict[str, list[float]] = {}
         for r in results:
             for s in r.rag_eval.scores:
                 per_crit_rag.setdefault(s.criterion, []).append(s.score)
-            for s in r.vanilla_eval.scores:
-                per_crit_van.setdefault(s.criterion, []).append(s.score)
-
         avg_crit_rag = {k: round(sum(v) / len(v), 2) for k, v in per_crit_rag.items()}
-        avg_crit_van = {k: round(sum(v) / len(v), 2) for k, v in per_crit_van.items()}
 
-        wins = sum(1 for r in results if r.rag_advantage > 0)
-        losses = sum(1 for r in results if r.rag_advantage < 0)
-        ties = n - wins - losses
+        # GPT baseline stats (only if any result has it)
+        gpt_results = [r for r in results if r.vanilla_gpt_eval is not None]
+        overall_gpt = None
+        avg_crit_gpt = None
+        wins_gpt = losses_gpt = ties_gpt = None
+        adv_gpt = None
+        if gpt_results:
+            gpt_avgs = [r.vanilla_gpt_eval.average_score for r in gpt_results]
+            overall_gpt = round(sum(gpt_avgs) / len(gpt_results), 2)
+            adv_gpt = round(overall_rag - overall_gpt, 2)
+            per_crit_gpt: dict[str, list[float]] = {}
+            for r in gpt_results:
+                for s in r.vanilla_gpt_eval.scores:
+                    per_crit_gpt.setdefault(s.criterion, []).append(s.score)
+            avg_crit_gpt = {k: round(sum(v) / len(v), 2) for k, v in per_crit_gpt.items()}
+            wins_gpt = sum(1 for r in gpt_results if (r.rag_advantage_vs_gpt or 0) > 0)
+            losses_gpt = sum(1 for r in gpt_results if (r.rag_advantage_vs_gpt or 0) < 0)
+            ties_gpt = len(gpt_results) - wins_gpt - losses_gpt
 
-        overall_rag = round(sum(rag_avgs) / n, 2)
-        overall_van = round(sum(van_avgs) / n, 2)
+        # Gemini baseline stats (only if any result has it)
+        gemini_results = [r for r in results if r.vanilla_gemini_eval is not None]
+        overall_gemini = None
+        avg_crit_gemini = None
+        wins_gemini = losses_gemini = ties_gemini = None
+        adv_gemini = None
+        if gemini_results:
+            gemini_avgs = [r.vanilla_gemini_eval.average_score for r in gemini_results]
+            overall_gemini = round(sum(gemini_avgs) / len(gemini_results), 2)
+            adv_gemini = round(overall_rag - overall_gemini, 2)
+            per_crit_gem: dict[str, list[float]] = {}
+            for r in gemini_results:
+                for s in r.vanilla_gemini_eval.scores:
+                    per_crit_gem.setdefault(s.criterion, []).append(s.score)
+            avg_crit_gemini = {k: round(sum(v) / len(v), 2) for k, v in per_crit_gem.items()}
+            wins_gemini = sum(1 for r in gemini_results if (r.rag_advantage_vs_gemini or 0) > 0)
+            losses_gemini = sum(1 for r in gemini_results if (r.rag_advantage_vs_gemini or 0) < 0)
+            ties_gemini = len(gemini_results) - wins_gemini - losses_gemini
 
         return EvalSummary(
             total_questions=n,
             rag_average=overall_rag,
-            vanilla_average=overall_van,
-            rag_advantage=round(overall_rag - overall_van, 2),
+            vanilla_gpt_average=overall_gpt,
+            vanilla_gemini_average=overall_gemini,
+            rag_advantage_vs_gpt=adv_gpt,
+            rag_advantage_vs_gemini=adv_gemini,
             per_criterion_rag=avg_crit_rag,
-            per_criterion_vanilla=avg_crit_van,
-            wins=wins,
-            losses=losses,
-            ties=ties,
+            per_criterion_vanilla_gpt=avg_crit_gpt,
+            per_criterion_vanilla_gemini=avg_crit_gemini,
+            wins_vs_gpt=wins_gpt,
+            losses_vs_gpt=losses_gpt,
+            ties_vs_gpt=ties_gpt,
+            wins_vs_gemini=wins_gemini,
+            losses_vs_gemini=losses_gemini,
+            ties_vs_gemini=ties_gemini,
         )

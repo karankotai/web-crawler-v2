@@ -1,3 +1,5 @@
+import threading
+import uuid
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException
@@ -7,6 +9,8 @@ from rag_app.config import settings
 from rag_app.models.schemas import (
     AskRequest,
     AskResponse,
+    CrawlRequest,
+    CrawlResponse,
     EvalQuestion,
     EvalRequest,
     EvalResponse,
@@ -17,6 +21,7 @@ from rag_app.services.eval_service import EvalService
 from rag_app.services.rag_pipeline import RAGPipeline
 
 pipeline: RAGPipeline | None = None
+crawl_jobs: dict[str, dict] = {}
 
 
 @asynccontextmanager
@@ -78,7 +83,7 @@ async def evaluate_question(request: EvalRequest):
         ground_truth=request.ground_truth,
         source_filter=request.source_filter,
     )
-    result = eval_service.evaluate_question(q)
+    result = eval_service.evaluate_question(q, baselines=request.baselines)
     return EvalResponse(result=result)
 
 
@@ -90,3 +95,100 @@ async def health():
         "status": "healthy",
         "collection": info if info else "not indexed",
     }
+
+
+# ── Crawl endpoints ──────────────────────────────────────────
+
+CRAWLER_MAP: dict[str, type] | None = None
+
+
+def _get_crawler_map():
+    global CRAWLER_MAP
+    if CRAWLER_MAP is None:
+        import sys, os
+
+        # Add project root so `import config` / `import crawlers.*` works
+        project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        if project_root not in sys.path:
+            sys.path.insert(0, project_root)
+
+        from crawlers.rbi import RBICrawler
+        from crawlers.sebi import SEBICrawler
+        from crawlers.mca import MCACrawler
+        from crawlers.irdai import IRDAICrawler
+        from crawlers.egazette import EGazetteCrawler
+
+        CRAWLER_MAP = {
+            "rbi": RBICrawler,
+            "sebi": SEBICrawler,
+            "mca": MCACrawler,
+            "irdai": IRDAICrawler,
+            "egazette": EGazetteCrawler,
+        }
+    return CRAWLER_MAP
+
+
+def _run_crawl(task_id: str, request: CrawlRequest):
+    """Run crawl in a background thread."""
+    import config as crawler_config
+
+    crawler_config.MAX_PAGES = request.max_pages
+    crawler_config.DEEP_CRAWL = request.deep_crawl
+    crawler_config.OUTPUT_FORMAT = request.output_format
+
+    crawlers = _get_crawler_map()
+    sources = list(crawlers.keys()) if request.source == "all" else [request.source]
+    total = 0
+
+    try:
+        for source in sources:
+            crawler = crawlers[source]()
+            results = crawler.run()
+            total += len(results)
+
+        crawl_jobs[task_id].update(
+            status="completed", record_count=total
+        )
+    except Exception as e:
+        crawl_jobs[task_id].update(
+            status="failed", error=str(e)
+        )
+
+
+@app.post("/crawl", response_model=CrawlResponse)
+async def start_crawl(request: CrawlRequest):
+    """Start a web crawl in the background."""
+    crawlers = _get_crawler_map()
+    valid_sources = list(crawlers.keys()) + ["all"]
+    if request.source not in valid_sources:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid source '{request.source}'. Choose from: {valid_sources}",
+        )
+
+    task_id = uuid.uuid4().hex[:12]
+    crawl_jobs[task_id] = {
+        "status": "running",
+        "source": request.source,
+        "record_count": 0,
+        "error": None,
+    }
+
+    thread = threading.Thread(target=_run_crawl, args=(task_id, request), daemon=True)
+    thread.start()
+
+    return CrawlResponse(
+        status="started",
+        task_id=task_id,
+        source=request.source,
+        message=f"Crawl started for {request.source} (max {request.max_pages} pages)",
+    )
+
+
+@app.get("/crawl/{task_id}")
+async def crawl_status(task_id: str):
+    """Check the status of a crawl job."""
+    job = crawl_jobs.get(task_id)
+    if not job:
+        raise HTTPException(status_code=404, detail="Task not found")
+    return {"task_id": task_id, **job}

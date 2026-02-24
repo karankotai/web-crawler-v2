@@ -11,6 +11,113 @@ from bs4 import BeautifulSoup
 
 import config
 
+# Known columns in the scraped_documents table.
+# Any record keys not in this set go into the `extra` JSONB column.
+_KNOWN_COLUMNS = {
+    "source", "crawler", "title", "date", "department", "link",
+    "details", "content", "circular_number", "pdf_links",
+}
+
+
+def _get_db_conn():
+    """Return a psycopg2 connection using DATABASE_URL, or None."""
+    if not config.DATABASE_URL:
+        return None
+    import psycopg2
+    return psycopg2.connect(config.DATABASE_URL)
+
+
+def _ensure_table(conn):
+    """Create the scraped_documents table and indexes if they don't exist."""
+    with conn.cursor() as cur:
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS scraped_documents (
+                id              SERIAL PRIMARY KEY,
+                source          TEXT NOT NULL,
+                crawler         TEXT NOT NULL,
+                title           TEXT NOT NULL DEFAULT '',
+                date            TEXT DEFAULT '',
+                department      TEXT DEFAULT '',
+                link            TEXT UNIQUE,
+                details         TEXT DEFAULT '',
+                content         TEXT DEFAULT '',
+                circular_number TEXT DEFAULT '',
+                pdf_links       JSONB DEFAULT '[]',
+                extra           JSONB DEFAULT '{}',
+                created_at      TIMESTAMPTZ DEFAULT NOW(),
+                updated_at      TIMESTAMPTZ DEFAULT NOW()
+            );
+            CREATE INDEX IF NOT EXISTS idx_scraped_docs_crawler ON scraped_documents(crawler);
+            CREATE INDEX IF NOT EXISTS idx_scraped_docs_source ON scraped_documents(source);
+        """)
+    conn.commit()
+
+
+def _record_to_row(record, crawler_name):
+    """Split a record dict into known columns + extra JSONB."""
+    extra = {}
+    row = {"crawler": crawler_name}
+    for k, v in record.items():
+        if k in _KNOWN_COLUMNS:
+            if k == "pdf_links":
+                row[k] = json.dumps(v if isinstance(v, list) else [])
+            else:
+                row[k] = v if v is not None else ""
+        else:
+            extra[k] = v
+    # Ensure required fields have defaults
+    row.setdefault("source", "")
+    row.setdefault("title", "")
+    row.setdefault("date", "")
+    row.setdefault("department", "")
+    row.setdefault("link", None)
+    row.setdefault("details", "")
+    row.setdefault("content", "")
+    row.setdefault("circular_number", "")
+    row.setdefault("pdf_links", "[]")
+    row["extra"] = json.dumps(extra)
+    return row
+
+
+def _upsert_records(conn, records, crawler_name):
+    """Upsert a list of record dicts into scraped_documents."""
+    if not records:
+        return
+    with conn.cursor() as cur:
+        for record in records:
+            row = _record_to_row(record, crawler_name)
+            if row["link"]:
+                cur.execute("""
+                    INSERT INTO scraped_documents
+                        (source, crawler, title, date, department, link,
+                         details, content, circular_number, pdf_links, extra, updated_at)
+                    VALUES (%(source)s, %(crawler)s, %(title)s, %(date)s, %(department)s, %(link)s,
+                            %(details)s, %(content)s, %(circular_number)s,
+                            %(pdf_links)s::jsonb, %(extra)s::jsonb, NOW())
+                    ON CONFLICT (link) DO UPDATE SET
+                        source = EXCLUDED.source,
+                        crawler = EXCLUDED.crawler,
+                        title = EXCLUDED.title,
+                        date = EXCLUDED.date,
+                        department = EXCLUDED.department,
+                        details = EXCLUDED.details,
+                        content = EXCLUDED.content,
+                        circular_number = EXCLUDED.circular_number,
+                        pdf_links = EXCLUDED.pdf_links,
+                        extra = EXCLUDED.extra,
+                        updated_at = NOW()
+                """, row)
+            else:
+                cur.execute("""
+                    INSERT INTO scraped_documents
+                        (source, crawler, title, date, department, link,
+                         details, content, circular_number, pdf_links, extra)
+                    VALUES (%(source)s, %(crawler)s, %(title)s, %(date)s, %(department)s, %(link)s,
+                            %(details)s, %(content)s, %(circular_number)s,
+                            %(pdf_links)s::jsonb, %(extra)s::jsonb)
+                """, row)
+    conn.commit()
+
 
 class BaseCrawler(ABC):
     """Base class for all government circular crawlers."""
@@ -25,6 +132,26 @@ class BaseCrawler(ABC):
 
     def load_existing(self):
         """Load previously saved results and build a set of known links."""
+        # Try PostgreSQL first
+        conn = _get_db_conn()
+        if conn:
+            try:
+                _ensure_table(conn)
+                with conn.cursor() as cur:
+                    cur.execute(
+                        "SELECT link FROM scraped_documents WHERE crawler = %s AND link IS NOT NULL",
+                        (self.name,),
+                    )
+                    links = [row[0] for row in cur.fetchall()]
+                self.existing_links = set(links)
+                print(f"  Loaded {len(links)} existing links from PostgreSQL for {self.name}")
+                return []  # No need to return full records; dedup uses existing_links
+            except Exception as e:
+                print(f"  [WARN] PostgreSQL load_existing failed: {e}")
+            finally:
+                conn.close()
+
+        # Fallback to JSON
         json_path = os.path.join(config.OUTPUT_DIR, f"{self.name}.json")
         if not os.path.exists(json_path):
             return []
@@ -81,10 +208,25 @@ class BaseCrawler(ABC):
         return BeautifulSoup(html, "lxml")
 
     def save_progress(self):
-        """Incremental save: merge current results with existing and write JSON.
+        """Incremental save: upsert current results to PostgreSQL (or JSON fallback).
         Called by crawlers after each page to guard against mid-crawl crashes."""
         if not self.results:
             return
+
+        # Try PostgreSQL
+        conn = _get_db_conn()
+        if conn:
+            try:
+                _ensure_table(conn)
+                _upsert_records(conn, self.results, self.name)
+                print(f"  [checkpoint] Upserted {len(self.results)} records to PostgreSQL")
+                return
+            except Exception as e:
+                print(f"  [WARN] PostgreSQL save_progress failed: {e}")
+            finally:
+                conn.close()
+
+        # Fallback to JSON
         os.makedirs(config.OUTPUT_DIR, exist_ok=True)
         path = os.path.join(config.OUTPUT_DIR, f"{self.name}.json")
 
@@ -129,11 +271,25 @@ class BaseCrawler(ABC):
         }
 
     def save(self):
-        """Save results to JSON and/or CSV based on config."""
+        """Save results to PostgreSQL (primary), with JSON/CSV as fallback."""
         if not self.results:
             print(f"  [{self.name}] No results to save.")
             return
 
+        # Try PostgreSQL
+        conn = _get_db_conn()
+        if conn:
+            try:
+                _ensure_table(conn)
+                _upsert_records(conn, self.results, self.name)
+                print(f"  Saved {len(self.results)} records to PostgreSQL ({self.name})")
+            except Exception as e:
+                print(f"  [ERROR] PostgreSQL save failed: {e}")
+            finally:
+                conn.close()
+            return
+
+        # Fallback: JSON/CSV files
         os.makedirs(config.OUTPUT_DIR, exist_ok=True)
         base_path = os.path.join(config.OUTPUT_DIR, self.name)
 
@@ -194,8 +350,72 @@ class BaseCrawler(ABC):
 
         if config.DEEP_CRAWL:
             self.crawl_details()
+            self._deep_crawl_missing_content()
 
         # Merge: new results first (most recent), then existing
         self.results = self.results + self._existing
         self.save()
         return self.results
+
+    def _deep_crawl_missing_content(self):
+        """Deep-crawl records already in PostgreSQL that lack content."""
+        conn = _get_db_conn()
+        if not conn:
+            return
+        try:
+            with conn.cursor() as cur:
+                cur.execute(
+                    "SELECT link FROM scraped_documents WHERE crawler = %s AND (content IS NULL OR content = '') AND link IS NOT NULL",
+                    (self.name,),
+                )
+                missing = [row[0] for row in cur.fetchall()]
+        except Exception as e:
+            print(f"  [WARN] Failed to query missing content: {e}")
+            return
+        finally:
+            conn.close()
+
+        if not missing:
+            return
+
+        print(f"  Deep crawling {len(missing)} existing records missing content...")
+        updated = []
+        for i, link in enumerate(missing):
+            print(f"  [deep {i+1}/{len(missing)}] {link[:80]}...")
+            resp = self.fetch(link)
+            if not resp:
+                continue
+            soup = self.parse_html(resp.text)
+            detail = self.parse_detail_page(soup, link)
+            if detail.get("content"):
+                updated.append((link, detail))
+
+        if not updated:
+            return
+
+        conn = _get_db_conn()
+        if not conn:
+            return
+        try:
+            with conn.cursor() as cur:
+                for link, detail in updated:
+                    cur.execute(
+                        """UPDATE scraped_documents
+                           SET content = %s,
+                               pdf_links = %s::jsonb,
+                               circular_number = COALESCE(NULLIF(circular_number, ''), %s),
+                               updated_at = NOW()
+                           WHERE link = %s""",
+                        (
+                            detail.get("content", ""),
+                            json.dumps(detail.get("pdf_links", [])),
+                            detail.get("circular_number", ""),
+                            link,
+                        ),
+                    )
+            conn.commit()
+            print(f"  Updated {len(updated)} records with deep-crawled content")
+        except Exception as e:
+            print(f"  [ERROR] Failed to update deep-crawled content: {e}")
+        finally:
+            conn.close()

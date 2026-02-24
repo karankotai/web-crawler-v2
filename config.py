@@ -1,5 +1,13 @@
 """Configuration for the circular crawler."""
 
+import os
+
+from dotenv import load_dotenv
+
+load_dotenv()
+
+DATABASE_URL = os.environ.get("DATABASE_URL", "")
+
 OUTPUT_DIR = "output"
 OUTPUT_FORMAT = "both"  # "json", "csv", or "both"
 
