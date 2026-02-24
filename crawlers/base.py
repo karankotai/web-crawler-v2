@@ -27,9 +27,25 @@ def _get_db_conn():
     return psycopg2.connect(config.DATABASE_URL)
 
 
+_table_ensured = False
+
+
 def _ensure_table(conn):
-    """Create the scraped_documents table and indexes if they don't exist."""
+    """Create the scraped_documents table and indexes if they don't exist.
+
+    Checks whether the table already exists before running DDL to avoid
+    acquiring locks that conflict with concurrent crawlers.
+    """
+    global _table_ensured
+    if _table_ensured:
+        return
     with conn.cursor() as cur:
+        cur.execute(
+            "SELECT EXISTS(SELECT 1 FROM information_schema.tables WHERE table_name = 'scraped_documents')"
+        )
+        if cur.fetchone()[0]:
+            _table_ensured = True
+            return
         cur.execute("""
             CREATE TABLE IF NOT EXISTS scraped_documents (
                 id              SERIAL PRIMARY KEY,
@@ -51,6 +67,7 @@ def _ensure_table(conn):
             CREATE INDEX IF NOT EXISTS idx_scraped_docs_source ON scraped_documents(source);
         """)
     conn.commit()
+    _table_ensured = True
 
 
 def _record_to_row(record, crawler_name):
@@ -164,7 +181,7 @@ class BaseCrawler(ABC):
         except (json.JSONDecodeError, KeyError):
             return []
 
-    def fetch(self, url, method="GET", data=None, timeout=None, retries=2):
+    def fetch(self, url, method="GET", data=None, timeout=None, retries=4):
         """Fetch a URL with retry logic and polite delay.
 
         PDFs are streamed in chunks to avoid read timeouts on large files.
@@ -243,21 +260,64 @@ class BaseCrawler(ABC):
         """Crawl the target website. Must be implemented by subclasses."""
 
     def crawl_details(self):
-        """Follow each result's link and extract full content. Override in subclasses."""
+        """Follow each result's link and extract full content.
+
+        Saves content directly to PostgreSQL after each page to guard
+        against long-running deep crawls losing progress.
+        """
         if not self.results:
             return
         print(f"  Deep crawling {len(self.results)} links...")
+        updated = 0
         for i, record in enumerate(self.results):
             link = record.get("link", "")
             if not link:
                 continue
             print(f"  [{i+1}/{len(self.results)}] {link[:80]}...")
-            resp = self.fetch(link)
-            if not resp:
-                continue
-            soup = self.parse_html(resp.text)
-            detail = self.parse_detail_page(soup, link)
-            record.update(detail)
+            try:
+                resp = self.fetch(link)
+                if not resp:
+                    continue
+                soup = self.parse_html(resp.text)
+                detail = self.parse_detail_page(soup, link)
+                record.update(detail)
+                # Save content to PG immediately so progress isn't lost
+                if detail.get("content") and config.DATABASE_URL:
+                    self._update_record_content(link, detail)
+                    updated += 1
+                    if updated % 50 == 0:
+                        print(f"  [deep checkpoint] {updated} records with content saved to PG")
+            except Exception as e:
+                print(f"  [ERROR] Deep crawl failed for {link[:60]}: {e}")
+        if updated:
+            print(f"  Deep crawl complete: {updated} records with content")
+
+    def _update_record_content(self, link, detail):
+        """Update a single record's content directly in PostgreSQL."""
+        conn = _get_db_conn()
+        if not conn:
+            return
+        try:
+            with conn.cursor() as cur:
+                cur.execute(
+                    """UPDATE scraped_documents
+                       SET content = %s,
+                           pdf_links = %s::jsonb,
+                           circular_number = COALESCE(NULLIF(circular_number, ''), %s),
+                           updated_at = NOW()
+                       WHERE link = %s""",
+                    (
+                        detail.get("content", ""),
+                        json.dumps(detail.get("pdf_links", [])),
+                        detail.get("circular_number", ""),
+                        link,
+                    ),
+                )
+            conn.commit()
+        except Exception as e:
+            print(f"  [WARN] Failed to save content for {link[:60]}: {e}")
+        finally:
+            conn.close()
 
     def parse_detail_page(self, soup, url):
         """Extract content from a detail page. Override for site-specific parsing."""

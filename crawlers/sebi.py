@@ -140,7 +140,14 @@ class SEBICrawler(BaseCrawler):
             page_num += 1
 
     def _has_next_page(self, soup, current_page):
-        """Check if there's a next page link in the SEBI pagination."""
+        """Check if there's a next page link in the SEBI pagination.
+
+        SEBI uses JavaScript-based pagination (searchFormNewsList) rather than
+        standard URL links, so we check multiple signals:
+        1. "Next" link text (standard or JS-based)
+        2. pageNo= in href (for URL-based pagination)
+        3. "X to Y of Z records" text to calculate total pages
+        """
         for a in soup.find_all("a", href=True):
             text = a.get_text(strip=True).lower()
             if text in ("next", "next >", ">>"):
@@ -148,14 +155,24 @@ class SEBICrawler(BaseCrawler):
             href = a.get("href", "")
             if f"pageNo={current_page + 1}" in href:
                 return True
-        # Also check for page number links higher than current
+
+        # Parse "1 to 25 of 2748 records" from pagination_inner to check
+        # total records — works even when links are JavaScript-based.
+        import re
+        for div in soup.select(".pagination_inner"):
+            m = re.search(r"(\d+)\s+to\s+(\d+)\s+of\s+(\d+)", div.get_text())
+            if m:
+                end_idx = int(m.group(2))
+                total = int(m.group(3))
+                if end_idx < total:
+                    return True
+
+        # Fallback: check JavaScript pagination links (searchFormNewsList)
         for a in soup.find_all("a", href=True):
             href = a.get("href", "")
-            if "pageNo=" in href:
-                try:
-                    pn = int(href.split("pageNo=")[1].split("&")[0])
-                    if pn > current_page:
-                        return True
-                except (ValueError, IndexError):
-                    pass
+            if "searchFormNewsList" in href:
+                text = a.get_text(strip=True).lower()
+                if text in ("next", "next >", ">>"):
+                    return True
+
         return False
