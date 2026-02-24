@@ -4,6 +4,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 
 from rag_app.config import settings
 from rag_app.models.schemas import (
@@ -66,6 +67,22 @@ async def ask_question(request: AskRequest):
             detail="No documents indexed yet. Call POST /index first.",
         )
     return pipeline.ask(request)
+
+
+@app.post("/ask/stream")
+async def ask_stream(request: AskRequest):
+    """Stream an answer about government circulars via Server-Sent Events."""
+    info = pipeline.vector_store.collection_info()
+    if not info.get("points_count", 0):
+        raise HTTPException(
+            status_code=400,
+            detail="No documents indexed yet. Call POST /index first.",
+        )
+
+    return StreamingResponse(
+        pipeline.ask_stream(request.question, request.top_k, request.source_filter),
+        media_type="text/event-stream",
+    )
 
 
 @app.post("/evaluate", response_model=EvalResponse)

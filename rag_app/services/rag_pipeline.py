@@ -1,3 +1,4 @@
+import json
 import re
 import time
 
@@ -23,6 +24,14 @@ from rag_app.services.loader import (
     load_all_records_from_pg,
 )
 from rag_app.services.vector_store import VectorStore
+
+
+def _sse_event(event_type: str, data) -> str:
+    """Format a server-sent event string."""
+    payload = {"type": event_type}
+    if data is not None:
+        payload["data"] = data
+    return f"data: {json.dumps(payload)}\n\n"
 
 
 class RAGPipeline:
@@ -180,6 +189,84 @@ class RAGPipeline:
             retrieved_chunks=retrieved_chunks,
         )
 
+    def ask_stream(self, question: str, top_k: int = 12, source_filter: str | None = None):
+        """Generator that yields SSE-formatted events for streaming answers."""
+        # Rewrite query for better retrieval
+        rewritten = self._rewrite_query(question)
+        print(f"Rewritten query: {rewritten}")
+
+        # Embed query
+        query_vector = self.embedding_service.embed_single(rewritten)
+
+        # Try circular-number-filtered search first
+        circular_number = self._extract_circular_number_from_query(question)
+        results = []
+        if circular_number:
+            print(f"Detected circular number: {circular_number}")
+            results = self.vector_store.search(
+                query_vector=query_vector,
+                top_k=top_k,
+                source_filter=source_filter,
+                circular_number_filter=circular_number,
+            )
+
+        # Fall through to regular hybrid search if no circular-number results
+        if not results:
+            results = self.vector_store.search(
+                query_vector=query_vector,
+                top_k=top_k,
+                score_threshold=settings.SCORE_THRESHOLD,
+                source_filter=source_filter,
+            )
+
+            keywords = self._extract_keywords(question)
+            if keywords:
+                keyword_results = self.vector_store.keyword_search(
+                    query_vector=query_vector,
+                    keywords=keywords,
+                    top_k=top_k,
+                    score_threshold=0.0,
+                    source_filter=source_filter,
+                )
+                results = self._merge_results(results, keyword_results, top_k)
+
+        if not results:
+            yield _sse_event("sources", {"sources": [], "query_used": rewritten, "chunks_retrieved": 0})
+            yield _sse_event("token", "I couldn't find any relevant information in the indexed government circulars for your question.")
+            yield _sse_event("done", None)
+            return
+
+        # Yield sources before starting answer generation
+        sources = [s.model_dump() for s in self._extract_sources(results)]
+        yield _sse_event("sources", {
+            "sources": sources,
+            "query_used": rewritten,
+            "chunks_retrieved": len(results),
+        })
+
+        # Build context and stream answer
+        context = self._build_context(results)
+        matched_circular = circular_number if circular_number and results else None
+        system_prompt = self._answer_system_prompt(matched_circular)
+
+        response = self.openai_client.chat.completions.create(
+            model=settings.ANSWER_MODEL,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": f"Context:\n{context}\n\nQuestion: {question}"},
+            ],
+            temperature=0,
+            max_tokens=2000,
+            stream=True,
+        )
+
+        for chunk in response:
+            delta = chunk.choices[0].delta.content
+            if delta:
+                yield _sse_event("token", delta)
+
+        yield _sse_event("done", None)
+
     def _rewrite_query(self, question: str) -> str:
         """Use LLM to rewrite question for better retrieval."""
         try:
@@ -227,8 +314,8 @@ class RAGPipeline:
             context_parts.append(f"--- Document {i} ---\n[{header}]\n{result['text']}")
         return "\n\n".join(context_parts)
 
-    def _generate_answer(self, question: str, context: str, matched_circular: str | None = None) -> str:
-        """Generate a grounded answer from context."""
+    def _answer_system_prompt(self, matched_circular: str | None = None) -> str:
+        """Build the system prompt used for answer generation."""
         system_prompt = (
             "You are an expert analyst of Indian government regulatory circulars "
             "(RBI, SEBI, IRDAI, MCA). You provide authoritative, well-structured answers "
@@ -268,6 +355,11 @@ class RAGPipeline:
                 "explain what the circular actually covers and clarify that it does not mention the specific "
                 "aspect asked about.\n"
             )
+        return system_prompt
+
+    def _generate_answer(self, question: str, context: str, matched_circular: str | None = None) -> str:
+        """Generate a grounded answer from context."""
+        system_prompt = self._answer_system_prompt(matched_circular)
 
         response = self.openai_client.chat.completions.create(
             model=settings.ANSWER_MODEL,
