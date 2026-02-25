@@ -2,7 +2,7 @@ import json
 import re
 import time
 
-from openai import OpenAI
+import google.generativeai as genai
 
 from rag_app.config import settings
 from rag_app.models.schemas import (
@@ -38,7 +38,8 @@ class RAGPipeline:
     def __init__(self):
         self.embedding_service = EmbeddingService()
         self.vector_store = VectorStore()
-        self.openai_client = OpenAI(api_key=settings.OPENAI_API_KEY)
+        genai.configure(api_key=settings.GEMINI_API_KEY)
+        self.gemini_model = genai.GenerativeModel(settings.GEMINI_MODEL)
 
     def index(self, force_reindex: bool = False) -> IndexResponse:
         """Load, chunk, embed, and store all circular documents."""
@@ -249,45 +250,45 @@ class RAGPipeline:
         matched_circular = circular_number if circular_number and results else None
         system_prompt = self._answer_system_prompt(matched_circular)
 
-        response = self.openai_client.chat.completions.create(
-            model=settings.ANSWER_MODEL,
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": f"Context:\n{context}\n\nQuestion: {question}"},
-            ],
-            temperature=0,
-            max_tokens=2000,
+        answer_model = genai.GenerativeModel(
+            settings.GEMINI_MODEL,
+            system_instruction=system_prompt,
+        )
+        response = answer_model.generate_content(
+            f"Context:\n{context}\n\nQuestion: {question}",
+            generation_config=genai.types.GenerationConfig(
+                temperature=0,
+                max_output_tokens=2000,
+            ),
             stream=True,
         )
 
         for chunk in response:
-            delta = chunk.choices[0].delta.content
-            if delta:
-                yield _sse_event("token", delta)
+            if chunk.text:
+                yield _sse_event("token", chunk.text)
 
         yield _sse_event("done", None)
 
     def _rewrite_query(self, question: str) -> str:
         """Use LLM to rewrite question for better retrieval."""
         try:
-            response = self.openai_client.chat.completions.create(
-                model=settings.GENERATION_MODEL,
-                messages=[
-                    {
-                        "role": "system",
-                        "content": (
-                            "You are a query rewriter for a search system over Indian government "
-                            "regulatory circulars (RBI, SEBI, IRDAI, MCA). Rewrite the user's "
-                            "question to improve retrieval. Keep it concise. Output ONLY the "
-                            "rewritten query, nothing else."
-                        ),
-                    },
-                    {"role": "user", "content": question},
-                ],
-                max_tokens=100,
-                temperature=0,
+            rewrite_model = genai.GenerativeModel(
+                settings.GEMINI_MODEL,
+                system_instruction=(
+                    "You are a query rewriter for a search system over Indian government "
+                    "regulatory circulars (RBI, SEBI, IRDAI, MCA). Rewrite the user's "
+                    "question to improve retrieval. Keep it concise. Output ONLY the "
+                    "rewritten query, nothing else."
+                ),
             )
-            rewritten = response.choices[0].message.content.strip()
+            response = rewrite_model.generate_content(
+                question,
+                generation_config=genai.types.GenerationConfig(
+                    temperature=0,
+                    max_output_tokens=100,
+                ),
+            )
+            rewritten = response.text.strip()
             return rewritten if rewritten else question
         except Exception as e:
             print(f"Query rewrite failed: {e}")
@@ -360,20 +361,18 @@ class RAGPipeline:
     def _generate_answer(self, question: str, context: str, matched_circular: str | None = None) -> str:
         """Generate a grounded answer from context."""
         system_prompt = self._answer_system_prompt(matched_circular)
-
-        response = self.openai_client.chat.completions.create(
-            model=settings.ANSWER_MODEL,
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {
-                    "role": "user",
-                    "content": f"Context:\n{context}\n\nQuestion: {question}",
-                },
-            ],
-            temperature=0,
-            max_tokens=2000,
+        answer_model = genai.GenerativeModel(
+            settings.GEMINI_MODEL,
+            system_instruction=system_prompt,
         )
-        return response.choices[0].message.content.strip()
+        response = answer_model.generate_content(
+            f"Context:\n{context}\n\nQuestion: {question}",
+            generation_config=genai.types.GenerationConfig(
+                temperature=0,
+                max_output_tokens=2000,
+            ),
+        )
+        return response.text.strip()
 
     @staticmethod
     def _extract_circular_number_from_query(question: str) -> str | None:
