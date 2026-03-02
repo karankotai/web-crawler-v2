@@ -1,6 +1,7 @@
 """Crawler for SEBI (Securities and Exchange Board of India) circulars."""
 
-import io
+import gc
+import tempfile
 from urllib.parse import urljoin
 
 import pdfplumber
@@ -75,13 +76,18 @@ class SEBICrawler(BaseCrawler):
         if not resp:
             return ""
         try:
-            pdf = pdfplumber.open(io.BytesIO(resp.content))
-            pages_text = []
-            for page in pdf.pages:
-                text = page.extract_text()
-                if text:
-                    pages_text.append(text)
-            pdf.close()
+            with tempfile.NamedTemporaryFile(suffix=".pdf") as tmp:
+                tmp.write(resp.content)
+                tmp.flush()
+                del resp
+                gc.collect()
+                pdf = pdfplumber.open(tmp.name)
+                pages_text = []
+                for page in pdf.pages:
+                    text = page.extract_text()
+                    if text:
+                        pages_text.append(text)
+                pdf.close()
             return "\n\n".join(pages_text)
         except Exception as e:
             print(f"    [ERROR] Failed to parse PDF: {e}")
