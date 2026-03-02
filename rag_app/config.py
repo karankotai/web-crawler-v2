@@ -20,6 +20,7 @@ class Settings(BaseSettings):
 
     # Qdrant
     QDRANT_URL: str = ""  # When set (e.g. http://qdrant:6333), use remote; when empty, use local path
+    QDRANT_API_KEY: str = ""  # Required for Qdrant Cloud
     QDRANT_PATH: str = "rag_app/qdrant_data"
     COLLECTION_NAME: str = "gov_circulars"
 
@@ -35,6 +36,7 @@ class Settings(BaseSettings):
 
     # Embedding cache
     EMBEDDING_CACHE_PATH: str = "rag_app/embedding_cache.pkl"
+    REDIS_URL: str = ""  # When set (e.g. redis://localhost:6379/0), use Redis for embedding cache
 
     # Chunking
     CHUNK_TARGET_TOKENS: int = 500

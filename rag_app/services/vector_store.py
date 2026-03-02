@@ -18,7 +18,10 @@ from rag_app.models.schemas import TextChunk
 class VectorStore:
     def __init__(self):
         if settings.QDRANT_URL:
-            self.client = QdrantClient(url=settings.QDRANT_URL)
+            self.client = QdrantClient(
+                url=settings.QDRANT_URL,
+                api_key=settings.QDRANT_API_KEY or None,
+            )
         else:
             self.client = QdrantClient(path=settings.QDRANT_PATH)
         self.collection_name = settings.COLLECTION_NAME
