@@ -169,6 +169,7 @@ class CrawlRequest(BaseModel):
     max_pages: int = Field(default=50, ge=1, le=500)
     deep_crawl: bool = False
     output_format: str = Field(default="both", pattern="^(json|csv|both)$")
+    offset: int = Field(default=0, ge=0, le=10000)
 
 
 class CrawlResponse(BaseModel):

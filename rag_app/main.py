@@ -154,6 +154,7 @@ def _run_crawl(task_id: str, request: CrawlRequest):
     crawler_config.MAX_PAGES = request.max_pages
     crawler_config.DEEP_CRAWL = request.deep_crawl
     crawler_config.OUTPUT_FORMAT = request.output_format
+    crawler_config.RECORD_OFFSET = request.offset
 
     crawlers = _get_crawler_map()
     sources = list(crawlers.keys()) if request.source == "all" else [request.source]

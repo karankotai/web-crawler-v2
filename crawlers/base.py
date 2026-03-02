@@ -408,6 +408,12 @@ class BaseCrawler(ABC):
             print(f"  Skipped {skipped} already-crawled circulars.")
         self.results = new_results
 
+        # Apply record offset (skip first N records)
+        if config.RECORD_OFFSET > 0:
+            skipped_offset = min(config.RECORD_OFFSET, len(self.results))
+            self.results = self.results[config.RECORD_OFFSET:]
+            print(f"  Offset: skipped first {skipped_offset} records, {len(self.results)} remaining.")
+
         if config.DEEP_CRAWL:
             self.crawl_details()
             self._deep_crawl_missing_content()
