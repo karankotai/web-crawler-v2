@@ -93,14 +93,16 @@ class RAGPipeline:
 
         print(f"Created {len(all_chunks)} chunks from {len(records)} records")
 
-        # Embed
-        texts = [c.text for c in all_chunks]
-        embeddings = self.embedding_service.embed_texts(texts)
-        print(f"Generated {len(embeddings)} embeddings")
-
-        # Store
+        # Embed and store in batches to limit memory usage
         self.vector_store.ensure_collection(recreate=force_reindex)
-        total_stored = self.vector_store.upsert_chunks(all_chunks, embeddings)
+        total_stored = 0
+        index_batch = 1000
+        for i in range(0, len(all_chunks), index_batch):
+            batch_chunks = all_chunks[i : i + index_batch]
+            texts = [c.text for c in batch_chunks]
+            embeddings = self.embedding_service.embed_texts(texts)
+            total_stored += self.vector_store.upsert_chunks(batch_chunks, embeddings)
+            print(f"Indexed {total_stored}/{len(all_chunks)} vectors")
 
         duration = round(time.time() - start, 2)
         print(f"Indexing complete in {duration}s")
