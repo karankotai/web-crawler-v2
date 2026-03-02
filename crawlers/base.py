@@ -119,9 +119,12 @@ def _upsert_records(conn, records, crawler_name):
                         date = EXCLUDED.date,
                         department = EXCLUDED.department,
                         details = EXCLUDED.details,
-                        content = EXCLUDED.content,
-                        circular_number = EXCLUDED.circular_number,
-                        pdf_links = EXCLUDED.pdf_links,
+                        content = CASE WHEN EXCLUDED.content != '' THEN EXCLUDED.content
+                                       ELSE scraped_documents.content END,
+                        circular_number = CASE WHEN EXCLUDED.circular_number != '' THEN EXCLUDED.circular_number
+                                               ELSE scraped_documents.circular_number END,
+                        pdf_links = CASE WHEN EXCLUDED.pdf_links != '[]'::jsonb THEN EXCLUDED.pdf_links
+                                         ELSE scraped_documents.pdf_links END,
                         extra = EXCLUDED.extra,
                         updated_at = NOW()
                 """, row)
