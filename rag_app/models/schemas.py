@@ -1,5 +1,9 @@
-from pydantic import BaseModel, Field
+import re
+
+from pydantic import BaseModel, Field, field_validator
 from typing import Optional
+
+VALID_SOURCES = {"rbi", "sebi", "mca", "irdai", "egazette"}
 
 
 class ChunkMetadata(BaseModel):
@@ -35,9 +39,16 @@ class IndexResponse(BaseModel):
 
 
 class AskRequest(BaseModel):
-    question: str
+    question: str = Field(max_length=2000)
     top_k: int = Field(default=12, ge=1, le=20)
-    source_filter: Optional[str] = None
+    source_filter: Optional[str] = Field(default=None, max_length=50)
+
+    @field_validator("source_filter")
+    @classmethod
+    def validate_source_filter(cls, v: str | None) -> str | None:
+        if v is not None and v.lower() not in VALID_SOURCES:
+            raise ValueError(f"source_filter must be one of: {', '.join(sorted(VALID_SOURCES))}")
+        return v
 
 
 class SourceReference(BaseModel):
@@ -70,9 +81,16 @@ class AskResponse(BaseModel):
 
 
 class EvalQuestion(BaseModel):
-    question: str
-    ground_truth: Optional[str] = None
-    source_filter: Optional[str] = None
+    question: str = Field(max_length=2000)
+    ground_truth: Optional[str] = Field(default=None, max_length=5000)
+    source_filter: Optional[str] = Field(default=None, max_length=50)
+
+    @field_validator("source_filter")
+    @classmethod
+    def validate_source_filter(cls, v: str | None) -> str | None:
+        if v is not None and v.lower() not in VALID_SOURCES:
+            raise ValueError(f"source_filter must be one of: {', '.join(sorted(VALID_SOURCES))}")
+        return v
 
 
 class CriterionScore(BaseModel):
@@ -100,10 +118,17 @@ class QuestionEvalResult(BaseModel):
 
 
 class EvalRequest(BaseModel):
-    question: str
-    ground_truth: Optional[str] = None
-    source_filter: Optional[str] = None
+    question: str = Field(max_length=2000)
+    ground_truth: Optional[str] = Field(default=None, max_length=5000)
+    source_filter: Optional[str] = Field(default=None, max_length=50)
     baselines: list[str] = Field(default=["gpt", "gemini"])
+
+    @field_validator("source_filter")
+    @classmethod
+    def validate_source_filter(cls, v: str | None) -> str | None:
+        if v is not None and v.lower() not in VALID_SOURCES:
+            raise ValueError(f"source_filter must be one of: {', '.join(sorted(VALID_SOURCES))}")
+        return v
 
 
 class EvalResponse(BaseModel):
