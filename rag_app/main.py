@@ -1,3 +1,5 @@
+import json
+import queue
 import threading
 import uuid
 from contextlib import asynccontextmanager
@@ -157,19 +159,24 @@ def _run_crawl(task_id: str, request: CrawlRequest):
     sources = list(crawlers.keys()) if request.source == "all" else [request.source]
     total = 0
 
+    job = crawl_jobs[task_id]
     try:
-        for source in sources:
-            crawler = crawlers[source]()
+        for source_name in sources:
+            crawler = crawlers[source_name]()
             results = crawler.run()
-            total += len(results)
+            count = len(results) if results else 0
+            total += count
+            job["record_count"] = total
+            job["queue"].put({
+                "type": "source_complete",
+                "data": {"source": source_name, "record_count": count, "total_records": total},
+            })
 
-        crawl_jobs[task_id].update(
-            status="completed", record_count=total
-        )
+        job.update(status="completed", record_count=total)
+        job["queue"].put({"type": "complete", "data": {"record_count": total}})
     except Exception as e:
-        crawl_jobs[task_id].update(
-            status="failed", error=str(e)
-        )
+        job.update(status="failed", error=str(e))
+        job["queue"].put({"type": "error", "data": {"message": str(e)}})
 
 
 @app.post("/crawl", response_model=CrawlResponse)
@@ -189,6 +196,7 @@ async def start_crawl(request: CrawlRequest):
         "source": request.source,
         "record_count": 0,
         "error": None,
+        "queue": queue.Queue(),
     }
 
     thread = threading.Thread(target=_run_crawl, args=(task_id, request), daemon=True)
@@ -202,10 +210,31 @@ async def start_crawl(request: CrawlRequest):
     )
 
 
+@app.get("/crawl/stream/{task_id}")
+async def crawl_stream(task_id: str):
+    """Stream crawl progress via Server-Sent Events."""
+    job = crawl_jobs.get(task_id)
+    if not job:
+        raise HTTPException(status_code=404, detail="Task not found")
+
+    def generate():
+        q = job["queue"]
+        while True:
+            try:
+                event = q.get(timeout=30)
+                yield f"data: {json.dumps(event)}\n\n"
+                if event["type"] in ("complete", "error"):
+                    return
+            except queue.Empty:
+                yield ": keepalive\n\n"
+
+    return StreamingResponse(generate(), media_type="text/event-stream")
+
+
 @app.get("/crawl/{task_id}")
 async def crawl_status(task_id: str):
     """Check the status of a crawl job."""
     job = crawl_jobs.get(task_id)
     if not job:
         raise HTTPException(status_code=404, detail="Task not found")
-    return {"task_id": task_id, **job}
+    return {"task_id": task_id, **{k: v for k, v in job.items() if k != "queue"}}
