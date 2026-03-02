@@ -1,6 +1,7 @@
 """Base crawler class that all site-specific crawlers inherit from."""
 
 import csv
+import gc
 import json
 import os
 import time
@@ -465,6 +466,7 @@ class BaseCrawler(ABC):
                 updated += len(batch)
                 print(f"  [deep checkpoint] {updated} records with content saved to PG")
                 batch = []
+                gc.collect()
 
         if batch:
             self._flush_deep_crawl_batch(batch)
