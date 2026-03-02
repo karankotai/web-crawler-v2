@@ -1,6 +1,7 @@
 import json
 
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 from openai import OpenAI
 
 from rag_app.config import settings
@@ -120,11 +121,7 @@ class EvalService:
     def __init__(self, pipeline: RAGPipeline):
         self.pipeline = pipeline
         self.client = OpenAI(api_key=settings.OPENAI_API_KEY)
-        genai.configure(api_key=settings.GEMINI_API_KEY)
-        self.gemini_model = genai.GenerativeModel(
-            settings.GEMINI_MODEL,
-            system_instruction=VANILLA_SYSTEM_PROMPT,
-        )
+        self.gemini_client = genai.Client(api_key=settings.GEMINI_API_KEY)
 
     def evaluate_question(
         self, q: EvalQuestion, baselines: list[str] | None = None,
@@ -229,9 +226,11 @@ class EvalService:
 
     def _vanilla_answer_gemini(self, question: str) -> str:
         """Get an answer from Gemini without any RAG context."""
-        response = self.gemini_model.generate_content(
-            question,
-            generation_config=genai.types.GenerationConfig(
+        response = self.gemini_client.models.generate_content(
+            model=settings.GEMINI_MODEL,
+            contents=question,
+            config=types.GenerateContentConfig(
+                system_instruction=VANILLA_SYSTEM_PROMPT,
                 temperature=0.1,
                 max_output_tokens=1000,
             ),
