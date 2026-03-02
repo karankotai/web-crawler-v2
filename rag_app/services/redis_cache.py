@@ -38,4 +38,7 @@ class RedisCache:
         pipeline = self.client.pipeline()
         for text_hash, embedding in items.items():
             pipeline.set(self._key(text_hash), json.dumps(embedding))
-        pipeline.execute()
+        try:
+            pipeline.execute()
+        except redis.exceptions.OutOfMemoryError:
+            print(f"[WARN] Redis OOM — skipped caching {len(items)} embeddings")
