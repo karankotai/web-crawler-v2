@@ -461,7 +461,7 @@ class BaseCrawler(ABC):
             except Exception as e:
                 print(f"  [ERROR] Deep crawl failed for {link[:60]}: {e}")
 
-            if len(batch) >= 5:
+            if len(batch) >= 3:
                 self._flush_deep_crawl_batch(batch)
                 updated += len(batch)
                 print(f"  [deep checkpoint] {updated} records with content saved to PG")
