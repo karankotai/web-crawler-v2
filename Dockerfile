@@ -8,5 +8,6 @@ COPY rag_app/ ./rag_app/
 COPY crawlers/ ./crawlers/
 COPY config.py main.py ./
 RUN mkdir -p ./output
+ENV PYTHONUNBUFFERED=1
 EXPOSE 8000
 CMD ["uvicorn", "rag_app.main:app", "--host", "0.0.0.0", "--port", "8000"]

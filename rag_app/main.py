@@ -1,6 +1,7 @@
 import json
 import queue
 import threading
+import traceback
 import uuid
 from contextlib import asynccontextmanager
 
@@ -176,6 +177,7 @@ def _run_crawl(task_id: str, request: CrawlRequest):
         job.update(status="completed", record_count=total)
         job["queue"].put({"type": "complete", "data": {"record_count": total}})
     except Exception as e:
+        traceback.print_exc()
         job.update(status="failed", error=str(e))
         job["queue"].put({"type": "error", "data": {"message": str(e)}})
 
