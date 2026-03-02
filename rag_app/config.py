@@ -13,8 +13,7 @@ class Settings(BaseSettings):
     # Models
     EMBEDDING_MODEL: str = "text-embedding-3-small"
     EMBEDDING_DIMENSION: int = 1536
-    GENERATION_MODEL: str = "gpt-4o-mini"  # Used for query rewriting & vanilla GPT
-    ANSWER_MODEL: str = "gpt-4o"  # Used for answer generation
+    GENERATION_MODEL: str = "gpt-4o-mini"  # Used for vanilla GPT baseline
     EVAL_JUDGE_MODEL: str = "gpt-4o"
     GEMINI_MODEL: str = "gemini-2.0-flash"  # Used for vanilla Gemini baseline
 
