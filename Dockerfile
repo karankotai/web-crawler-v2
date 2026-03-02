@@ -7,6 +7,6 @@ RUN pip install --no-cache-dir -r rag_app/requirements.txt -r requirements.txt p
 COPY rag_app/ ./rag_app/
 COPY crawlers/ ./crawlers/
 COPY config.py main.py ./
-COPY output/ ./output/
+RUN mkdir -p ./output
 EXPOSE 8000
 CMD ["uvicorn", "rag_app.main:app", "--host", "0.0.0.0", "--port", "8000"]
