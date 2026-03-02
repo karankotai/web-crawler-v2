@@ -445,26 +445,41 @@ class BaseCrawler(ABC):
             return
 
         print(f"  Deep crawling {len(missing)} existing records missing content...")
-        updated = []
+        updated = 0
+        batch = []
         for i, link in enumerate(missing):
             print(f"  [deep {i+1}/{len(missing)}] {link[:80]}...")
-            resp = self.fetch(link)
-            if not resp:
-                continue
-            soup = self.parse_html(resp.text)
-            detail = self.parse_detail_page(soup, link)
-            if detail.get("content"):
-                updated.append((link, detail))
+            try:
+                resp = self.fetch(link)
+                if not resp:
+                    continue
+                soup = self.parse_html(resp.text)
+                detail = self.parse_detail_page(soup, link)
+                if detail.get("content"):
+                    batch.append((link, detail))
+            except Exception as e:
+                print(f"  [ERROR] Deep crawl failed for {link[:60]}: {e}")
 
-        if not updated:
-            return
+            if len(batch) >= 5:
+                self._flush_deep_crawl_batch(batch)
+                updated += len(batch)
+                print(f"  [deep checkpoint] {updated} records with content saved to PG")
+                batch = []
 
+        if batch:
+            self._flush_deep_crawl_batch(batch)
+            updated += len(batch)
+        if updated:
+            print(f"  Deep crawl complete: {updated} records with content")
+
+    def _flush_deep_crawl_batch(self, batch):
+        """Write a batch of deep-crawled records to PostgreSQL."""
         conn = _get_db_conn()
         if not conn:
             return
         try:
             with conn.cursor() as cur:
-                for link, detail in updated:
+                for link, detail in batch:
                     cur.execute(
                         """UPDATE scraped_documents
                            SET content = %s,
@@ -480,8 +495,7 @@ class BaseCrawler(ABC):
                         ),
                     )
             conn.commit()
-            print(f"  Updated {len(updated)} records with deep-crawled content")
         except Exception as e:
-            print(f"  [ERROR] Failed to update deep-crawled content: {e}")
+            print(f"  [ERROR] Failed to flush deep-crawl batch: {e}")
         finally:
             conn.close()
