@@ -4,7 +4,7 @@ import gc
 import tempfile
 from urllib.parse import urljoin
 
-import pdfplumber
+from pdfminer.high_level import extract_text
 
 import config
 from crawlers.base import BaseCrawler
@@ -81,14 +81,8 @@ class SEBICrawler(BaseCrawler):
                 tmp.flush()
                 del resp
                 gc.collect()
-                pdf = pdfplumber.open(tmp.name)
-                pages_text = []
-                for page in pdf.pages:
-                    text = page.extract_text()
-                    if text:
-                        pages_text.append(text)
-                pdf.close()
-            return "\n\n".join(pages_text)
+                text = extract_text(tmp.name)
+            return text.strip()
         except Exception as e:
             print(f"    [ERROR] Failed to parse PDF: {e}")
             return ""
