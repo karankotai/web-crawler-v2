@@ -21,6 +21,7 @@ class VectorStore:
             self.client = QdrantClient(
                 url=settings.QDRANT_URL,
                 api_key=settings.QDRANT_API_KEY or None,
+                timeout=60,
             )
         else:
             self.client = QdrantClient(path=settings.QDRANT_PATH)
@@ -47,7 +48,7 @@ class VectorStore:
 
     def upsert_chunks(self, chunks: list[TextChunk], embeddings: list[list[float]]) -> int:
         """Upsert chunks with their embeddings into Qdrant. Returns count of points stored."""
-        batch_size = 100
+        batch_size = 50
         total_stored = 0
 
         for i in range(0, len(chunks), batch_size):
@@ -180,6 +181,27 @@ class VectorStore:
             }
             for hit in results
         ]
+
+    def get_indexed_links(self) -> set[str]:
+        """Return the set of all `link` values already stored in Qdrant."""
+        links: set[str] = set()
+        offset = None
+        while True:
+            points, offset = self.client.scroll(
+                collection_name=self.collection_name,
+                scroll_filter=None,
+                limit=1000,
+                offset=offset,
+                with_payload=["link"],
+                with_vectors=False,
+            )
+            for point in points:
+                link = point.payload.get("link", "")
+                if link:
+                    links.add(link)
+            if offset is None:
+                break
+        return links
 
     def collection_info(self) -> dict:
         """Get collection info, or empty dict if collection doesn't exist."""

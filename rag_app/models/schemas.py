@@ -36,6 +36,8 @@ class IndexResponse(BaseModel):
     total_vectors_stored: int
     sources_indexed: list[str]
     duration_seconds: float
+    skipped_records: int = 0
+    new_records: int = 0
 
 
 class AskRequest(BaseModel):

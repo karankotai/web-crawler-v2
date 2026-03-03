@@ -42,21 +42,12 @@ class RAGPipeline:
         self.client = genai.Client(api_key=settings.GEMINI_API_KEY)
 
     def index(self, force_reindex: bool = False) -> IndexResponse:
-        """Load, chunk, embed, and store all circular documents."""
-        start = time.time()
+        """Load, chunk, embed, and store all circular documents.
 
-        # Check if already indexed
-        if not force_reindex:
-            info = self.vector_store.collection_info()
-            if info.get("points_count", 0) > 0:
-                return IndexResponse(
-                    total_records=0,
-                    records_with_content=0,
-                    total_chunks=0,
-                    total_vectors_stored=info["points_count"],
-                    sources_indexed=[],
-                    duration_seconds=round(time.time() - start, 2),
-                )
+        When force_reindex is False and the collection already has points,
+        only new records (by link) are processed (incremental mode).
+        """
+        start = time.time()
 
         # Load records
         if settings.DATABASE_URL:
@@ -69,6 +60,29 @@ class RAGPipeline:
 
         records_with_content = sum(1 for r in records if r.get("content"))
         sources = list({r.get("source", "Unknown") for r in records})
+
+        # Incremental mode: filter to only new records
+        skipped_records = 0
+        if not force_reindex:
+            info = self.vector_store.collection_info()
+            if info.get("points_count", 0) > 0:
+                indexed_links = self.vector_store.get_indexed_links()
+                new_records = [r for r in records if r.get("link", "") not in indexed_links]
+                skipped_records = len(records) - len(new_records)
+                print(f"Incremental mode: {skipped_records} already indexed, {len(new_records)} new")
+
+                if not new_records:
+                    return IndexResponse(
+                        total_records=len(records),
+                        records_with_content=records_with_content,
+                        total_chunks=0,
+                        total_vectors_stored=info["points_count"],
+                        sources_indexed=sorted(sources),
+                        duration_seconds=round(time.time() - start, 2),
+                        skipped_records=skipped_records,
+                        new_records=0,
+                    )
+                records = new_records
 
         # Build document texts and chunk
         all_chunks = []
@@ -108,12 +122,14 @@ class RAGPipeline:
         print(f"Indexing complete in {duration}s")
 
         return IndexResponse(
-            total_records=len(records),
+            total_records=len(records) + skipped_records,
             records_with_content=records_with_content,
             total_chunks=len(all_chunks),
             total_vectors_stored=total_stored,
             sources_indexed=sorted(sources),
             duration_seconds=duration,
+            skipped_records=skipped_records,
+            new_records=len(records),
         )
 
     def ask(self, request: AskRequest) -> AskResponse:

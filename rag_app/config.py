@@ -33,10 +33,6 @@ class Settings(BaseSettings):
     # CORS
     ALLOWED_ORIGINS: str = "http://localhost:3000,http://localhost:3001"
 
-    # Embedding cache
-    EMBEDDING_CACHE_PATH: str = "rag_app/embedding_cache.pkl"
-    REDIS_URL: str = ""  # When set (e.g. redis://localhost:6379/0), use Redis for embedding cache
-
     # Chunking
     CHUNK_TARGET_TOKENS: int = 500
     CHUNK_MIN_TOKENS: int = 400
