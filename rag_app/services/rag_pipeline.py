@@ -1,6 +1,7 @@
 import json
 import re
 import time
+from datetime import date, datetime
 
 from google import genai
 from google.genai import types
@@ -459,7 +460,7 @@ class RAGPipeline:
 
     def _extract_sources(self, results: list[dict]) -> list[SourceReference]:
         """Deduplicate sources by link, keeping highest score per source.
-        Only return sources scoring within 85% of the top result."""
+        Applies a date recency boost so newer circulars rank higher."""
         seen: dict[str, SourceReference] = {}
         for result in results:
             meta = result["metadata"]
@@ -477,9 +478,20 @@ class RAGPipeline:
                     pdf_links=meta.get("pdf_links", []),
                 )
 
+        # Apply date recency boost: recent docs keep ~100%, old docs decay to 70% floor
+        today = date.today()
+        for src in seen.values():
+            try:
+                src_date = datetime.strptime(src.date, "%Y-%m-%d").date()
+                years_old = (today - src_date).days / 365.25
+            except (ValueError, TypeError):
+                years_old = 0  # unknown date → no penalty
+            boost = max(0.7, 1.0 - years_old * 0.04)
+            src.relevance_score = round(src.relevance_score * boost, 4)
+
         ranked = sorted(seen.values(), key=lambda x: x.relevance_score, reverse=True)
         if not ranked:
             return ranked
-        # Only keep sources within 65% of the top score
-        cutoff = ranked[0].relevance_score * 0.65
-        return [s for s in ranked if s.relevance_score >= cutoff]
+        # Only keep sources within 75% of the top adjusted score, capped at 8
+        cutoff = ranked[0].relevance_score * 0.75
+        return [s for s in ranked if s.relevance_score >= cutoff][:8]
