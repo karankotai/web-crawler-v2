@@ -188,7 +188,7 @@ class RAGPipeline:
         answer = self._generate_answer(
             request.question, context, matched_circular=circular_number if circular_number and results else None,
         )
-        sources = self._extract_sources(results)
+        sources = self._extract_sources(results, question=request.question)
 
         retrieved_chunks = [
             RetrievedChunk(
@@ -257,7 +257,7 @@ class RAGPipeline:
             return
 
         # Yield sources before starting answer generation
-        sources = [s.model_dump() for s in self._extract_sources(results)]
+        sources = [s.model_dump() for s in self._extract_sources(results, question=question)]
         yield _sse_event("sources", {
             "sources": sources,
             "query_used": rewritten,
@@ -458,9 +458,20 @@ class RAGPipeline:
 
         return merged
 
-    def _extract_sources(self, results: list[dict]) -> list[SourceReference]:
+    _RECENCY_PATTERN = re.compile(
+        r"\b(latest|latest\b.*circular|recent|newest|most recent|new|current|"
+        r"this month|this year|last month|today)\b",
+        re.IGNORECASE,
+    )
+
+    def _extract_sources(
+        self, results: list[dict], question: str = ""
+    ) -> list[SourceReference]:
         """Deduplicate sources by link, keeping highest score per source.
-        Applies a date recency boost so newer circulars rank higher."""
+        Applies a date recency boost so newer circulars rank higher.
+        When the question signals recency intent, the boost is much steeper."""
+        wants_recent = bool(self._RECENCY_PATTERN.search(question))
+
         seen: dict[str, SourceReference] = {}
         for result in results:
             meta = result["metadata"]
@@ -478,20 +489,28 @@ class RAGPipeline:
                     pdf_links=meta.get("pdf_links", []),
                 )
 
-        # Apply date recency boost: recent docs keep ~100%, old docs decay to 70% floor
+        # Apply date recency boost.
+        # Normal: gentle decay (4%/year, floor 70%).
+        # Recency query: steep decay (20%/year, floor 30%) so old docs drop hard.
+        decay_rate = 0.20 if wants_recent else 0.04
+        floor = 0.30 if wants_recent else 0.70
         today = date.today()
         for src in seen.values():
             try:
                 src_date = datetime.strptime(src.date, "%Y-%m-%d").date()
                 years_old = (today - src_date).days / 365.25
             except (ValueError, TypeError):
-                years_old = 0  # unknown date → no penalty
-            boost = max(0.7, 1.0 - years_old * 0.04)
+                # Unknown date gets penalised on recency queries
+                years_old = 5 if wants_recent else 0
+            boost = max(floor, 1.0 - years_old * decay_rate)
             src.relevance_score = round(src.relevance_score * boost, 4)
 
         ranked = sorted(seen.values(), key=lambda x: x.relevance_score, reverse=True)
         if not ranked:
             return ranked
-        # Only keep sources within 75% of the top adjusted score, capped at 8
-        cutoff = ranked[0].relevance_score * 0.75
-        return [s for s in ranked if s.relevance_score >= cutoff][:8]
+
+        # Tighter cutoff for recency queries (90%) vs normal (75%), capped at 5 / 8
+        cutoff_pct = 0.90 if wants_recent else 0.75
+        max_sources = 5 if wants_recent else 8
+        cutoff = ranked[0].relevance_score * cutoff_pct
+        return [s for s in ranked if s.relevance_score >= cutoff][:max_sources]
