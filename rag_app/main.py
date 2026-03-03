@@ -103,7 +103,7 @@ async def evaluate_question(request: EvalRequest):
         ground_truth=request.ground_truth,
         source_filter=request.source_filter,
     )
-    result = eval_service.evaluate_question(q, baselines=request.baselines)
+    result = eval_service.evaluate_question(q, baselines=request.baselines, custom_answer=request.custom_answer)
     return EvalResponse(result=result)
 
 

@@ -125,6 +125,7 @@ class EvalService:
 
     def evaluate_question(
         self, q: EvalQuestion, baselines: list[str] | None = None,
+        custom_answer: str | None = None,
     ) -> QuestionEvalResult:
         """Evaluate a single question: RAG vs selected vanilla baselines."""
         if baselines is None:
@@ -187,25 +188,44 @@ class EvalService:
                 rag_eval.average_score - vanilla_gemini_eval.average_score, 2
             )
 
+        # 6. Conditionally evaluate custom answer
+        custom_eval = None
+        rag_advantage_vs_custom = None
+        if custom_answer:
+            custom_scores = self._judge_answer(
+                question=q.question,
+                answer=custom_answer,
+                ground_truth=q.ground_truth,
+                source_text=None,
+                is_rag=False,
+            )
+            custom_eval = self._build_eval(custom_answer, custom_scores)
+            rag_advantage_vs_custom = round(
+                rag_eval.average_score - custom_eval.average_score, 2
+            )
+
         return QuestionEvalResult(
             question=q.question,
             ground_truth=q.ground_truth,
             rag_eval=rag_eval,
             vanilla_gpt_eval=vanilla_gpt_eval,
             vanilla_gemini_eval=vanilla_gemini_eval,
+            custom_eval=custom_eval,
             rag_sources=rag_sources,
             rag_advantage_vs_gpt=rag_advantage_vs_gpt,
             rag_advantage_vs_gemini=rag_advantage_vs_gemini,
+            rag_advantage_vs_custom=rag_advantage_vs_custom,
         )
 
     def evaluate_batch(
         self, questions: list[EvalQuestion], baselines: list[str] | None = None,
+        custom_answer: str | None = None,
     ) -> BatchEvalResponse:
         """Evaluate a batch of questions and compute summary statistics."""
         results = []
         for i, q in enumerate(questions, 1):
             print(f"[{i}/{len(questions)}] Evaluating: {q.question[:80]}...")
-            result = self.evaluate_question(q, baselines=baselines)
+            result = self.evaluate_question(q, baselines=baselines, custom_answer=custom_answer)
             results.append(result)
 
         summary = self._compute_summary(results)
@@ -377,20 +397,45 @@ class EvalService:
             losses_gemini = sum(1 for r in gemini_results if (r.rag_advantage_vs_gemini or 0) < 0)
             ties_gemini = len(gemini_results) - wins_gemini - losses_gemini
 
+        # Custom baseline stats (only if any result has it)
+        custom_results = [r for r in results if r.custom_eval is not None]
+        overall_custom = None
+        avg_crit_custom = None
+        wins_custom = losses_custom = ties_custom = None
+        adv_custom = None
+        if custom_results:
+            custom_avgs = [r.custom_eval.average_score for r in custom_results]
+            overall_custom = round(sum(custom_avgs) / len(custom_results), 2)
+            adv_custom = round(overall_rag - overall_custom, 2)
+            per_crit_cust: dict[str, list[float]] = {}
+            for r in custom_results:
+                for s in r.custom_eval.scores:
+                    per_crit_cust.setdefault(s.criterion, []).append(s.score)
+            avg_crit_custom = {k: round(sum(v) / len(v), 2) for k, v in per_crit_cust.items()}
+            wins_custom = sum(1 for r in custom_results if (r.rag_advantage_vs_custom or 0) > 0)
+            losses_custom = sum(1 for r in custom_results if (r.rag_advantage_vs_custom or 0) < 0)
+            ties_custom = len(custom_results) - wins_custom - losses_custom
+
         return EvalSummary(
             total_questions=n,
             rag_average=overall_rag,
             vanilla_gpt_average=overall_gpt,
             vanilla_gemini_average=overall_gemini,
+            vanilla_custom_average=overall_custom,
             rag_advantage_vs_gpt=adv_gpt,
             rag_advantage_vs_gemini=adv_gemini,
+            rag_advantage_vs_custom=adv_custom,
             per_criterion_rag=avg_crit_rag,
             per_criterion_vanilla_gpt=avg_crit_gpt,
             per_criterion_vanilla_gemini=avg_crit_gemini,
+            per_criterion_custom=avg_crit_custom,
             wins_vs_gpt=wins_gpt,
             losses_vs_gpt=losses_gpt,
             ties_vs_gpt=ties_gpt,
             wins_vs_gemini=wins_gemini,
             losses_vs_gemini=losses_gemini,
             ties_vs_gemini=ties_gemini,
+            wins_vs_custom=wins_custom,
+            losses_vs_custom=losses_custom,
+            ties_vs_custom=ties_custom,
         )

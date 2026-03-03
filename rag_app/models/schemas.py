@@ -114,9 +114,11 @@ class QuestionEvalResult(BaseModel):
     rag_eval: SingleAnswerEval
     vanilla_gpt_eval: Optional[SingleAnswerEval] = None
     vanilla_gemini_eval: Optional[SingleAnswerEval] = None
+    custom_eval: Optional[SingleAnswerEval] = None
     rag_sources: list[SourceReference]
     rag_advantage_vs_gpt: Optional[float] = None
     rag_advantage_vs_gemini: Optional[float] = None
+    rag_advantage_vs_custom: Optional[float] = None
 
 
 class EvalRequest(BaseModel):
@@ -124,6 +126,7 @@ class EvalRequest(BaseModel):
     ground_truth: Optional[str] = Field(default=None, max_length=5000)
     source_filter: Optional[str] = Field(default=None, max_length=50)
     baselines: list[str] = Field(default=["gpt", "gemini"])
+    custom_answer: Optional[str] = Field(default=None, max_length=10000)
 
     @field_validator("source_filter")
     @classmethod
@@ -142,17 +145,23 @@ class EvalSummary(BaseModel):
     rag_average: float
     vanilla_gpt_average: Optional[float] = None
     vanilla_gemini_average: Optional[float] = None
+    vanilla_custom_average: Optional[float] = None
     rag_advantage_vs_gpt: Optional[float] = None
     rag_advantage_vs_gemini: Optional[float] = None
+    rag_advantage_vs_custom: Optional[float] = None
     per_criterion_rag: dict[str, float]
     per_criterion_vanilla_gpt: Optional[dict[str, float]] = None
     per_criterion_vanilla_gemini: Optional[dict[str, float]] = None
+    per_criterion_custom: Optional[dict[str, float]] = None
     wins_vs_gpt: Optional[int] = None
     losses_vs_gpt: Optional[int] = None
     ties_vs_gpt: Optional[int] = None
     wins_vs_gemini: Optional[int] = None
     losses_vs_gemini: Optional[int] = None
     ties_vs_gemini: Optional[int] = None
+    wins_vs_custom: Optional[int] = None
+    losses_vs_custom: Optional[int] = None
+    ties_vs_custom: Optional[int] = None
 
 
 class BatchEvalResponse(BaseModel):
