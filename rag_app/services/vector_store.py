@@ -8,6 +8,8 @@ from qdrant_client.models import (
     MatchText,
     MatchValue,
     PointStruct,
+    TextIndexParams,
+    TokenizerType,
     VectorParams,
 )
 
@@ -26,6 +28,7 @@ class VectorStore:
         else:
             self.client = QdrantClient(path=settings.QDRANT_PATH)
         self.collection_name = settings.COLLECTION_NAME
+        self._ensure_text_index()
 
     def ensure_collection(self, recreate: bool = False):
         """Create collection, optionally recreating it."""
@@ -45,6 +48,34 @@ class VectorStore:
             print(f"Created collection: {self.collection_name}")
         else:
             print(f"Collection already exists: {self.collection_name}")
+
+        self._ensure_text_index()
+
+    def _ensure_text_index(self):
+        """Create a full-text index on the 'text' payload field if missing."""
+        try:
+            info = self.client.get_collection(self.collection_name)
+            existing = info.payload_schema or {}
+            if "text" in existing:
+                return
+        except Exception:
+            pass
+
+        try:
+            self.client.create_payload_index(
+                collection_name=self.collection_name,
+                field_name="text",
+                field_schema=TextIndexParams(
+                    type="text",
+                    tokenizer=TokenizerType.WORD,
+                    min_token_len=2,
+                    max_token_len=20,
+                    lowercase=True,
+                ),
+            )
+            print("Created full-text index on 'text' field")
+        except Exception as e:
+            print(f"Text index creation skipped: {e}")
 
     def upsert_chunks(self, chunks: list[TextChunk], embeddings: list[list[float]]) -> int:
         """Upsert chunks with their embeddings into Qdrant. Returns count of points stored."""
