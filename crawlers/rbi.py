@@ -16,6 +16,7 @@ class RBICrawler(BaseCrawler):
     BASE_URL = "https://www.rbi.org.in"
     NOTIFICATIONS_URL = f"{BASE_URL}/Scripts/NotificationUser.aspx"
     CIRCULARS_URL = f"{BASE_URL}/Scripts/BS_CircularIndexDisplay.aspx"
+    PRESS_RELEASES_URL = f"{BASE_URL}/Scripts/BS_PressReleaseDisplay.aspx"
 
     # Year range: current year down to START_YEAR (controlled by --max-pages as year count)
     START_YEAR = 2016
@@ -27,10 +28,11 @@ class RBICrawler(BaseCrawler):
 
         self._crawl_by_year(self.NOTIFICATIONS_URL, years, source="notification")
         self._crawl_by_year(self.CIRCULARS_URL, years, source="circular")
+        self._crawl_by_year(self.PRESS_RELEASES_URL, years, source="press release")
 
     def _crawl_by_year(self, url, years, source):
         """Crawl an RBI listing page year by year using the hdnYear form POST."""
-        label = "notifications" if source == "notification" else "circulars"
+        label = source + "s"
         print(f"  Fetching RBI {label}...")
 
         # Initial GET to establish session and get form fields
