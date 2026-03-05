@@ -9,11 +9,9 @@ to download PDFs — this inherits the session cookies needed to bypass Akamai.
 """
 
 import base64
-import io
 import json
 import time
 
-import pdfplumber
 from playwright.sync_api import sync_playwright
 from urllib.parse import quote
 
@@ -145,15 +143,8 @@ class MCACrawler(BaseCrawler):
                     print(f"    [WARN] PDF too small ({len(pdf_bytes)} bytes), skipping.")
                     continue
 
-                pdf = pdfplumber.open(io.BytesIO(pdf_bytes))
-                pages_text = []
-                for pg in pdf.pages:
-                    text = pg.extract_text()
-                    if text:
-                        pages_text.append(text)
-                pdf.close()
-
-                record["content"] = "\n\n".join(pages_text)
+                from utils.pdf_extract import extract_text_from_pdf
+                record["content"] = extract_text_from_pdf(pdf_bytes)
                 record["pdf_links"] = [url]
                 print(f"    OK: {len(pdf.pages)} pages, {len(record['content'])} chars")
             except Exception as e:

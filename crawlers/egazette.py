@@ -14,11 +14,8 @@ where {year} and {number} are extracted from the Gazette ID
 (e.g. CG-DL-E-16022026-270189 → 2026/270189.pdf).
 """
 
-import io
 import re
 from urllib.parse import urljoin
-
-import pdfplumber
 
 import config
 from crawlers.base import BaseCrawler
@@ -248,14 +245,8 @@ class EGazetteCrawler(BaseCrawler):
                 print(f"    [WARN] Not a PDF, skipping.")
                 continue
             try:
-                pdf = pdfplumber.open(io.BytesIO(resp.content))
-                pages_text = []
-                for page in pdf.pages:
-                    text = page.extract_text()
-                    if text:
-                        pages_text.append(text)
-                pdf.close()
-                record["content"] = "\n\n".join(pages_text)
+                from utils.pdf_extract import extract_text_from_pdf
+                record["content"] = extract_text_from_pdf(resp.content)
                 record["pdf_links"] = [pdf_url]
                 print(f"    OK: {len(pdf.pages)} pages, {len(record['content'])} chars")
             except Exception as e:

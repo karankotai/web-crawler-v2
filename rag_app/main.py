@@ -1,4 +1,3 @@
-import io
 import json
 import queue
 import threading
@@ -7,7 +6,6 @@ import uuid
 from contextlib import asynccontextmanager
 from datetime import datetime
 
-import pdfplumber
 import requests
 from bs4 import BeautifulSoup
 from fastapi import FastAPI, Form, HTTPException, UploadFile
@@ -127,15 +125,7 @@ async def health():
 # ── Upload endpoint ──────────────────────────────────────────
 
 
-def _extract_text_from_pdf(pdf_bytes: bytes) -> str:
-    """Extract text from PDF bytes using pdfplumber."""
-    text_parts = []
-    with pdfplumber.open(io.BytesIO(pdf_bytes)) as pdf:
-        for page in pdf.pages:
-            page_text = page.extract_text()
-            if page_text:
-                text_parts.append(page_text)
-    return "\n\n".join(text_parts)
+from utils.pdf_extract import extract_text_from_pdf as _extract_text_from_pdf
 
 
 def _fetch_link_content(url: str) -> tuple[str, str]:

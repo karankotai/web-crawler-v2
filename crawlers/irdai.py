@@ -7,7 +7,6 @@ controlled via query parameters. Each page shows 60 items (max delta).
 import io
 from urllib.parse import urljoin
 
-import pdfplumber
 
 import config
 from crawlers.base import BaseCrawler
@@ -159,14 +158,8 @@ class IRDAICrawler(BaseCrawler):
         if not resp:
             return ""
         try:
-            pdf = pdfplumber.open(io.BytesIO(resp.content))
-            pages_text = []
-            for page in pdf.pages:
-                text = page.extract_text()
-                if text:
-                    pages_text.append(text)
-            pdf.close()
-            return "\n\n".join(pages_text)
+            from utils.pdf_extract import extract_text_from_pdf
+            return extract_text_from_pdf(resp.content)
         except Exception as e:
             print(f"    [ERROR] Failed to parse PDF: {e}")
             return ""
