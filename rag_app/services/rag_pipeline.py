@@ -140,6 +140,42 @@ class RAGPipeline:
             new_records=len(records),
         )
 
+    def index_records(self, records: list[dict]) -> int:
+        """Chunk, embed, and index specific records into Qdrant. Returns chunk count."""
+        all_chunks = []
+        for record in records:
+            doc_text = build_document_text(record)
+            pdf_links = record.get("pdf_links", []) or []
+            if record.get("pdf_link") and record["pdf_link"] not in pdf_links:
+                pdf_links.append(record["pdf_link"])
+
+            metadata = ChunkMetadata(
+                source=record.get("source", "Unknown"),
+                title=record.get("title", "Untitled"),
+                date=_normalize_date(record.get("date", "")),
+                link=record.get("link", ""),
+                circular_number=_extract_circular_number(record),
+                file_name=record.get("_file_name", ""),
+                pdf_links=pdf_links,
+            )
+            chunks = chunk_document(doc_text, metadata)
+            all_chunks.extend(chunks)
+
+        if not all_chunks:
+            return 0
+
+        self.vector_store.ensure_collection(recreate=False)
+        total_stored = 0
+        batch_size = 1000
+        for i in range(0, len(all_chunks), batch_size):
+            batch_chunks = all_chunks[i : i + batch_size]
+            texts = [c.text for c in batch_chunks]
+            embeddings = self.embedding_service.embed_texts(texts)
+            total_stored += self.vector_store.upsert_chunks(batch_chunks, embeddings)
+
+        print(f"Indexed {total_stored} vectors from {len(records)} uploaded records")
+        return total_stored
+
     def ask(self, request: AskRequest) -> AskResponse:
         """Answer a question using RAG pipeline."""
         # Rewrite query for better retrieval

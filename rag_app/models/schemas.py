@@ -3,7 +3,7 @@ import re
 from pydantic import BaseModel, Field, field_validator
 from typing import Optional
 
-VALID_SOURCES = {"rbi", "sebi", "mca", "irdai", "egazette"}
+VALID_SOURCES = {"rbi", "sebi", "mca", "irdai", "egazette", "other"}
 
 
 class ChunkMetadata(BaseModel):
@@ -170,6 +170,13 @@ class BatchEvalResponse(BaseModel):
 
 
 # ── Crawl schemas ─────────────────────────────────────────────
+
+
+class UploadResponse(BaseModel):
+    status: str
+    documents_saved: int
+    chunks_indexed: int
+    message: str
 
 
 class CrawlRequest(BaseModel):
