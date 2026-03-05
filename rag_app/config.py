@@ -16,6 +16,8 @@ class Settings(BaseSettings):
     GENERATION_MODEL: str = "gpt-4o-mini"  # Used for vanilla GPT baseline
     EVAL_JUDGE_MODEL: str = "gpt-4o"
     GEMINI_MODEL: str = "gemini-2.0-flash"  # Used for vanilla Gemini baseline
+    LLM_PROVIDER: str = "gemini"  # "gemini" or "openai"
+    OPENAI_GENERATION_MODEL: str = "gpt-4o-mini"
 
     # Qdrant
     QDRANT_URL: str = ""  # When set (e.g. http://qdrant:6333), use remote; when empty, use local path
@@ -42,6 +44,7 @@ class Settings(BaseSettings):
     # Retrieval
     TOP_K: int = 12
     SCORE_THRESHOLD: float = 0.35
+    MULTI_QUERY_ENABLED: bool = True
 
     model_config = {"env_file": str(_ENV_FILE), "env_file_encoding": "utf-8", "extra": "ignore"}
 

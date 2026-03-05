@@ -88,7 +88,7 @@ async def ask_stream(request: AskRequest):
         )
 
     return StreamingResponse(
-        pipeline.ask_stream(request.question, request.top_k, request.source_filter),
+        pipeline.ask_stream(request.question, request.top_k, request.source_filter, request.multi_query),
         media_type="text/event-stream",
     )
 

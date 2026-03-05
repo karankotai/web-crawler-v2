@@ -16,6 +16,7 @@ class ChunkMetadata(BaseModel):
     total_chunks: int = 0
     file_name: str = ""
     pdf_links: list[str] = []
+    chunk_type: str = "general"  # rule, exception, definition, threshold, applicability, general
 
 
 class TextChunk(BaseModel):
@@ -44,6 +45,7 @@ class AskRequest(BaseModel):
     question: str = Field(max_length=2000)
     top_k: int = Field(default=12, ge=1, le=20)
     source_filter: Optional[str] = Field(default=None, max_length=50)
+    multi_query: Optional[bool] = None  # None = use server default (MULTI_QUERY_ENABLED)
 
     @field_validator("source_filter")
     @classmethod
@@ -69,6 +71,7 @@ class RetrievedChunk(BaseModel):
     title: str
     circular_number: str
     relevance_score: float
+    chunk_type: str = "general"
 
 
 class AskResponse(BaseModel):

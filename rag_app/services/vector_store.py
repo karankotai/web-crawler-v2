@@ -5,6 +5,7 @@ from qdrant_client.models import (
     Distance,
     FieldCondition,
     Filter,
+    KeywordIndexParams,
     MatchText,
     MatchValue,
     PointStruct,
@@ -29,6 +30,7 @@ class VectorStore:
             self.client = QdrantClient(path=settings.QDRANT_PATH)
         self.collection_name = settings.COLLECTION_NAME
         self._ensure_text_index()
+        self._ensure_chunk_type_index()
 
     def ensure_collection(self, recreate: bool = False):
         """Create collection, optionally recreating it."""
@@ -50,6 +52,7 @@ class VectorStore:
             print(f"Collection already exists: {self.collection_name}")
 
         self._ensure_text_index()
+        self._ensure_chunk_type_index()
 
     def _ensure_text_index(self):
         """Create a full-text index on the 'text' payload field if missing."""
@@ -77,6 +80,26 @@ class VectorStore:
         except Exception as e:
             print(f"Text index creation skipped: {e}")
 
+    def _ensure_chunk_type_index(self):
+        """Create a keyword index on the 'chunk_type' payload field if missing."""
+        try:
+            info = self.client.get_collection(self.collection_name)
+            existing = info.payload_schema or {}
+            if "chunk_type" in existing:
+                return
+        except Exception:
+            return
+
+        try:
+            self.client.create_payload_index(
+                collection_name=self.collection_name,
+                field_name="chunk_type",
+                field_schema=KeywordIndexParams(type="keyword"),
+            )
+            print("Created keyword index on 'chunk_type' field")
+        except Exception as e:
+            print(f"chunk_type index creation skipped: {e}")
+
     def upsert_chunks(self, chunks: list[TextChunk], embeddings: list[list[float]]) -> int:
         """Upsert chunks with their embeddings into Qdrant. Returns count of points stored."""
         batch_size = 50
@@ -103,6 +126,7 @@ class VectorStore:
                     "total_chunks": chunk.metadata.total_chunks,
                     "file_name": chunk.metadata.file_name,
                     "pdf_links": chunk.metadata.pdf_links,
+                    "chunk_type": chunk.metadata.chunk_type,
                 }
                 points.append(PointStruct(id=point_id, vector=embedding, payload=payload))
 
@@ -154,6 +178,7 @@ class VectorStore:
                     "chunk_index": hit.payload.get("chunk_index", 0),
                     "total_chunks": hit.payload.get("total_chunks", 0),
                     "pdf_links": hit.payload.get("pdf_links", []),
+                    "chunk_type": hit.payload.get("chunk_type", "general"),
                 },
             }
             for hit in results
@@ -208,10 +233,75 @@ class VectorStore:
                     "chunk_index": hit.payload.get("chunk_index", 0),
                     "total_chunks": hit.payload.get("total_chunks", 0),
                     "pdf_links": hit.payload.get("pdf_links", []),
+                    "chunk_type": hit.payload.get("chunk_type", "general"),
                 },
             }
             for hit in results
         ]
+
+    def search_with_type_boost(
+        self,
+        query_vector: list[float],
+        preferred_types: list[str],
+        top_k: int = settings.TOP_K,
+        score_threshold: float = settings.SCORE_THRESHOLD,
+        source_filter: str | None = None,
+        boost_amount: float = 0.1,
+    ) -> list[dict]:
+        """Search with over-fetch and boost preferred chunk types."""
+        results = self.search(
+            query_vector=query_vector,
+            top_k=top_k * 2,
+            score_threshold=score_threshold,
+            source_filter=source_filter,
+        )
+        for r in results:
+            if r["metadata"].get("chunk_type", "general") in preferred_types:
+                r["score"] += boost_amount
+        results.sort(key=lambda x: x["score"], reverse=True)
+        return results[:top_k]
+
+    def search_circular_level(
+        self,
+        query_vector: list[float],
+        top_k_circulars: int = 5,
+        source_filter: str | None = None,
+    ) -> list[str]:
+        """Over-fetch chunks, deduplicate by circular_number, return top N circular IDs by best score."""
+        results = self.search(
+            query_vector=query_vector,
+            top_k=top_k_circulars * 10,
+            score_threshold=0.0,
+            source_filter=source_filter,
+        )
+        best_per_circular: dict[str, float] = {}
+        for r in results:
+            cn = r["metadata"].get("circular_number", "")
+            if not cn:
+                continue
+            if cn not in best_per_circular or r["score"] > best_per_circular[cn]:
+                best_per_circular[cn] = r["score"]
+        ranked = sorted(best_per_circular.items(), key=lambda x: x[1], reverse=True)
+        return [cn for cn, _ in ranked[:top_k_circulars]]
+
+    def search_within_circulars(
+        self,
+        query_vector: list[float],
+        circular_numbers: list[str],
+        top_k_per_circular: int = 5,
+    ) -> list[dict]:
+        """Search within specific circulars, returning top chunks from each."""
+        all_results = []
+        for cn in circular_numbers:
+            results = self.search(
+                query_vector=query_vector,
+                top_k=top_k_per_circular,
+                score_threshold=0.0,
+                circular_number_filter=cn,
+            )
+            all_results.extend(results)
+        all_results.sort(key=lambda x: x["score"], reverse=True)
+        return all_results
 
     def get_indexed_links(self) -> set[str]:
         """Return the set of all `link` values already stored in Qdrant."""
