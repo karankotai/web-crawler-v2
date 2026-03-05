@@ -15,7 +15,7 @@ CA_ANALYSIS_SYSTEM_PROMPT = (
     "OUTPUT FORMAT - use ALL of the following sections:\n\n"
     "## 1. Circular Identity\n"
     "Issuing authority, circular number, date of issue, and subject line as stated in the text.\n\n"
-    "## 2. Plain-Language Summary\n"
+    "## 2. Summary\n"
     "A 3-5 sentence summary a non-specialist can understand. State what the circular does, "
     "why it was issued, and the key takeaway.\n\n"
     "## 3. Who Is Affected\n"
