@@ -418,6 +418,12 @@ class BaseCrawler(ABC):
             self.results = self.results[config.RECORD_OFFSET:]
             print(f"  Offset: skipped first {skipped_offset} records, {len(self.results)} remaining.")
 
+        if config.SELECTIVE_CRAWL:
+            from crawlers.importance_filter import filter_by_importance
+            self.results, filtered_count = filter_by_importance(self.results)
+            if filtered_count:
+                print(f"  Selective filter: kept {len(self.results)}, filtered out {filtered_count} non-important records.")
+
         if config.DEEP_CRAWL:
             self.crawl_details()
             self._deep_crawl_missing_content()

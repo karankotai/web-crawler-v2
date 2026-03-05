@@ -27,7 +27,8 @@ from rag_app.models.schemas import (
     VALID_SOURCES,
 )
 from rag_app.services.eval_service import EvalService
-from rag_app.services.rag_pipeline import RAGPipeline
+from rag_app.prompts.ca_analysis import CA_ANALYSIS_SYSTEM_PROMPT
+from rag_app.services.rag_pipeline import RAGPipeline, _sse_event
 
 pipeline: RAGPipeline | None = None
 crawl_jobs: dict[str, dict] = {}
@@ -273,6 +274,43 @@ async def upload_documents(
         chunks_indexed=chunks_indexed,
         message=f"Uploaded {len(records)} document(s), indexed {chunks_indexed} chunks.{error_suffix}",
     )
+
+
+# ── Analyze endpoint ─────────────────────────────────────────
+
+
+@app.post("/analyze/stream")
+async def analyze_stream(
+    text: str | None = Form(None),
+    file: UploadFile | None = None,
+):
+    """Stream a structured CA analysis of a circular (text or PDF)."""
+    circular_text = None
+    if file and file.filename:
+        pdf_bytes = await file.read()
+        circular_text = _extract_text_from_pdf(pdf_bytes)
+    elif text:
+        circular_text = text.strip()
+
+    if not circular_text or len(circular_text) < 50:
+        raise HTTPException(
+            status_code=400,
+            detail="Provide circular text (>=50 chars) or upload a PDF.",
+        )
+
+    prompt = f"<circular_text>\n{circular_text}\n</circular_text>"
+
+    def generate():
+        for chunk in pipeline.llm.generate_stream(
+            prompt=prompt,
+            system=CA_ANALYSIS_SYSTEM_PROMPT,
+            max_tokens=8000,
+            temperature=0,
+        ):
+            yield _sse_event("token", chunk)
+        yield _sse_event("done", None)
+
+    return StreamingResponse(generate(), media_type="text/event-stream")
 
 
 # ── Crawl endpoints ──────────────────────────────────────────

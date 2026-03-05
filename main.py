@@ -70,12 +70,18 @@ def main():
         default=None,
         help="Max pages to paginate per source listing (default: 50)",
     )
+    parser.add_argument(
+        "--selective",
+        action="store_true",
+        help="Only crawl important circulars (master directions, amendments, key regulatory terms)",
+    )
     args = parser.parse_args()
 
     config.OUTPUT_FORMAT = args.format
     config.DEEP_CRAWL = args.deep
     if args.max_pages is not None:
         config.MAX_PAGES = args.max_pages
+    config.SELECTIVE_CRAWL = args.selective
 
     total = 0
 
