@@ -6,6 +6,7 @@ COPY requirements.txt ./requirements.txt
 RUN pip install --no-cache-dir -r rag_app/requirements.txt -r requirements.txt pymongo
 COPY rag_app/ ./rag_app/
 COPY crawlers/ ./crawlers/
+COPY utils/ ./utils/
 COPY config.py main.py ./
 RUN mkdir -p ./output
 ENV PYTHONUNBUFFERED=1
