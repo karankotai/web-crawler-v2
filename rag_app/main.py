@@ -186,8 +186,14 @@ async def upload_documents(
     title: str | None = Form(None),
     date: str | None = Form(None),
     circular_number: str | None = Form(None),
+    merge: bool = Form(False, description="Merge all files/links into a single document (for original + amendments)"),
 ):
-    """Upload PDF files or links to add to the RAG index."""
+    """Upload PDF files or links to add to the RAG index.
+
+    When merge=true, all uploaded PDFs and links are combined into a single
+    document. Use this for a circular with its amendments — the content from
+    each file is concatenated with clear section headers.
+    """
     # Validate source
     if source.lower() not in VALID_SOURCES:
         raise HTTPException(
@@ -216,44 +222,79 @@ async def upload_documents(
     records = []
     errors = []
 
+    # Collect content parts for merge mode
+    merged_parts: list[tuple[str, str]] = []  # (label, content)
+    merged_filenames: list[str] = []
+
     # Process PDF files
     if has_files:
-        for f in files:
+        for idx, f in enumerate(files):
             if not f.filename:
                 continue
             try:
                 pdf_bytes = await f.read()
                 content = _extract_text_from_pdf(pdf_bytes)
-                file_title = title or f.filename.replace(".pdf", "").replace("_", " ").replace("-", " ")
-                record = {
-                    "source": source.lower(),
-                    "title": file_title,
-                    "date": date or datetime.now().strftime("%Y-%m-%d"),
-                    "link": f"upload://{f.filename}",
-                    "content": content,
-                    "circular_number": circular_number or "",
-                    "pdf_links": [],
-                }
-                records.append(record)
+                file_title = f.filename.replace(".pdf", "").replace("_", " ").replace("-", " ")
+                merged_filenames.append(f.filename)
+
+                if merge:
+                    label = f"Amendment {idx}" if idx > 0 else "Original"
+                    merged_parts.append((f"{label} — {f.filename}", content))
+                else:
+                    record = {
+                        "source": source.lower(),
+                        "title": title or file_title,
+                        "date": date or datetime.now().strftime("%Y-%m-%d"),
+                        "link": f"upload://{f.filename}",
+                        "content": content,
+                        "circular_number": circular_number or "",
+                        "pdf_links": [],
+                    }
+                    records.append(record)
             except Exception as e:
                 errors.append(f"Failed to process {f.filename}: {e}")
 
     # Process links
-    for url in link_list:
+    for idx, url in enumerate(link_list):
         try:
             content, auto_title = _fetch_link_content(url)
-            record = {
-                "source": source.lower(),
-                "title": title or auto_title or url.split("/")[-1],
-                "date": date or datetime.now().strftime("%Y-%m-%d"),
-                "link": url,
-                "content": content,
-                "circular_number": circular_number or "",
-                "pdf_links": [url] if url.lower().endswith(".pdf") else [],
-            }
-            records.append(record)
+
+            if merge:
+                offset = len(merged_filenames)
+                label = f"Amendment {offset + idx}" if (offset + idx) > 0 else "Original"
+                merged_parts.append((f"{label} — {url.split('/')[-1]}", content))
+            else:
+                record = {
+                    "source": source.lower(),
+                    "title": title or auto_title or url.split("/")[-1],
+                    "date": date or datetime.now().strftime("%Y-%m-%d"),
+                    "link": url,
+                    "content": content,
+                    "circular_number": circular_number or "",
+                    "pdf_links": [url] if url.lower().endswith(".pdf") else [],
+                }
+                records.append(record)
         except Exception as e:
             errors.append(f"Failed to fetch {url}: {e}")
+
+    # Build single merged record
+    if merge and merged_parts:
+        sections = []
+        for label, content in merged_parts:
+            sections.append(f"{'='*60}\n{label}\n{'='*60}\n\n{content}")
+        merged_content = "\n\n".join(sections)
+
+        first_file = merged_filenames[0] if merged_filenames else link_list[0] if link_list else "merged"
+        record = {
+            "source": source.lower(),
+            "title": title or f"{first_file} (with {len(merged_parts) - 1} amendment(s))",
+            "date": date or datetime.now().strftime("%Y-%m-%d"),
+            "link": f"upload://{first_file}",
+            "content": merged_content,
+            "circular_number": circular_number or "",
+            "pdf_links": [u for u in link_list if u.lower().endswith(".pdf")],
+        }
+        records.append(record)
 
     if not records:
         raise HTTPException(
@@ -268,11 +309,12 @@ async def upload_documents(
     chunks_indexed = pipeline.index_records(records)
 
     error_suffix = f" Errors: {'; '.join(errors)}" if errors else ""
+    merge_note = f" (merged {len(merged_parts)} files into 1 document)" if merge and merged_parts else ""
     return UploadResponse(
         status="success",
         documents_saved=docs_saved or len(records),
         chunks_indexed=chunks_indexed,
-        message=f"Uploaded {len(records)} document(s), indexed {chunks_indexed} chunks.{error_suffix}",
+        message=f"Uploaded {len(records)} document(s), indexed {chunks_indexed} chunks.{merge_note}{error_suffix}",
     )
 
 
@@ -282,13 +324,36 @@ async def upload_documents(
 @app.post("/analyze/stream")
 async def analyze_stream(
     text: str | None = Form(None),
-    file: UploadFile | None = None,
+    file: list[UploadFile] = [],
+    merge: bool = Form(False),
 ):
-    """Stream a structured CA analysis of a circular (text or PDF)."""
+    """Stream a structured CA analysis of a circular (text or PDF).
+
+    Accepts multiple PDF files. When merge=true (or multiple files uploaded),
+    all PDFs are concatenated into a single document with section headers
+    so the LLM can produce a consolidated analysis.
+    """
     circular_text = None
-    if file and file.filename:
-        pdf_bytes = await file.read()
-        circular_text = _extract_text_from_pdf(pdf_bytes)
+
+    # Filter to files that actually have content
+    valid_files = [f for f in file if f.filename]
+
+    if valid_files:
+        if len(valid_files) == 1 and not merge:
+            # Single file, original behaviour
+            pdf_bytes = await valid_files[0].read()
+            circular_text = _extract_text_from_pdf(pdf_bytes)
+        else:
+            # Multiple files or merge requested — concatenate with headers
+            parts: list[str] = []
+            for idx, f in enumerate(valid_files):
+                pdf_bytes = await f.read()
+                content = _extract_text_from_pdf(pdf_bytes)
+                label = f"Amendment {idx}" if idx > 0 else "Original"
+                parts.append(
+                    f"{'=' * 60}\n{label} — {f.filename}\n{'=' * 60}\n\n{content}"
+                )
+            circular_text = "\n\n".join(parts)
     elif text:
         circular_text = text.strip()
 

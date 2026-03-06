@@ -15,7 +15,7 @@ class Settings(BaseSettings):
     EMBEDDING_DIMENSION: int = 1536
     GENERATION_MODEL: str = "gpt-4o-mini"  # Used for vanilla GPT baseline
     EVAL_JUDGE_MODEL: str = "gpt-4o"
-    GEMINI_MODEL: str = "gemini-2.0-flash"  # Used for vanilla Gemini baseline
+    GEMINI_MODEL: str = "gemini-2.5-pro"  # Used for vanilla Gemini baseline
     LLM_PROVIDER: str = "gemini"  # "gemini" or "openai"
     OPENAI_GENERATION_MODEL: str = "gpt-4o-mini"
 

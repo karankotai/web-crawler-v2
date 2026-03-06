@@ -3,7 +3,7 @@ import re
 from pydantic import BaseModel, Field, field_validator
 from typing import Optional
 
-VALID_SOURCES = {"rbi", "sebi", "mca", "irdai", "egazette", "other"}
+VALID_SOURCES = {"rbi", "sebi", "mca", "irdai", "egazette", "cbic", "other"}
 
 
 class ChunkMetadata(BaseModel):
