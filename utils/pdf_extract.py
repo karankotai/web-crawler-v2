@@ -105,12 +105,35 @@ def _extract_page_text(page) -> str:
     return "\n\n".join(parts) if parts else (page.extract_text() or "")
 
 
+def _ocr_pdf(pdf_bytes: bytes) -> str:
+    """OCR fallback for scanned/image-based PDFs."""
+    from pdf2image import convert_from_bytes
+    import pytesseract
+
+    images = convert_from_bytes(pdf_bytes)
+    parts = []
+    for img in images:
+        text = pytesseract.image_to_string(img)
+        if text and text.strip():
+            parts.append(text.strip())
+    return "\n\n".join(parts)
+
+
 def extract_text_from_pdf(pdf_bytes: bytes) -> str:
-    """Extract text from PDF bytes with table-aware extraction."""
+    """Extract text from PDF bytes with table-aware extraction, OCR fallback."""
     text_parts = []
     with pdfplumber.open(io.BytesIO(pdf_bytes)) as pdf:
         for page in pdf.pages:
             page_text = _extract_page_text(page)
             if page_text:
                 text_parts.append(page_text)
-    return "\n\n".join(text_parts)
+    result = "\n\n".join(text_parts)
+
+    # OCR fallback for scanned/image PDFs
+    if len(result.strip()) < 50:
+        try:
+            result = _ocr_pdf(pdf_bytes)
+        except Exception:
+            pass  # Return whatever pdfplumber got (may be empty)
+
+    return result
