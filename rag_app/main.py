@@ -14,6 +14,7 @@ from fastapi.responses import StreamingResponse
 
 from rag_app.config import settings
 from rag_app.models.schemas import (
+    AnalysisChatRequest,
     AskRequest,
     AskResponse,
     CrawlRequest,
@@ -370,6 +371,46 @@ async def analyze_stream(
             prompt=prompt,
             system=CA_ANALYSIS_SYSTEM_PROMPT,
             max_tokens=8000,
+            temperature=0,
+        ):
+            yield _sse_event("token", chunk)
+        yield _sse_event("done", None)
+
+    return StreamingResponse(generate(), media_type="text/event-stream")
+
+
+# ── Analyze chat endpoint ────────────────────────────────────
+
+
+@app.post("/analyze/chat/stream")
+async def analyze_chat_stream(request: AnalysisChatRequest):
+    """Stream a follow-up answer about a previously generated analysis."""
+    # Build conversation history (last 10 messages)
+    history_block = ""
+    if request.history:
+        recent = request.history[-10:]
+        turns = "\n".join(f"<{m.role}>{m.content}</{m.role}>" for m in recent)
+        history_block = f"\n\n<conversation_history>\n{turns}\n</conversation_history>"
+
+    prompt = (
+        f"<analysis>\n{request.analysis_text}\n</analysis>"
+        f"{history_block}"
+        f"\n\n<user_question>\n{request.question}\n</user_question>"
+    )
+
+    system = (
+        "You are an expert Indian Chartered Accountant (CA) assistant. "
+        "You have been provided with a structured analysis of a government circular. "
+        "Answer the user's follow-up questions accurately, grounding your response "
+        "strictly in the provided analysis. If the analysis does not contain enough "
+        "information to answer, say so clearly. Be concise and precise."
+    )
+
+    def generate():
+        for chunk in pipeline.llm.generate_stream(
+            prompt=prompt,
+            system=system,
+            max_tokens=4000,
             temperature=0,
         ):
             yield _sse_event("token", chunk)

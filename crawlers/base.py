@@ -259,6 +259,21 @@ class BaseCrawler(ABC):
             json.dump(merged, f, indent=2, ensure_ascii=False)
         print(f"  [checkpoint] Saved {len(merged)} records ({len(unique_new)} new)")
 
+    def _filter_inline(self, before_count):
+        """Apply importance filter to records added since before_count.
+
+        Called by crawlers after parsing each page/year when SELECTIVE_CRAWL is on.
+        Returns the number of records filtered out.
+        """
+        if not config.SELECTIVE_CRAWL:
+            return 0
+        from crawlers.importance_filter import is_important
+        new_records = self.results[before_count:]
+        kept = [r for r in new_records if is_important(r)]
+        filtered = len(new_records) - len(kept)
+        self.results = self.results[:before_count] + kept
+        return filtered
+
     @abstractmethod
     def crawl(self):
         """Crawl the target website. Must be implemented by subclasses."""

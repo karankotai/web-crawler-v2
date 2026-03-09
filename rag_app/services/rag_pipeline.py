@@ -313,7 +313,10 @@ class RAGPipeline:
             print(f"Preferred chunk types: {preferred_types}")
 
         # Try circular-number-filtered search first (from original question)
-        circular_number = self._extract_circular_number_from_query(request.question)
+        circular_number = (
+            self._extract_circular_number_from_query(request.question)
+            or self._extract_section_reference(request.question)
+        )
         is_analysis = self._is_analysis_mode(request.question, circular_number)
         results = []
         if circular_number:
@@ -418,7 +421,10 @@ class RAGPipeline:
         preferred_types = _detect_preferred_types(question)
 
         # Try circular-number-filtered search first
-        circular_number = self._extract_circular_number_from_query(question)
+        circular_number = (
+            self._extract_circular_number_from_query(question)
+            or self._extract_section_reference(question)
+        )
         is_analysis = self._is_analysis_mode(question, circular_number)
         results = []
         if circular_number:
@@ -665,25 +671,41 @@ class RAGPipeline:
             "context, do not include it.\n"
             "3. If a section below has no relevant information in the context, write "
             "\"Not specified in this circular.\" for that section.\n\n"
+            "STYLE RULES:\n"
+            "- NO filler language. Never write \"It is important to note\", "
+            "\"This is a significant development\", \"It is worth noting\", or similar. "
+            "Every sentence must add new information.\n"
+            "- Write in direct, precise language. Lead with consequences, not descriptions.\n"
+            "- Do not restate what was just said. State it once, clearly, then move on.\n"
+            "- Prefer short sentences. If a bullet exceeds two lines, split it.\n\n"
             "REASONING APPROACH:\n"
             "1. Locate specific clauses/paragraphs addressing each section\n"
             "2. Extract exact text, numbers, dates, conditions\n"
             "3. Synthesize into structured prose with precise references\n\n"
             "ANSWER FORMAT — use ALL of the following sections:\n\n"
-            "## Overview\n"
-            "Brief summary of what this circular is about, its purpose, and issuing authority.\n\n"
-            "## Applicability\n"
-            "Who does this circular apply to? (e.g., banks, NBFCs, insurers, listed companies, etc.)\n\n"
-            "## Key Provisions\n"
-            "Bullet each major provision, requirement, or directive. Be thorough — cover every substantive point.\n\n"
-            "## Compliance Requirements\n"
-            "What must regulated entities do to comply? Include reporting, documentation, and procedural requirements.\n\n"
-            "## Timelines & Effective Dates\n"
-            "List all dates: effective date, compliance deadlines, transition periods, review dates.\n\n"
+            "## Bottom Line\n"
+            "2-3 sentences only. Lead with the consequence: what changes for affected entities, "
+            "then state what the circular does. Include issuing authority.\n\n"
+            "## Who Is Affected & How\n"
+            "List each category of entity this circular applies to (banks, NBFCs, insurers, "
+            "listed companies, etc.). For each, state in one line what specifically changes for them.\n\n"
+            "## What Changed & Why It Matters\n"
+            "For each major provision, requirement, or directive, use this format:\n"
+            "- **Provision:** [What the circular mandates/changes]\n"
+            "- **Impact:** [Practical consequence for compliance, operations, or reporting]\n\n"
+            "Be thorough — cover every substantive point. Note conditions or thresholds.\n\n"
+            "## Deadlines\n"
+            "Present as a table. If no dates are mentioned, write \"Not specified in this circular.\"\n\n"
+            "| Date | What | Who |\n"
+            "|---|---|---|\n"
+            "| (date) | (requirement/milestone) | (affected entity) |\n\n"
             "## Penalties & Consequences\n"
             "Any penalties, enforcement actions, or consequences for non-compliance mentioned.\n\n"
             "## Exceptions & Exemptions\n"
             "Any carve-outs, exemptions, thresholds, or conditions that limit applicability.\n\n"
+            "## Action Items\n"
+            "Numbered checklist of specific steps regulated entities should take. "
+            "Each item must start with a verb (Review, File, Update, Notify, etc.).\n\n"
             "## References\n"
             "List any other circulars, master directions, acts, or regulations referenced in this circular.\n"
         )
@@ -704,6 +726,21 @@ class RAGPipeline:
         # Normalize 4-digit second year to 2-digit: 2025-2026 -> 2025-26
         normalized = re.sub(r"(\d{4})-(\d{4})", lambda m: f"{m.group(1)}-{m.group(2)[2:]}", raw)
         return normalized
+
+    @staticmethod
+    def _extract_section_reference(question: str) -> str | None:
+        """Extract a GST Act section reference like 'Section 16 of CGST Act'."""
+        match = re.search(
+            r"(?:section|sec\.?)\s+(\d+[A-Z]?)\s+(?:of\s+)?(?:the\s+)?"
+            r"(CGST|IGST|UTGST|GST\s*Compensation)\s*(?:Act)?",
+            question,
+            re.IGNORECASE,
+        )
+        if not match:
+            return None
+        section_num = match.group(1)
+        act_prefix = match.group(2).upper().replace(" ", "_")
+        return f"{act_prefix}-S{section_num}"
 
     def _extract_keywords(self, question: str) -> list[str]:
         """Extract distinctive keywords (acronyms, specific terms) for hybrid search."""

@@ -28,7 +28,10 @@ class RBICrawler(BaseCrawler):
 
         self._crawl_by_year(self.NOTIFICATIONS_URL, years, source="notification")
         self._crawl_by_year(self.CIRCULARS_URL, years, source="circular")
-        self._crawl_by_year(self.PRESS_RELEASES_URL, years, source="press release")
+        if not config.SELECTIVE_CRAWL:
+            self._crawl_by_year(self.PRESS_RELEASES_URL, years, source="press release")
+        else:
+            print("  Skipping press releases (selective crawl mode).")
 
     def _crawl_by_year(self, url, years, source):
         """Crawl an RBI listing page year by year using the hdnYear form POST."""
@@ -64,8 +67,12 @@ class RBICrawler(BaseCrawler):
             else:
                 self._parse_link_listing(soup, source=source)
 
+            filtered = self._filter_inline(before)
             found = len(self.results) - before
-            print(f"  {label.capitalize()} {year}: {found} records")
+            if filtered:
+                print(f"  {label.capitalize()} {year}: {found} records (filtered out {filtered})")
+            else:
+                print(f"  {label.capitalize()} {year}: {found} records")
             if found > 0:
                 self.save_progress()
 

@@ -23,4 +23,4 @@ DELAY_BETWEEN_REQUESTS = 2  # seconds, be polite to servers
 DEEP_CRAWL = False  # follow links and extract full notification content
 MAX_PAGES = 500  # max pages to crawl per listing (safety limit)
 RECORD_OFFSET = 0  # skip the first N records from crawl results
-SELECTIVE_CRAWL = False  # only crawl important circulars (master directions, amendments, key terms)
+SELECTIVE_CRAWL = True  # only crawl important circulars (master directions, amendments, key terms)

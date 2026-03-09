@@ -3,7 +3,7 @@ import re
 from pydantic import BaseModel, Field, field_validator
 from typing import Optional
 
-VALID_SOURCES = {"rbi", "sebi", "mca", "irdai", "egazette", "cbic", "other"}
+VALID_SOURCES = {"rbi", "sebi", "mca", "irdai", "egazette", "cbic", "legislation", "other"}
 
 
 class ChunkMetadata(BaseModel):
@@ -198,3 +198,17 @@ class CrawlResponse(BaseModel):
     task_id: str
     source: str
     message: str
+
+
+# ── Analysis chat schemas ────────────────────────────────────
+
+
+class AnalysisChatMessage(BaseModel):
+    role: str = Field(pattern="^(user|assistant)$")
+    content: str = Field(max_length=10000)
+
+
+class AnalysisChatRequest(BaseModel):
+    analysis_text: str = Field(min_length=50)
+    question: str = Field(max_length=2000)
+    history: list[AnalysisChatMessage] = Field(default=[])
