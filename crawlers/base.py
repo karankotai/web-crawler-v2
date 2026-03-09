@@ -2,10 +2,13 @@
 
 import csv
 import gc
+import hashlib
 import json
 import os
 import time
 from abc import ABC, abstractmethod
+from concurrent.futures import ThreadPoolExecutor, as_completed
+import threading
 
 import requests
 from bs4 import BeautifulSoup
@@ -17,6 +20,9 @@ import config
 _KNOWN_COLUMNS = {
     "source", "crawler", "title", "date", "department", "link",
     "details", "content", "circular_number", "pdf_links",
+    "extraction_status", "extraction_method", "extraction_error",
+    "extraction_attempts", "extraction_timestamp", "content_hash",
+    "content_length", "pdf_count",
 }
 
 
@@ -61,11 +67,20 @@ def _ensure_table(conn):
                 circular_number TEXT DEFAULT '',
                 pdf_links       JSONB DEFAULT '[]',
                 extra           JSONB DEFAULT '{}',
+                extraction_status    TEXT DEFAULT 'pending',
+                extraction_method    TEXT DEFAULT '',
+                extraction_error     TEXT DEFAULT '',
+                extraction_attempts  INTEGER DEFAULT 0,
+                extraction_timestamp TIMESTAMPTZ,
+                content_hash         TEXT DEFAULT '',
+                content_length       INTEGER DEFAULT 0,
+                pdf_count            INTEGER DEFAULT 0,
                 created_at      TIMESTAMPTZ DEFAULT NOW(),
                 updated_at      TIMESTAMPTZ DEFAULT NOW()
             );
             CREATE INDEX IF NOT EXISTS idx_scraped_docs_crawler ON scraped_documents(crawler);
             CREATE INDEX IF NOT EXISTS idx_scraped_docs_source ON scraped_documents(source);
+            CREATE INDEX IF NOT EXISTS idx_scraped_docs_extraction_status ON scraped_documents(extraction_status);
         """)
     conn.commit()
     _table_ensured = True
@@ -93,7 +108,28 @@ def _record_to_row(record, crawler_name):
     row.setdefault("content", "")
     row.setdefault("circular_number", "")
     row.setdefault("pdf_links", "[]")
+    row.setdefault("extraction_status", "pending")
+    row.setdefault("extraction_method", "")
+    row.setdefault("extraction_error", "")
+    row.setdefault("extraction_attempts", 0)
+    row.setdefault("content_hash", "")
+    row.setdefault("content_length", 0)
+    row.setdefault("pdf_count", 0)
     row["extra"] = json.dumps(extra)
+
+    # Compute content_length and content_hash if content is present
+    content = row.get("content", "")
+    if content:
+        row["content_length"] = len(content)
+        row["content_hash"] = hashlib.sha256(content.encode()).hexdigest()
+
+    # Compute pdf_count from pdf_links
+    try:
+        pdf_list = json.loads(row["pdf_links"]) if isinstance(row["pdf_links"], str) else row["pdf_links"]
+        row["pdf_count"] = len(pdf_list) if isinstance(pdf_list, list) else 0
+    except (json.JSONDecodeError, TypeError):
+        row["pdf_count"] = 0
+
     return row
 
 
@@ -108,10 +144,16 @@ def _upsert_records(conn, records, crawler_name):
                 cur.execute("""
                     INSERT INTO scraped_documents
                         (source, crawler, title, date, department, link,
-                         details, content, circular_number, pdf_links, extra, updated_at)
+                         details, content, circular_number, pdf_links, extra,
+                         extraction_status, extraction_method, extraction_error,
+                         extraction_attempts, content_hash, content_length, pdf_count,
+                         updated_at)
                     VALUES (%(source)s, %(crawler)s, %(title)s, %(date)s, %(department)s, %(link)s,
                             %(details)s, %(content)s, %(circular_number)s,
-                            %(pdf_links)s::jsonb, %(extra)s::jsonb, NOW())
+                            %(pdf_links)s::jsonb, %(extra)s::jsonb,
+                            %(extraction_status)s, %(extraction_method)s, %(extraction_error)s,
+                            %(extraction_attempts)s, %(content_hash)s, %(content_length)s, %(pdf_count)s,
+                            NOW())
                     ON CONFLICT (link) DO UPDATE SET
                         source = EXCLUDED.source,
                         crawler = EXCLUDED.crawler,
@@ -126,16 +168,30 @@ def _upsert_records(conn, records, crawler_name):
                         pdf_links = CASE WHEN EXCLUDED.pdf_links != '[]'::jsonb THEN EXCLUDED.pdf_links
                                          ELSE scraped_documents.pdf_links END,
                         extra = EXCLUDED.extra,
+                        extraction_status = CASE WHEN EXCLUDED.extraction_status != 'pending' THEN EXCLUDED.extraction_status
+                                                  ELSE scraped_documents.extraction_status END,
+                        extraction_method = CASE WHEN EXCLUDED.extraction_method != '' THEN EXCLUDED.extraction_method
+                                                  ELSE scraped_documents.extraction_method END,
+                        extraction_error = EXCLUDED.extraction_error,
+                        extraction_attempts = GREATEST(EXCLUDED.extraction_attempts, scraped_documents.extraction_attempts),
+                        content_hash = CASE WHEN EXCLUDED.content_hash != '' THEN EXCLUDED.content_hash
+                                            ELSE scraped_documents.content_hash END,
+                        content_length = GREATEST(EXCLUDED.content_length, scraped_documents.content_length),
+                        pdf_count = GREATEST(EXCLUDED.pdf_count, scraped_documents.pdf_count),
                         updated_at = NOW()
                 """, row)
             else:
                 cur.execute("""
                     INSERT INTO scraped_documents
                         (source, crawler, title, date, department, link,
-                         details, content, circular_number, pdf_links, extra)
+                         details, content, circular_number, pdf_links, extra,
+                         extraction_status, extraction_method, extraction_error,
+                         extraction_attempts, content_hash, content_length, pdf_count)
                     VALUES (%(source)s, %(crawler)s, %(title)s, %(date)s, %(department)s, %(link)s,
                             %(details)s, %(content)s, %(circular_number)s,
-                            %(pdf_links)s::jsonb, %(extra)s::jsonb)
+                            %(pdf_links)s::jsonb, %(extra)s::jsonb,
+                            %(extraction_status)s, %(extraction_method)s, %(extraction_error)s,
+                            %(extraction_attempts)s, %(content_hash)s, %(content_length)s, %(pdf_count)s)
                 """, row)
     conn.commit()
 
@@ -150,6 +206,8 @@ class BaseCrawler(ABC):
         self.session.headers.update(config.HEADERS)
         self.results = []
         self.existing_links = set()
+        self._domain_locks = {}  # per-domain rate limiting for concurrent downloads
+        self._domain_locks_lock = threading.Lock()
 
     def load_existing(self):
         """Load previously saved results and build a set of known links."""
@@ -274,6 +332,245 @@ class BaseCrawler(ABC):
         self.results = self.results[:before_count] + kept
         return filtered
 
+    # --- Raw Content Caching ---
+
+    def _cache_raw_content(self, document_link, source_url, content_type, raw_bytes):
+        """Store raw bytes in raw_content_cache, deduplicating by SHA256."""
+        if not config.CACHE_RAW_CONTENT:
+            return
+        conn = _get_db_conn()
+        if not conn:
+            return
+        try:
+            content_sha256 = hashlib.sha256(raw_bytes).hexdigest()
+            with conn.cursor() as cur:
+                cur.execute("""
+                    INSERT INTO raw_content_cache
+                        (document_link, source_url, content_type, content_sha256, raw_bytes, file_size)
+                    VALUES (%s, %s, %s, %s, %s, %s)
+                    ON CONFLICT (document_link, source_url) DO UPDATE SET
+                        content_sha256 = EXCLUDED.content_sha256,
+                        raw_bytes = EXCLUDED.raw_bytes,
+                        file_size = EXCLUDED.file_size
+                """, (document_link, source_url, content_type, content_sha256,
+                      raw_bytes, len(raw_bytes)))
+            conn.commit()
+        except Exception as e:
+            print(f"  [WARN] Failed to cache raw content for {source_url[:60]}: {e}")
+        finally:
+            conn.close()
+
+    def _get_cached_content(self, document_link, source_url):
+        """Retrieve cached raw bytes, or None if not cached."""
+        conn = _get_db_conn()
+        if not conn:
+            return None
+        try:
+            with conn.cursor() as cur:
+                cur.execute(
+                    "SELECT raw_bytes FROM raw_content_cache WHERE document_link = %s AND source_url = %s",
+                    (document_link, source_url),
+                )
+                row = cur.fetchone()
+                if row and row[0]:
+                    return bytes(row[0])
+        except Exception as e:
+            print(f"  [WARN] Cache lookup failed: {e}")
+        finally:
+            conn.close()
+        return None
+
+    # --- Error Tracking ---
+
+    def _log_extraction_failure(self, document_link, source_url, error_type, error_message, attempt_number=1):
+        """Log a failed extraction to the dead letter queue."""
+        conn = _get_db_conn()
+        if not conn:
+            return
+        try:
+            with conn.cursor() as cur:
+                cur.execute("""
+                    INSERT INTO failed_extractions
+                        (document_link, source_url, crawler, error_type, error_message, attempt_number)
+                    VALUES (%s, %s, %s, %s, %s, %s)
+                """, (document_link, source_url, self.name, error_type, str(error_message)[:500], attempt_number))
+            conn.commit()
+        except Exception as e:
+            print(f"  [WARN] Failed to log extraction failure: {e}")
+        finally:
+            conn.close()
+
+    def _extract_with_tracking(self, document_link, source_url, extract_fn, content_type="pdf"):
+        """Wrap an extraction call with metadata tracking.
+
+        Args:
+            document_link: the record's unique link
+            source_url: the URL being extracted from
+            extract_fn: callable that returns (text, metadata_dict) or just text
+            content_type: 'pdf' or 'html'
+
+        Returns:
+            dict with content, extraction_status, extraction_method, extraction_error
+        """
+        result = {
+            "content": "",
+            "extraction_status": "failed",
+            "extraction_method": "",
+            "extraction_error": "",
+            "extraction_attempts": 1,
+        }
+        try:
+            output = extract_fn()
+            if isinstance(output, tuple):
+                text, metadata = output
+                result["extraction_method"] = metadata.get("method", content_type)
+            else:
+                text = output
+                result["extraction_method"] = content_type
+
+            if text and len(text.strip()) > 10:
+                result["content"] = text
+                result["extraction_status"] = "success"
+                if len(text.strip()) < 200:
+                    result["extraction_status"] = "partial"
+            else:
+                result["extraction_status"] = "failed"
+                result["extraction_error"] = "empty_extraction"
+                self._log_extraction_failure(document_link, source_url, "empty_extraction",
+                                             f"Extraction returned {len(text.strip()) if text else 0} chars")
+        except Exception as e:
+            result["extraction_error"] = str(e)[:500]
+            self._log_extraction_failure(document_link, source_url, type(e).__name__, str(e))
+        return result
+
+    # --- HTML Content Extraction ---
+
+    def _extract_html_content(self, soup):
+        """Extract main text content from an HTML page with table-to-markdown conversion.
+
+        Used as a fallback when PDF extraction fails or returns empty.
+        """
+        # Find the main content container
+        content_div = (
+            soup.select_one("#example-min") or
+            soup.select_one("#doublescroll") or
+            soup.select_one("#pnlDetails") or
+            soup.select_one("main") or
+            soup.select_one("#content") or
+            soup.select_one("article") or
+            soup.select_one(".content") or
+            soup.body
+        )
+        if not content_div:
+            return ""
+
+        parts = []
+
+        # Convert tables to markdown
+        for table in content_div.find_all("table"):
+            rows = []
+            for tr in table.find_all("tr"):
+                cells = tr.find_all(["td", "th"])
+                rows.append([c.get_text(strip=True) for c in cells])
+            if rows and any(any(cell for cell in row) for row in rows):
+                from utils.pdf_extract import _table_to_markdown
+                md = _table_to_markdown(rows)
+                if md:
+                    table.replace_with(BeautifulSoup(f"\n{md}\n", "lxml"))
+
+        text = content_div.get_text(separator="\n", strip=True)
+        return text
+
+    # --- Concurrent PDF Downloads ---
+
+    def _get_domain_lock(self, url):
+        """Get a per-domain lock for rate limiting concurrent downloads."""
+        from urllib.parse import urlparse
+        domain = urlparse(url).netloc
+        with self._domain_locks_lock:
+            if domain not in self._domain_locks:
+                self._domain_locks[domain] = threading.Lock()
+            return self._domain_locks[domain]
+
+    def _download_and_extract_pdf(self, pdf_url, document_link):
+        """Download a single PDF with rate limiting, cache it, and extract text.
+
+        Returns (pdf_url, text, metadata) or (pdf_url, "", {}) on failure.
+        """
+        from utils.pdf_extract import extract_text_from_pdf_with_metadata
+
+        # Check cache first
+        cached = self._get_cached_content(document_link, pdf_url)
+        if cached:
+            try:
+                text, metadata = extract_text_from_pdf_with_metadata(cached)
+                return (pdf_url, text, metadata)
+            except Exception:
+                pass
+
+        # Download with per-domain rate limiting
+        lock = self._get_domain_lock(pdf_url)
+        with lock:
+            time.sleep(config.DELAY_PDF_DOWNLOADS)
+            resp = self.fetch(pdf_url, retries=2)
+
+        if not resp:
+            return (pdf_url, "", {})
+
+        pdf_bytes = resp.content
+        if len(pdf_bytes) < 500:
+            return (pdf_url, "", {})
+
+        # Cache raw bytes
+        self._cache_raw_content(document_link, pdf_url, "pdf", pdf_bytes)
+
+        try:
+            text, metadata = extract_text_from_pdf_with_metadata(pdf_bytes)
+            return (pdf_url, text, metadata)
+        except Exception as e:
+            self._log_extraction_failure(document_link, pdf_url, "pdf_extraction", str(e))
+            return (pdf_url, "", {})
+
+    def _download_and_extract_all_pdfs(self, pdf_urls, document_link, concurrent=True):
+        """Download and extract text from multiple PDFs.
+
+        Uses concurrent downloads when config.PDF_CONCURRENT_WORKERS > 1.
+        Returns concatenated text with separators.
+        """
+        if not pdf_urls:
+            return "", "none", ""
+
+        if len(pdf_urls) == 1 or not concurrent:
+            parts = []
+            method = "pdfplumber"
+            for url in pdf_urls:
+                _, text, meta = self._download_and_extract_pdf(url, document_link)
+                if text:
+                    parts.append(f"--- PDF: {url} ---\n{text}" if len(pdf_urls) > 1 else text)
+                    method = meta.get("method", method)
+            return "\n\n".join(parts), method, ""
+
+        # Concurrent download for multiple PDFs
+        parts = []
+        method = "pdfplumber"
+        workers = min(config.PDF_CONCURRENT_WORKERS, len(pdf_urls))
+        with ThreadPoolExecutor(max_workers=workers) as executor:
+            futures = {
+                executor.submit(self._download_and_extract_pdf, url, document_link): url
+                for url in pdf_urls
+            }
+            for future in as_completed(futures):
+                url = futures[future]
+                try:
+                    _, text, meta = future.result()
+                    if text:
+                        parts.append(f"--- PDF: {url} ---\n{text}" if len(pdf_urls) > 1 else text)
+                        method = meta.get("method", method)
+                except Exception as e:
+                    self._log_extraction_failure(document_link, url, "concurrent_download", str(e))
+
+        return "\n\n".join(parts), method, ""
+
     @abstractmethod
     def crawl(self):
         """Crawl the target website. Must be implemented by subclasses."""
@@ -297,8 +594,20 @@ class BaseCrawler(ABC):
                 resp = self.fetch(link)
                 if not resp:
                     continue
+
+                # Cache detail page HTML
+                self._cache_raw_content(link, link, "html", resp.content)
+
                 soup = self.parse_html(resp.text)
                 detail = self.parse_detail_page(soup, link)
+
+                # If PDF extraction returned empty/short content, try HTML fallback
+                if not detail.get("content") or len(detail.get("content", "").strip()) < 50:
+                    html_content = self._extract_html_content(soup)
+                    if html_content and len(html_content.strip()) > len(detail.get("content", "").strip()):
+                        detail["content"] = html_content
+                        detail.setdefault("extraction_method", "html_fallback")
+
                 record.update(detail)
                 # Save content to PG immediately so progress isn't lost
                 if detail.get("content") and config.DATABASE_URL:
@@ -308,6 +617,7 @@ class BaseCrawler(ABC):
                         print(f"  [deep checkpoint] {updated} records with content saved to PG")
             except Exception as e:
                 print(f"  [ERROR] Deep crawl failed for {link[:60]}: {e}")
+                self._log_extraction_failure(link, link, "deep_crawl", str(e))
         if updated:
             print(f"  Deep crawl complete: {updated} records with content")
 
@@ -317,18 +627,32 @@ class BaseCrawler(ABC):
         if not conn:
             return
         try:
+            content = detail.get("content", "")
+            content_hash = hashlib.sha256(content.encode()).hexdigest() if content else ""
             with conn.cursor() as cur:
                 cur.execute(
                     """UPDATE scraped_documents
                        SET content = %s,
                            pdf_links = %s::jsonb,
                            circular_number = COALESCE(NULLIF(circular_number, ''), %s),
+                           extraction_status = %s,
+                           extraction_method = %s,
+                           extraction_error = %s,
+                           extraction_attempts = GREATEST(extraction_attempts, 1),
+                           extraction_timestamp = NOW(),
+                           content_length = %s,
+                           content_hash = %s,
                            updated_at = NOW()
                        WHERE link = %s""",
                     (
-                        detail.get("content", ""),
+                        content,
                         json.dumps(detail.get("pdf_links", [])),
                         detail.get("circular_number", ""),
+                        detail.get("extraction_status", "success" if content else "failed"),
+                        detail.get("extraction_method", ""),
+                        detail.get("extraction_error", ""),
+                        len(content),
+                        content_hash,
                         link,
                     ),
                 )
@@ -345,7 +669,7 @@ class BaseCrawler(ABC):
         content = body.get_text(separator="\n", strip=True) if body else ""
         pdf_links = [a["href"] for a in (body or soup).find_all("a", href=True) if ".pdf" in a["href"].lower()]
         return {
-            "content": content[:5000],
+            "content": content,  # No truncation — removed [:5000] limit
             "pdf_links": pdf_links,
         }
 
@@ -478,12 +802,25 @@ class BaseCrawler(ABC):
                 resp = self.fetch(link)
                 if not resp:
                     continue
+
+                # Cache detail page HTML
+                self._cache_raw_content(link, link, "html", resp.content)
+
                 soup = self.parse_html(resp.text)
                 detail = self.parse_detail_page(soup, link)
+
+                # HTML fallback if PDF extraction was empty
+                if not detail.get("content") or len(detail.get("content", "").strip()) < 50:
+                    html_content = self._extract_html_content(soup)
+                    if html_content and len(html_content.strip()) > len(detail.get("content", "").strip()):
+                        detail["content"] = html_content
+                        detail.setdefault("extraction_method", "html_fallback")
+
                 if detail.get("content"):
                     batch.append((link, detail))
             except Exception as e:
                 print(f"  [ERROR] Deep crawl failed for {link[:60]}: {e}")
+                self._log_extraction_failure(link, link, "deep_crawl_missing", str(e))
 
             if len(batch) >= 3:
                 self._flush_deep_crawl_batch(batch)
@@ -506,17 +843,31 @@ class BaseCrawler(ABC):
         try:
             with conn.cursor() as cur:
                 for link, detail in batch:
+                    content = detail.get("content", "")
+                    content_hash = hashlib.sha256(content.encode()).hexdigest() if content else ""
                     cur.execute(
                         """UPDATE scraped_documents
                            SET content = %s,
                                pdf_links = %s::jsonb,
                                circular_number = COALESCE(NULLIF(circular_number, ''), %s),
+                               extraction_status = %s,
+                               extraction_method = %s,
+                               extraction_error = %s,
+                               extraction_attempts = GREATEST(extraction_attempts, 1),
+                               extraction_timestamp = NOW(),
+                               content_length = %s,
+                               content_hash = %s,
                                updated_at = NOW()
                            WHERE link = %s""",
                         (
-                            detail.get("content", ""),
+                            content,
                             json.dumps(detail.get("pdf_links", [])),
                             detail.get("circular_number", ""),
+                            detail.get("extraction_status", "success" if content else "failed"),
+                            detail.get("extraction_method", ""),
+                            detail.get("extraction_error", ""),
+                            len(content),
+                            content_hash,
                             link,
                         ),
                     )

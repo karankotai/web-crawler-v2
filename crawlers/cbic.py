@@ -9,7 +9,6 @@ Tax types: GST, Customs, Central Excise, Service Tax
 
 import base64
 import json
-import tempfile
 import gc
 
 import config
@@ -280,14 +279,18 @@ class CBICCrawler(BaseCrawler):
             if not pdf_url.startswith(BASE_URL + "/content/pdf/"):
                 continue
             print(f"  [{i+1}/{len(self.results)}] {record.get('circular_number', '')[:40]}...")
-            content = self._fetch_pdf_content(pdf_url)
+            content = self._fetch_pdf_content(pdf_url, record.get("link", ""))
             if content:
                 record["content"] = content
+                record["extraction_status"] = "success"
+                record["extraction_method"] = "pdfplumber"
                 if config.DATABASE_URL:
                     self._update_record_content(record["link"], {
                         "content": content,
                         "pdf_links": pdf_links,
                         "circular_number": record.get("circular_number", ""),
+                        "extraction_status": "success",
+                        "extraction_method": "pdfplumber",
                     })
                 updated += 1
                 if updated % 25 == 0:
@@ -295,7 +298,7 @@ class CBICCrawler(BaseCrawler):
         if updated:
             print(f"  Deep crawl complete: {updated} records with content")
 
-    def _fetch_pdf_content(self, pdf_url):
+    def _fetch_pdf_content(self, pdf_url, document_link):
         """Fetch PDF via CBIC's base64 JSON endpoint and extract text."""
         resp = self.fetch(pdf_url)
         if not resp:
@@ -306,16 +309,19 @@ class CBICCrawler(BaseCrawler):
             if not b64:
                 return ""
             pdf_bytes = base64.b64decode(b64)
-            from pdfminer.high_level import extract_text
-            with tempfile.NamedTemporaryFile(suffix=".pdf") as tmp:
-                tmp.write(pdf_bytes)
-                tmp.flush()
-                text = extract_text(tmp.name)
+
+            # Cache the raw PDF bytes and API JSON
+            self._cache_raw_content(document_link, pdf_url, "json_api", resp.content)
+            self._cache_raw_content(document_link, pdf_url + "#pdf", "pdf", pdf_bytes)
+
+            from utils.pdf_extract import extract_text_from_pdf
+            text = extract_text_from_pdf(pdf_bytes)
             del pdf_bytes
             gc.collect()
-            return text.strip()[:10000]
+            return text.strip()  # No truncation — removed [:10000] limit
         except Exception as e:
             print(f"    [ERROR] PDF extraction failed: {e}")
+            self._log_extraction_failure(document_link, pdf_url, "cbic_pdf_extraction", str(e))
             return ""
 
     # --- Helpers ---

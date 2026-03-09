@@ -25,6 +25,10 @@ from crawlers.mca import MCACrawler
 from crawlers.irdai import IRDAICrawler
 from crawlers.egazette import EGazetteCrawler
 from crawlers.cbic import CBICCrawler
+from crawlers.cbdt import CBDTCrawler
+from crawlers.icai import ICAICrawler
+from crawlers.ibbi import IBBICrawler
+from crawlers.dgft import DGFTCrawler
 from crawlers.generic import GenericGovCrawler
 
 
@@ -35,6 +39,10 @@ CRAWLERS = {
     "irdai": IRDAICrawler,
     "egazette": EGazetteCrawler,
     "cbic": CBICCrawler,
+    "cbdt": CBDTCrawler,
+    "icai": ICAICrawler,
+    "ibbi": IBBICrawler,
+    "dgft": DGFTCrawler,
 }
 
 

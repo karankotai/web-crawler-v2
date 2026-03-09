@@ -77,7 +77,10 @@ class RBICrawler(BaseCrawler):
                 self.save_progress()
 
     def parse_detail_page(self, soup, url):
-        """Extract full content from an RBI notification/circular detail page."""
+        """Extract full content from an RBI notification/circular detail page.
+
+        Now also downloads and extracts PDFs linked on the page.
+        """
         detail = {"content": "", "circular_number": "", "date": "", "addressed_to": "", "pdf_links": []}
 
         content_div = soup.select_one("#example-min") or soup.select_one("#doublescroll")
@@ -87,16 +90,20 @@ class RBICrawler(BaseCrawler):
         if not content_div:
             return detail
 
-        detail["content"] = content_div.get_text(separator="\n", strip=True)
+        # Extract HTML text content (no truncation)
+        html_content = content_div.get_text(separator="\n", strip=True)
 
+        # Collect all PDF links
         for a in content_div.find_all("a", href=True):
             href = a["href"]
             if ".pdf" in href.lower():
                 if not href.startswith("http"):
                     href = urljoin(url, href)
-                detail["pdf_links"].append(href)
+                if href not in detail["pdf_links"]:
+                    detail["pdf_links"].append(href)
 
-        lines = detail["content"].split("\n")
+        # Extract circular number and date from text
+        lines = html_content.split("\n")
         for line in lines:
             line = line.strip()
             if line.startswith("RBI/") and not detail["circular_number"]:
@@ -107,6 +114,24 @@ class RBICrawler(BaseCrawler):
                     if line.startswith(month) and len(line) < 30:
                         detail["date"] = line
                         break
+
+        # Download and extract PDFs if available
+        if detail["pdf_links"]:
+            pdf_content, method, _ = self._download_and_extract_all_pdfs(
+                detail["pdf_links"], url
+            )
+            if pdf_content and len(pdf_content.strip()) > len(html_content.strip()):
+                detail["content"] = pdf_content
+                detail["extraction_method"] = method
+                detail["extraction_status"] = "success"
+            else:
+                detail["content"] = html_content
+                detail["extraction_method"] = "html"
+                detail["extraction_status"] = "success"
+        else:
+            detail["content"] = html_content
+            detail["extraction_method"] = "html"
+            detail["extraction_status"] = "success" if html_content else "failed"
 
         return detail
 

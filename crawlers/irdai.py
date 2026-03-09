@@ -100,8 +100,8 @@ class IRDAICrawler(BaseCrawler):
         date_cell = row.find("td", class_="table-col-lastUpdated")
         date = date_cell.get_text(strip=True) if date_cell else ""
 
-        # PDF download link
-        pdf_link = ""
+        # PDF download link — normalized to pdf_links list
+        pdf_links = []
         doc_cell = row.find("td", class_="table-col-documents")
         if doc_cell:
             pdf_tag = doc_cell.find("a", href=True)
@@ -109,6 +109,7 @@ class IRDAICrawler(BaseCrawler):
                 pdf_link = pdf_tag["href"]
                 if not pdf_link.startswith("http"):
                     pdf_link = urljoin(self.BASE_URL, pdf_link)
+                pdf_links.append(pdf_link)
 
         return {
             "source": "IRDAI",
@@ -116,7 +117,7 @@ class IRDAICrawler(BaseCrawler):
             "date": date,
             "department": "IRDAI",
             "link": detail_link,
-            "pdf_link": pdf_link,
+            "pdf_links": pdf_links,  # Normalized: always a list
             "archive_status": archive_status,
         }
 
@@ -145,21 +146,13 @@ class IRDAICrawler(BaseCrawler):
                 if href not in detail["pdf_links"]:
                     detail["pdf_links"].append(href)
 
-        # Download first available PDF and extract text
+        # Download ALL available PDFs and extract text
         if detail["pdf_links"]:
-            detail["content"] = self._extract_pdf_text(detail["pdf_links"][0])
+            content, method, _ = self._download_and_extract_all_pdfs(
+                detail["pdf_links"], url
+            )
+            detail["content"] = content
+            detail["extraction_method"] = method
+            detail["extraction_status"] = "success" if content else "failed"
 
         return detail
-
-    def _extract_pdf_text(self, pdf_url):
-        """Download a PDF and extract its text content."""
-        print(f"    Downloading PDF: {pdf_url.split('/')[-1][:60]}")
-        resp = self.fetch(pdf_url)
-        if not resp:
-            return ""
-        try:
-            from utils.pdf_extract import extract_text_from_pdf
-            return extract_text_from_pdf(resp.content)
-        except Exception as e:
-            print(f"    [ERROR] Failed to parse PDF: {e}")
-            return ""

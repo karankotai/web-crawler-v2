@@ -4,14 +4,14 @@ egazette.gov.in is an ASP.NET site that uses cookieless sessions (session ID
 embedded in the URL) and __doPostBack for navigation and pagination.
 
 Flow:
-  1. GET homepage → extract session token from URL
-  2. POST homepage with __doPostBack('lnk_Extra_All') → Extra Ordinary listing
+  1. GET homepage -> extract session token from URL
+  2. POST homepage with __doPostBack('lnk_Extra_All') -> Extra Ordinary listing
   3. Parse the ASP.NET GridView table, paginate with __doPostBack('gvGazetteList','Page$N')
   4. Repeat for Weekly gazettes via __doPostBack('lnk_Week_All')
 
 PDFs are available at: https://egazette.gov.in/WriteReadData/{year}/{number}.pdf
 where {year} and {number} are extracted from the Gazette ID
-(e.g. CG-DL-E-16022026-270189 → 2026/270189.pdf).
+(e.g. CG-DL-E-16022026-270189 -> 2026/270189.pdf).
 """
 
 import re
@@ -21,7 +21,7 @@ import config
 from crawlers.base import BaseCrawler
 
 
-# Gazette types to crawl (homepage postback target → label)
+# Gazette types to crawl (homepage postback target -> label)
 GAZETTE_TYPES = [
     ("lnk_Extra_All", "Extra Ordinary"),
     ("lnk_Week_All", "Weekly"),
@@ -206,17 +206,20 @@ class EGazetteCrawler(BaseCrawler):
 
         Gazette ID format: CG-DL-E-16022026-270189
         PDF URL: https://egazette.gov.in/WriteReadData/2026/270189.pdf
-        """
-        parts = gazette_id.rsplit("-", 1)
-        if len(parts) != 2:
-            return ""
-        number = parts[1]
 
-        # Extract year from the date portion (e.g. 16022026 -> 2026)
-        date_segment = gazette_id.split("-")[3] if len(gazette_id.split("-")) >= 5 else ""
+        Uses [-2] and [-1] split for robustness against varying prefix formats.
+        """
+        parts = gazette_id.split("-")
+        if len(parts) < 3:
+            return ""
+
+        # Number is always the last segment
+        number = parts[-1]
+        # Date segment is second-to-last (e.g. 16022026)
+        date_segment = parts[-2]
         year = date_segment[-4:] if len(date_segment) >= 4 else ""
 
-        if not year or not number:
+        if not year or not number or not year.isdigit():
             return ""
 
         return f"{self.BASE_URL}/WriteReadData/{year}/{number}.pdf"
@@ -237,7 +240,7 @@ class EGazetteCrawler(BaseCrawler):
         print(f"  Deep crawling {len(pdf_results)} gazette PDFs...")
         for i, record in enumerate(pdf_results):
             pdf_url = record["link"]
-            print(f"  [{i+1}/{len(pdf_results)}] {record['gazette_id']}")
+            print(f"  [{i+1}/{len(pdf_results)}] {record.get('gazette_id', '')}")
             resp = self.fetch(pdf_url)
             if not resp:
                 continue
@@ -245,9 +248,15 @@ class EGazetteCrawler(BaseCrawler):
                 print(f"    [WARN] Not a PDF, skipping.")
                 continue
             try:
+                # Cache raw PDF bytes
+                self._cache_raw_content(record["link"], pdf_url, "pdf", resp.content)
+
                 from utils.pdf_extract import extract_text_from_pdf
                 record["content"] = extract_text_from_pdf(resp.content)
                 record["pdf_links"] = [pdf_url]
-                print(f"    OK: {len(pdf.pages)} pages, {len(record['content'])} chars")
+                record["extraction_status"] = "success" if record["content"] else "failed"
+                record["extraction_method"] = "pdfplumber"
+                print(f"    OK: {len(record['content'])} chars")
             except Exception as e:
                 print(f"    [ERROR] Failed to parse PDF: {e}")
+                self._log_extraction_failure(record["link"], pdf_url, "egazette_pdf", str(e))

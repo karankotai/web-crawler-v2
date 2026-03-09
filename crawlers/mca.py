@@ -143,11 +143,17 @@ class MCACrawler(BaseCrawler):
                     print(f"    [WARN] PDF too small ({len(pdf_bytes)} bytes), skipping.")
                     continue
 
+                # Cache raw PDF bytes
+                self._cache_raw_content(record["link"], url, "pdf", pdf_bytes)
+
                 from utils.pdf_extract import extract_text_from_pdf
                 record["content"] = extract_text_from_pdf(pdf_bytes)
                 record["pdf_links"] = [url]
-                print(f"    OK: {len(pdf.pages)} pages, {len(record['content'])} chars")
+                record["extraction_status"] = "success" if record["content"] else "failed"
+                record["extraction_method"] = "pdfplumber"
+                print(f"    OK: {len(record['content'])} chars")
             except Exception as e:
                 print(f"    [ERROR] Failed: {e}")
+                self._log_extraction_failure(record["link"], url, "mca_pdf_download", str(e))
 
             time.sleep(config.DELAY_BETWEEN_REQUESTS)

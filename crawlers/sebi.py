@@ -1,10 +1,7 @@
 """Crawler for SEBI (Securities and Exchange Board of India) circulars."""
 
 import gc
-import tempfile
 from urllib.parse import urljoin
-
-from pdfminer.high_level import extract_text
 
 import config
 from crawlers.base import BaseCrawler
@@ -45,7 +42,6 @@ class SEBICrawler(BaseCrawler):
             detail["circular_number"] = text.replace("Circular No.:", "").strip()
 
         # Extract PDF URL from the iframe
-        # iframe src: ../../../web/?file=https://www.sebi.gov.in/sebi_data/attachdocs/...pdf
         for iframe in soup.find_all("iframe"):
             src = iframe.get("src", "")
             if "file=" in src:
@@ -62,30 +58,16 @@ class SEBICrawler(BaseCrawler):
                 if href not in detail["pdf_links"]:
                     detail["pdf_links"].append(href)
 
-        # Download the PDF and extract text
+        # Download ALL PDFs and extract text (not just the first)
         if detail["pdf_links"]:
-            pdf_url = detail["pdf_links"][0]
-            detail["content"] = self._extract_pdf_text(pdf_url)
+            content, method, _ = self._download_and_extract_all_pdfs(
+                detail["pdf_links"], url
+            )
+            detail["content"] = content
+            detail["extraction_method"] = method
+            detail["extraction_status"] = "success" if content else "failed"
 
         return detail
-
-    def _extract_pdf_text(self, pdf_url):
-        """Download a PDF and extract its text content."""
-        print(f"    Downloading PDF: {pdf_url.split('/')[-1]}")
-        resp = self.fetch(pdf_url)
-        if not resp:
-            return ""
-        try:
-            with tempfile.NamedTemporaryFile(suffix=".pdf") as tmp:
-                tmp.write(resp.content)
-                tmp.flush()
-                del resp
-                gc.collect()
-                text = extract_text(tmp.name)
-            return text.strip()
-        except Exception as e:
-            print(f"    [ERROR] Failed to parse PDF: {e}")
-            return ""
 
     def _crawl_listing_page(self, base_url, label):
         """Crawl a SEBI listing page with pagination."""
@@ -140,14 +122,7 @@ class SEBICrawler(BaseCrawler):
             page_num += 1
 
     def _has_next_page(self, soup, current_page):
-        """Check if there's a next page link in the SEBI pagination.
-
-        SEBI uses JavaScript-based pagination (searchFormNewsList) rather than
-        standard URL links, so we check multiple signals:
-        1. "Next" link text (standard or JS-based)
-        2. pageNo= in href (for URL-based pagination)
-        3. "X to Y of Z records" text to calculate total pages
-        """
+        """Check if there's a next page link in the SEBI pagination."""
         for a in soup.find_all("a", href=True):
             text = a.get_text(strip=True).lower()
             if text in ("next", "next >", ">>"):
@@ -156,8 +131,6 @@ class SEBICrawler(BaseCrawler):
             if f"pageNo={current_page + 1}" in href:
                 return True
 
-        # Parse "1 to 25 of 2748 records" from pagination_inner to check
-        # total records — works even when links are JavaScript-based.
         import re
         for div in soup.select(".pagination_inner"):
             m = re.search(r"(\d+)\s+to\s+(\d+)\s+of\s+(\d+)", div.get_text())
@@ -167,7 +140,6 @@ class SEBICrawler(BaseCrawler):
                 if end_idx < total:
                     return True
 
-        # Fallback: check JavaScript pagination links (searchFormNewsList)
         for a in soup.find_all("a", href=True):
             href = a.get("href", "")
             if "searchFormNewsList" in href:
