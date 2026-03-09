@@ -476,5 +476,586 @@
     "pdf_links": [
       "https://rbidocs.rbi.org.in/rdocs/notification/PDFs/MD48290920160255C86B033F4C4691FE7D44C22327B5.PDF"
     ]
+  },
+  {
+    "doc_id": 746095,
+    "title": "Guidelines on Digital Lending",
+    "extraction": {
+      "circular_reference": "RBI/2022-23/111 DOR.CRE.REC.66/21.07.001/2022-23",
+      "issuing_authority": "RBI",
+      "date_issued": "2022-09-02",
+      "effective_date": "2022-09-02",
+      "subject": "Guidelines on Digital Lending",
+      "summary": "The circular provides detailed guidelines for digital lending by regulated entities, emphasizing customer protection, data privacy, and compliance with existing regulations. It aims to ensure transparency and accountability in digital lending processes, impacting both new and existing digital loans.",
+      "applies_to": [
+        {
+          "entity_type": "All Commercial Banks",
+          "conditions": null
+        },
+        {
+          "entity_type": "Primary (Urban) Co-operative Banks, State Co-operative Banks, District Central Co-operative Banks",
+          "conditions": null
+        },
+        {
+          "entity_type": "Non-Banking Financial Companies (including Housing Finance Companies)",
+          "conditions": null
+        }
+      ],
+      "obligations": [
+        {
+          "action": "Ensure all loan servicing, repayment, etc., is executed directly in the RE’s bank account without any third-party pass-through account.",
+          "deadline": null,
+          "penalty_for_non_compliance": null,
+          "form_or_filing": null,
+          "section_reference": null,
+          "is_new": true,
+          "notes": "Disbursements must be made directly to the borrower's bank account, with specific exceptions."
+        },
+        {
+          "action": "Ensure fees/charges payable to LSPs are paid directly by REs and not charged to the borrower.",
+          "deadline": null,
+          "penalty_for_non_compliance": null,
+          "form_or_filing": null,
+          "section_reference": null,
+          "is_new": true,
+          "notes": null
+        },
+        {
+          "action": "Disclose penal interest/charges upfront on an annualized basis in the Key Fact Statement (KFS).",
+          "deadline": null,
+          "penalty_for_non_compliance": null,
+          "form_or_filing": "Key Fact Statement",
+          "section_reference": null,
+          "is_new": true,
+          "notes": null
+        },
+        {
+          "action": "Provide a Key Fact Statement (KFS) to the borrower before contract execution in a standardized format.",
+          "deadline": null,
+          "penalty_for_non_compliance": null,
+          "form_or_filing": "Key Fact Statement",
+          "section_reference": null,
+          "is_new": true,
+          "notes": "KFS must include APR, recovery mechanism, grievance redressal officer details, and cooling-off period."
+        },
+        {
+          "action": "Ensure digitally signed documents flow to borrowers automatically upon loan contract execution.",
+          "deadline": null,
+          "penalty_for_non_compliance": null,
+          "form_or_filing": null,
+          "section_reference": null,
+          "is_new": true,
+          "notes": "Documents include KFS, loan product summary, sanction letter, terms and conditions, etc."
+        },
+        {
+          "action": "Publish the list of DLAs, LSPs, and their activities on the RE's website.",
+          "deadline": null,
+          "penalty_for_non_compliance": null,
+          "form_or_filing": null,
+          "section_reference": null,
+          "is_new": true,
+          "notes": null
+        },
+        {
+          "action": "Ensure DLAs display product information prominently at onboarding/sign-up stage.",
+          "deadline": null,
+          "penalty_for_non_compliance": null,
+          "form_or_filing": null,
+          "section_reference": null,
+          "is_new": true,
+          "notes": null
+        },
+        {
+          "action": "Communicate details of the LSP acting as recovery agent to the borrower at loan sanctioning and when recovery responsibilities change.",
+          "deadline": null,
+          "penalty_for_non_compliance": null,
+          "form_or_filing": null,
+          "section_reference": null,
+          "is_new": true,
+          "notes": null
+        },
+        {
+          "action": "Ensure DLAs have links to REs’ website for detailed information about loan products and customer care.",
+          "deadline": null,
+          "penalty_for_non_compliance": null,
+          "form_or_filing": null,
+          "section_reference": null,
+          "is_new": true,
+          "notes": "Details must be available at a prominent single place on the website."
+        },
+        {
+          "action": "Ensure a suitable nodal grievance redressal officer is available for digital lending complaints.",
+          "deadline": null,
+          "penalty_for_non_compliance": null,
+          "form_or_filing": null,
+          "section_reference": null,
+          "is_new": true,
+          "notes": "Contact details must be prominently displayed on websites and in the KFS."
+        },
+        {
+          "action": "Capture the economic profile of borrowers before extending any loan to assess creditworthiness.",
+          "deadline": null,
+          "penalty_for_non_compliance": null,
+          "form_or_filing": null,
+          "section_reference": null,
+          "is_new": true,
+          "notes": "Profile includes age, occupation, income, etc."
+        },
+        {
+          "action": "Provide an explicit option for borrowers to exit digital loans during the cooling-off period without penalty.",
+          "deadline": null,
+          "penalty_for_non_compliance": null,
+          "form_or_filing": null,
+          "section_reference": null,
+          "is_new": true,
+          "notes": "Cooling-off period must be at least three days for loans of seven days or more, and one day for shorter loans."
+        },
+        {
+          "action": "Conduct enhanced due diligence before partnering with LSPs for digital lending.",
+          "deadline": null,
+          "penalty_for_non_compliance": null,
+          "form_or_filing": null,
+          "section_reference": null,
+          "is_new": true,
+          "notes": "Consider technical abilities, data privacy policies, and compliance capabilities."
+        },
+        {
+          "action": "Ensure data collection by DLAs is need-based and with prior explicit consent of the borrower.",
+          "deadline": null,
+          "penalty_for_non_compliance": null,
+          "form_or_filing": null,
+          "section_reference": null,
+          "is_new": true,
+          "notes": "DLAs must not access mobile phone resources without explicit consent."
+        },
+        {
+          "action": "Ensure LSPs/DLAs do not store personal information of borrowers except minimal data required for operations.",
+          "deadline": null,
+          "penalty_for_non_compliance": null,
+          "form_or_filing": null,
+          "section_reference": null,
+          "is_new": true,
+          "notes": "Data privacy and security responsibility lies with the RE."
+        },
+        {
+          "action": "Ensure all data is stored only in servers located within India.",
+          "deadline": null,
+          "penalty_for_non_compliance": null,
+          "form_or_filing": null,
+          "section_reference": null,
+          "is_new": true,
+          "notes": "Must comply with statutory obligations and regulatory instructions."
+        },
+        {
+          "action": "Ensure DLAs and LSPs have a comprehensive privacy policy compliant with applicable laws and RBI guidelines.",
+          "deadline": null,
+          "penalty_for_non_compliance": null,
+          "form_or_filing": null,
+          "section_reference": null,
+          "is_new": true,
+          "notes": "Privacy policy must be publicly available."
+        },
+        {
+          "action": "Report any lending done through DLAs to Credit Information Companies (CICs).",
+          "deadline": null,
+          "penalty_for_non_compliance": null,
+          "form_or_filing": null,
+          "section_reference": "Credit Information Companies (CIC) (Regulation) Act, 2005",
+          "is_new": true,
+          "notes": "Includes structured digital lending products and deferred payment credits."
+        }
+      ],
+      "key_thresholds": [
+        {
+          "parameter": "Cooling-off period for loans",
+          "value": "Not less than three days for loans of seven days or more, and one day for loans of less than seven days",
+          "context": "Period during which a borrower can exit a digital loan without penalty"
+        }
+      ],
+      "supersedes": [],
+      "amendments_to": [
+        {
+          "regulation_name": "Master Direction – Reserve Bank of India (Securitisation of Standard Assets) Directions, 2021",
+          "specific_provisions": "Adherence to provisions regarding First Loss Default Guarantee (FLDG) and synthetic securitisation."
+        }
+      ],
+      "compliance_risk_level": "HIGH",
+      "risk_rationale": "The circular introduces comprehensive guidelines for digital lending, impacting a wide range of financial entities and requiring significant changes to existing processes and systems."
+    },
+    "source_url": "https://www.rbi.org.in/Scripts/BS_CircularIndexDisplay.aspx?Id=12382",
+    "pdf_links": [
+      "https://rbidocs.rbi.org.in/rdocs/Notification/PDFs/GUIDELINESDIGITALLENDINGD5C35A71D8124A0E92AEB940A7D25BB3.PDF"
+    ],
+    "chain_type": "repeal",
+    "repealed_by": "Reserve Bank of India (Digital Lending) Directions, 2025"
+  },
+  {
+    "doc_id": 748191,
+    "title": "Review of Regulatory Framework for Housing Finance Companies (HFCs)",
+    "extraction": {
+      "circular_reference": "RBI/2020-21/60 DOR.NBFC (HFC).CC.No.118/03.10.136/2020-21",
+      "issuing_authority": "RBI",
+      "date_issued": "2020-10-22",
+      "effective_date": "from the date of this circular",
+      "subject": "Review of regulatory framework for Housing Finance Companies (HFCs)",
+      "summary": "The RBI has revised the regulatory framework for Housing Finance Companies (HFCs), superseding certain NHB regulations. Key changes include new definitions and criteria for HFCs, phased compliance timelines, and specific guidelines on liquidity and risk management. This aims to harmonize HFC and NBFC regulations over the next two years.",
+      "applies_to": [
+        {
+          "entity_type": "Housing Finance Companies",
+          "conditions": null
+        }
+      ],
+      "obligations": [
+        {
+          "action": "Submit a Board approved plan including a roadmap to fulfil the criteria and timeline for transition.",
+          "deadline": "within three months",
+          "penalty_for_non_compliance": "HFCs unable to fulfil the criteria shall be treated as NBFC – Investment and Credit Companies (NBFC-ICC) and will be required to approach the Reserve Bank for conversion of their Certificate of Registration.",
+          "form_or_filing": null,
+          "section_reference": null,
+          "is_new": true,
+          "notes": "Applies to registered HFCs not currently fulfilling the criteria."
+        },
+        {
+          "action": "Submit a statutory auditor's certificate to Reserve Bank evidencing compliance with the prescribed NOF levels.",
+          "deadline": "within a period of one month",
+          "penalty_for_non_compliance": "HFCs failing to achieve the prescribed level shall not be eligible to hold the Certificate of Registration (CoR) as HFCs and registration shall be liable to be cancelled.",
+          "form_or_filing": null,
+          "section_reference": null,
+          "is_new": true,
+          "notes": "Applies to HFCs with NOF below Rupees twenty crore."
+        },
+        {
+          "action": "Maintain a Loan to Value (LTV) ratio of 50% for loans granted against the collateral of shares.",
+          "deadline": "Any shortfall in the maintenance of the 50% LTV occurring on account of movement in the share prices shall be made good within seven working days.",
+          "penalty_for_non_compliance": null,
+          "form_or_filing": null,
+          "section_reference": "Para 22 of Master Direction – Non-Banking Financial Company – Systemically Important Non-Deposit taking Company and Deposit taking Company (Reserve Bank) Directions, 2016",
+          "is_new": true,
+          "notes": null
+        },
+        {
+          "action": "Maintain a Loan-to-Value (LTV) Ratio not exceeding 75 per cent for loans granted against the collateral of gold jewellery.",
+          "deadline": null,
+          "penalty_for_non_compliance": null,
+          "form_or_filing": null,
+          "section_reference": "Para 27 and Para 39 of Master Direction – Non-Banking Financial Company – Systemically Important Non-Deposit taking Company and Deposit taking Company (Reserve Bank) Directions, 2016",
+          "is_new": true,
+          "notes": "HFCs shall put in place a Board approved policy for lending against gold."
+        },
+        {
+          "action": "Not impose foreclosure charges/ pre-payment penalties on any floating rate term loan sanctioned for purposes other than business to individual borrowers.",
+          "deadline": null,
+          "penalty_for_non_compliance": null,
+          "form_or_filing": null,
+          "section_reference": "Para 31 (4) of Master Direction – Non-Banking Financial Company – Systemically Important Non-Deposit taking Company and Deposit taking Company (Reserve Bank) Directions, 2016",
+          "is_new": true,
+          "notes": null
+        },
+        {
+          "action": "Maintain a liquidity buffer in terms of LCR to promote resilience to potential liquidity disruptions.",
+          "deadline": "From December 01, 2021, with phased increases until December 01, 2025",
+          "penalty_for_non_compliance": null,
+          "form_or_filing": null,
+          "section_reference": "Para 15B of Master Direction - Non-Banking Financial Company - Systemically Important Non-Deposit taking Company and Deposit taking Company (Reserve Bank) Directions, 2016",
+          "is_new": true,
+          "notes": "Applies to HFCs based on asset size and deposit-taking status."
+        }
+      ],
+      "key_thresholds": [
+        {
+          "parameter": "Minimum percentage of total assets towards housing finance",
+          "value": "60%",
+          "context": "Applicable from March 31, 2024"
+        },
+        {
+          "parameter": "Minimum percentage of total assets towards housing finance for individuals",
+          "value": "50%",
+          "context": "Applicable from March 31, 2024"
+        },
+        {
+          "parameter": "Net Owned Fund (NOF) Requirement",
+          "value": "Rupees twenty crore",
+          "context": "Required to commence or carry on the business of housing finance"
+        }
+      ],
+      "supersedes": [
+        {
+          "circular_reference": "Relevant regulations issued by National Housing Bank (NHB)",
+          "description": "Supersession of NHB regulations as per the Annex"
+        }
+      ],
+      "amendments_to": [
+        {
+          "regulation_name": "Reserve Bank of India Act, 1934",
+          "specific_provisions": "Exemption from section 45-IB and section 45-IC"
+        }
+      ],
+      "compliance_risk_level": "HIGH",
+      "risk_rationale": "The circular introduces significant changes to the regulatory framework for HFCs, requiring substantial compliance efforts and potential restructuring."
+    },
+    "source_url": "https://www.rbi.org.in/Scripts/BS_CircularIndexDisplay.aspx?Id=11988",
+    "pdf_links": [
+      "https://rbidocs.rbi.org.in/rdocs/Notification/PDFs/NT605BE165AA9E8043EFA087339829CCF469.PDF"
+    ],
+    "chain_type": "supersession"
+  },
+  {
+    "doc_id": 748247,
+    "title": "Merchanting Trade Transactions — Revised Guidelines",
+    "extraction": {
+      "circular_reference": "RBI/2019-20/152 A.P. (DIR Series) Circular No.20",
+      "issuing_authority": "RBI",
+      "date_issued": "2020-01-23",
+      "effective_date": "2020-01-23",
+      "subject": "Merchanting Trade Transactions (MTT) – Revised Guidelines",
+      "summary": "The RBI has revised guidelines for Merchanting Trade Transactions to facilitate trade by allowing certain processing of goods and setting specific compliance requirements for AD banks. These changes aim to streamline MTT operations while ensuring adherence to KYC and AML guidelines.",
+      "applies_to": [
+        {
+          "entity_type": "Category-I Authorised Dealer Banks",
+          "conditions": null
+        }
+      ],
+      "obligations": [
+        {
+          "action": "Ensure goods acquired for merchanting trade do not enter the Domestic Tariff Area.",
+          "deadline": null,
+          "penalty_for_non_compliance": null,
+          "form_or_filing": null,
+          "section_reference": null,
+          "is_new": true,
+          "notes": "Goods may undergo specific processing if documentary evidence and bonafides are satisfactory."
+        },
+        {
+          "action": "Ensure MTT goods are permitted for exports/imports under the prevailing Foreign Trade Policy as on the date of shipment.",
+          "deadline": null,
+          "penalty_for_non_compliance": null,
+          "form_or_filing": null,
+          "section_reference": null,
+          "is_new": true,
+          "notes": "Comply with all applicable rules, regulations, and directions for export and import legs."
+        },
+        {
+          "action": "Satisfy itself with the bonafides of MTT transactions and adhere to KYC and AML guidelines.",
+          "deadline": null,
+          "penalty_for_non_compliance": null,
+          "form_or_filing": null,
+          "section_reference": null,
+          "is_new": true,
+          "notes": null
+        },
+        {
+          "action": "Route the entire merchanting trade through the same AD bank and verify trade documents.",
+          "deadline": null,
+          "penalty_for_non_compliance": null,
+          "form_or_filing": null,
+          "section_reference": null,
+          "is_new": true,
+          "notes": "May rely on online verification of Bill of Lading/Airway Bill."
+        },
+        {
+          "action": "Complete the entire MTT within nine months with no foreign exchange outlay beyond four months.",
+          "deadline": "within nine months",
+          "penalty_for_non_compliance": null,
+          "form_or_filing": null,
+          "section_reference": null,
+          "is_new": true,
+          "notes": "Commencement date is the date of shipment/export leg receipt or import leg payment, whichever is first."
+        },
+        {
+          "action": "Report defaults in any leg of MTT to the concerned Regional Office of the Reserve Bank on a half-yearly basis.",
+          "deadline": "within 15 days from the close of each half year, i.e. June and December",
+          "penalty_for_non_compliance": null,
+          "form_or_filing": "format as annexed",
+          "section_reference": null,
+          "is_new": true,
+          "notes": null
+        },
+        {
+          "action": "Write-off unrealized amount of export leg under specified circumstances.",
+          "deadline": null,
+          "penalty_for_non_compliance": null,
+          "form_or_filing": null,
+          "section_reference": null,
+          "is_new": true,
+          "notes": "Subject to conditions such as insolvency, auction/destruction of goods, or intervention by Indian Embassy."
+        },
+        {
+          "action": "Ensure one-to-one matching in each MTT and report defaults.",
+          "deadline": "half-yearly",
+          "penalty_for_non_compliance": null,
+          "form_or_filing": "format as annexed",
+          "section_reference": null,
+          "is_new": true,
+          "notes": null
+        },
+        {
+          "action": "Report merchanting trade transactions under FETERS on a gross basis using specified codes.",
+          "deadline": null,
+          "penalty_for_non_compliance": null,
+          "form_or_filing": "FETERS",
+          "section_reference": null,
+          "is_new": true,
+          "notes": "Use Purpose Code P0108 for export and S0108 for import."
+        }
+      ],
+      "key_thresholds": [
+        {
+          "parameter": "Advance payment for import leg",
+          "value": "USD 500,000",
+          "context": "Advance payment beyond this amount requires Bank Guarantee or standby Letter of Credit."
+        },
+        {
+          "parameter": "Outstanding of merchant traders",
+          "value": "5% or more of annual export earnings",
+          "context": "Liable for caution listing."
+        }
+      ],
+      "supersedes": [
+        {
+          "circular_reference": "A.P. (DIR Series) Circular No.115 dated March 28, 2014",
+          "description": "Supersedes previous guidelines on merchanting trade transactions."
+        }
+      ],
+      "amendments_to": [],
+      "compliance_risk_level": "MEDIUM",
+      "risk_rationale": "The revised guidelines introduce specific compliance requirements and timelines that require careful adherence by AD banks to avoid regulatory issues."
+    },
+    "source_url": "https://www.rbi.org.in/Scripts/BS_CircularIndexDisplay.aspx?Id=11799",
+    "pdf_links": [
+      "https://rbidocs.rbi.org.in/rdocs/Notification/PDFs/APDIR20395627F10EB645FA8641A0A0B966B593.PDF"
+    ],
+    "chain_type": "supersession"
+  },
+  {
+    "doc_id": 739470,
+    "title": "FEMA Export of Goods (Amendment) Regulations, 2021",
+    "extraction": {
+      "circular_reference": "Notification No. FEMA 23(R)/(5)/2021-RB",
+      "issuing_authority": "RBI",
+      "date_issued": "2021-09-08",
+      "effective_date": "from the date of their publication in the Official Gazette",
+      "subject": "Foreign Exchange Management (Export of Goods and Services) (Amendment) Regulations, 2021",
+      "summary": "The amendment modifies the interest rate cap on advance payments for exports, setting it to not exceed 100 basis points above LIBOR or another benchmark as directed by the RBI. This change is important for exporters managing advance payments and interest costs.",
+      "applies_to": [
+        {
+          "entity_type": "Exporters",
+          "conditions": null
+        }
+      ],
+      "obligations": [
+        {
+          "action": "Ensure the rate of interest on advance payments does not exceed 100 basis points above LIBOR or other applicable benchmark as directed by the RBI.",
+          "deadline": null,
+          "penalty_for_non_compliance": null,
+          "form_or_filing": null,
+          "section_reference": "Regulation 15, sub-regulation 1, clause (ii)",
+          "is_new": true,
+          "notes": "This obligation applies to the interest rate on advance payments for exports."
+        }
+      ],
+      "key_thresholds": [
+        {
+          "parameter": "Interest rate on advance payments",
+          "value": "100 basis points above LIBOR",
+          "context": "The maximum allowable interest rate for advance payments on exports."
+        }
+      ],
+      "supersedes": [],
+      "amendments_to": [
+        {
+          "regulation_name": "Foreign Exchange Management (Export of Goods and Services) Regulations, 2015",
+          "specific_provisions": "Regulation 15, sub-regulation 1, clause (ii)"
+        }
+      ],
+      "compliance_risk_level": "MEDIUM",
+      "risk_rationale": "Non-compliance could lead to financial discrepancies and potential regulatory scrutiny for exporters."
+    },
+    "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=12167&Mode=0",
+    "pdf_links": [
+      "https://rbidocs.rbi.org.in/rdocs/notification/PDFs/FEMA28092021F4D265E37DF2494793463F8CA5050A99.PDF"
+    ],
+    "chain_type": "amendment"
+  },
+  {
+    "doc_id": 741885,
+    "title": "FEMA Securities Transfer (13th Amendment) Regulations, 2016",
+    "extraction": {
+      "circular_reference": "Notification No.FEMA.375/2016-RB",
+      "issuing_authority": "RBI",
+      "date_issued": "2016-09-09",
+      "effective_date": "from the date of their publication in the Official Gazette",
+      "subject": "Foreign Exchange Management (Transfer or Issue of Security by a Person Resident outside India) (Thirteenth Amendment) Regulations, 2016",
+      "summary": "This amendment to the Foreign Exchange Management Regulations allows 100% foreign investment in 'Other Financial Services' under the automatic route, subject to regulatory conditions. It clarifies the conditions under which foreign investment in financial services activities is permitted, including the need for regulatory oversight and minimum capitalization norms.",
+      "applies_to": [
+        {
+          "entity_type": "Entities engaged in 'Other Financial Services'",
+          "conditions": "Activities must be regulated by a financial sector regulator or require government approval if not fully regulated."
+        }
+      ],
+      "obligations": [
+        {
+          "action": "Ensure foreign investment in 'Other Financial Services' is subject to conditionalities, including minimum capitalization norms.",
+          "deadline": null,
+          "penalty_for_non_compliance": null,
+          "form_or_filing": null,
+          "section_reference": "Schedule 1, Annex B, Paragraph F.8",
+          "is_new": true,
+          "notes": "Applies to financial services activities regulated by RBI, SEBI, IRDA, PFRDA, NHB, or any other notified regulator."
+        },
+        {
+          "action": "Obtain government approval for foreign investment up to 100% in financial services activities not fully regulated by a financial sector regulator.",
+          "deadline": null,
+          "penalty_for_non_compliance": null,
+          "form_or_filing": null,
+          "section_reference": "Schedule 1, Annex B, Paragraph F.8.1",
+          "is_new": true,
+          "notes": "Subject to conditions including minimum capitalization requirement."
+        },
+        {
+          "action": "Ensure foreign investment limits comply with those specified in any applicable Act for specifically regulated activities.",
+          "deadline": null,
+          "penalty_for_non_compliance": null,
+          "form_or_filing": null,
+          "section_reference": "Schedule 1, Annex B, Paragraph F.8.1",
+          "is_new": true,
+          "notes": "Foreign investment limits are restricted to levels specified in the relevant Act."
+        },
+        {
+          "action": "Ensure downstream investments by entities engaged in 'Other Financial Services' comply with extant sectoral regulations and provisions of the Foreign Exchange Management Regulations.",
+          "deadline": null,
+          "penalty_for_non_compliance": null,
+          "form_or_filing": null,
+          "section_reference": "Schedule 1, Annex B, Paragraph F.8.1",
+          "is_new": true,
+          "notes": "Subject to amendments from time to time."
+        }
+      ],
+      "key_thresholds": [
+        {
+          "parameter": "Foreign investment",
+          "value": "100%",
+          "context": "Allowed under automatic route for regulated 'Other Financial Services' activities."
+        }
+      ],
+      "supersedes": [
+        {
+          "circular_reference": "Notification No. FEMA. 20/2000-RB dated 3rd May 2000",
+          "description": "Amends Schedule 1, Annex B, Paragraph F.8 of the original regulations."
+        }
+      ],
+      "amendments_to": [
+        {
+          "regulation_name": "Foreign Exchange Management (Transfer or Issue of Security by a Person Resident outside India) Regulations, 2000",
+          "specific_provisions": "Schedule 1, Annex B, Paragraph F.8"
+        }
+      ],
+      "compliance_risk_level": "MEDIUM",
+      "risk_rationale": "The amendment introduces new conditions for foreign investment in financial services, requiring compliance with regulatory oversight and capitalization norms, which may pose moderate compliance challenges."
+    },
+    "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=10606&Mode=0",
+    "pdf_links": [
+      "https://rbidocs.rbi.org.in/rdocs/notification/PDFs/NTN37501077A8BEF8044A385B05D172202C1EB.PDF"
+    ],
+    "chain_type": "amendment"
   }
 ]

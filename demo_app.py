@@ -25,6 +25,12 @@ def load_obligations():
 
 data = load_obligations()
 
+
+def is_linked(item):
+    """Check if a circular was specifically selected for its regulatory chain relationship."""
+    return bool(item.get("chain_type"))
+
+
 # --- Styling ---
 st.markdown("""
 <style>
@@ -67,6 +73,41 @@ st.markdown("""
         color: #666;
         margin-top: 4px;
     }
+    .chain-repeal {
+        background: #fff3f3;
+        border: 2px solid #dc3545;
+        border-radius: 8px;
+        padding: 12px 16px;
+        margin: 8px 0;
+    }
+    .chain-repeal .chain-label { color: #dc3545; font-weight: 700; }
+    .chain-supersession {
+        background: #fff8e1;
+        border: 2px solid #f59e0b;
+        border-radius: 8px;
+        padding: 12px 16px;
+        margin: 8px 0;
+    }
+    .chain-supersession .chain-label { color: #b45309; font-weight: 700; }
+    .chain-amendment {
+        background: #eff6ff;
+        border: 2px solid #3b82f6;
+        border-radius: 8px;
+        padding: 12px 16px;
+        margin: 8px 0;
+    }
+    .chain-amendment .chain-label { color: #1d4ed8; font-weight: 700; }
+    .chain-badge {
+        display: inline-block;
+        padding: 2px 10px;
+        border-radius: 4px;
+        font-weight: 600;
+        font-size: 0.85em;
+        margin-left: 8px;
+    }
+    .chain-badge-repeal { color: #fff; background: #dc3545; }
+    .chain-badge-supersession { color: #fff; background: #f59e0b; }
+    .chain-badge-amendment { color: #fff; background: #3b82f6; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -80,8 +121,9 @@ total_obligations = sum(len(d["extraction"].get("obligations", [])) for d in dat
 total_thresholds = sum(len(d["extraction"].get("key_thresholds", [])) for d in data)
 high_risk = sum(1 for d in data if d["extraction"].get("compliance_risk_level") == "HIGH")
 authorities = set(d["extraction"].get("issuing_authority", "") for d in data)
+linked_count = sum(1 for d in data if is_linked(d))
 
-col1, col2, col3, col4 = st.columns(4)
+col1, col2, col3, col4, col5 = st.columns(5)
 with col1:
     st.markdown(f'<div><div class="stat-number">{len(data)}</div><div class="stat-label">Circulars Analyzed</div></div>', unsafe_allow_html=True)
 with col2:
@@ -90,11 +132,13 @@ with col3:
     st.markdown(f'<div><div class="stat-number">{total_thresholds}</div><div class="stat-label">Key Thresholds</div></div>', unsafe_allow_html=True)
 with col4:
     st.markdown(f'<div><div class="stat-number">{high_risk}</div><div class="stat-label">High Risk Items</div></div>', unsafe_allow_html=True)
+with col5:
+    st.markdown(f'<div><div class="stat-number">{linked_count}</div><div class="stat-label">Regulatory Chains</div></div>', unsafe_allow_html=True)
 
 st.divider()
 
 # --- Filter ---
-filter_col1, filter_col2 = st.columns([1, 1])
+filter_col1, filter_col2, filter_col3 = st.columns([1, 1, 1])
 with filter_col1:
     selected_authority = st.selectbox(
         "Filter by Authority",
@@ -105,12 +149,21 @@ with filter_col2:
         "Filter by Risk Level",
         ["All", "HIGH", "MEDIUM", "LOW"],
     )
+with filter_col3:
+    selected_linkage = st.selectbox(
+        "Show",
+        ["All", "Standalone", "Linked"],
+    )
 
 filtered_data = data
 if selected_authority != "All":
     filtered_data = [d for d in filtered_data if d["extraction"].get("issuing_authority") == selected_authority]
 if selected_risk != "All":
     filtered_data = [d for d in filtered_data if d["extraction"].get("compliance_risk_level") == selected_risk]
+if selected_linkage == "Linked":
+    filtered_data = [d for d in filtered_data if is_linked(d)]
+elif selected_linkage == "Standalone":
+    filtered_data = [d for d in filtered_data if not is_linked(d)]
 
 # --- Circular cards ---
 for item in filtered_data:
@@ -119,10 +172,15 @@ for item in filtered_data:
     risk_class = f"risk-{risk.lower()}"
 
     with st.container():
-        # Header row
+        # Header row with chain badge
+        chain_type = item.get("chain_type", "")
         header_col1, header_col2 = st.columns([5, 1])
         with header_col1:
-            st.subheader(ext.get("subject", item["title"]))
+            chain_badge = ""
+            if chain_type:
+                chain_labels = {"repeal": "REPEALED", "supersession": "SUPERSEDES", "amendment": "AMENDMENT"}
+                chain_badge = f' <span class="chain-badge chain-badge-{chain_type}">{chain_labels.get(chain_type, chain_type.upper())}</span>'
+            st.markdown(f'<h3 style="margin:0">{ext.get("subject", item["title"])}{chain_badge}</h3>', unsafe_allow_html=True)
         with header_col2:
             st.markdown(f'<span class="{risk_class}">{risk} RISK</span>', unsafe_allow_html=True)
 
@@ -147,6 +205,48 @@ for item in filtered_data:
 
         # Summary
         st.info(ext.get("summary", ""))
+
+        # Regulatory Lineage (between summary and applies_to)
+        supersedes = ext.get("supersedes", [])
+        amendments = ext.get("amendments_to", [])
+        repealed_by = item.get("repealed_by", "")
+
+        if repealed_by or supersedes or amendments or chain_type:
+            lineage_parts = []
+
+            if repealed_by:
+                lineage_parts.append(
+                    f'<div class="chain-repeal">'
+                    f'<span class="chain-label">REPEALED</span> — '
+                    f'This circular has been repealed and replaced by: <b>{repealed_by}</b>'
+                    f'</div>'
+                )
+
+            if supersedes:
+                for s in supersedes:
+                    ref = s.get("circular_reference", "N/A")
+                    desc = s.get("description", "")
+                    lineage_parts.append(
+                        f'<div class="chain-supersession">'
+                        f'<span class="chain-label">SUPERSEDES</span> — '
+                        f'<code>{ref}</code>: {desc}'
+                        f'</div>'
+                    )
+
+            if amendments:
+                for a in amendments:
+                    reg = a.get("regulation_name", "N/A")
+                    prov = a.get("specific_provisions", "")
+                    lineage_parts.append(
+                        f'<div class="chain-amendment">'
+                        f'<span class="chain-label">AMENDS</span> — '
+                        f'<b>{reg}</b> ({prov})'
+                        f'</div>'
+                    )
+
+            if lineage_parts:
+                st.markdown("**Regulatory Lineage:**")
+                st.markdown("\n".join(lineage_parts), unsafe_allow_html=True)
 
         # Applies to
         applies_to = ext.get("applies_to", [])
@@ -186,20 +286,6 @@ for item in filtered_data:
                 for t in thresholds
             )
             st.markdown(threshold_html, unsafe_allow_html=True)
-
-        # Supersedes
-        supersedes = ext.get("supersedes", [])
-        if supersedes:
-            st.markdown("**Supersedes:**")
-            for s in supersedes:
-                st.markdown(f"- `{s.get('circular_reference', 'N/A')}` — {s.get('description', '')}")
-
-        # Amendments
-        amendments = ext.get("amendments_to", [])
-        if amendments:
-            st.markdown("**Amends:**")
-            for a in amendments:
-                st.markdown(f"- {a.get('regulation_name', 'N/A')} — {a.get('specific_provisions', '')}")
 
         st.divider()
 

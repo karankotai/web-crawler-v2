@@ -1,7 +1,14 @@
 """Crawler for IBBI (Insolvency and Bankruptcy Board of India).
 
-ibbi.gov.in uses PHP + jQuery/AJAX with CSRF tokens.
-Sections: Circulars, Regulations, Notifications, Guidelines
+ibbi.gov.in uses PHP with simple HTML tables. PDF links are in onclick handlers:
+onclick="javascript:newwindow1('https://ibbi.gov.in//uploads/legalframwork/HASH.pdf')"
+
+Two table formats:
+  5 columns: Sr. No. | Date | Subject | PDF(English) | PDF(Hindi)  (circulars, regulations, guidelines)
+  3 columns: Sr. No. | Date | Subject (with PDF link inside)       (notifications)
+
+Pagination: /legal-framework/circulars?page=2 (20 items/page)
+Regulations URL: /legal-framework/updated (not /regulations)
 """
 
 import re
@@ -18,7 +25,7 @@ IBBI_SECTIONS = [
         "doc_type": "Circular",
     },
     {
-        "path": "/en/legal-framework/regulations",
+        "path": "/en/legal-framework/updated",
         "label": "regulations",
         "doc_type": "Regulation",
     },
@@ -41,50 +48,34 @@ class IBBICrawler(BaseCrawler):
     name = "ibbi"
     BASE_URL = "https://ibbi.gov.in"
 
-    def __init__(self):
-        super().__init__()
-        self._csrf_token = None
-
     def crawl(self):
         for section in IBBI_SECTIONS:
             self._crawl_section(section)
-
-    def _get_csrf_token(self, soup):
-        """Extract CSRF token from page meta tag or hidden input."""
-        # Try meta tag
-        meta = soup.find("meta", attrs={"name": "csrf-token"})
-        if meta and meta.get("content"):
-            return meta["content"]
-        # Try hidden input
-        inp = soup.find("input", attrs={"name": "_token"})
-        if inp and inp.get("value"):
-            return inp["value"]
-        return None
 
     def _crawl_section(self, section):
         """Crawl an IBBI section with pagination."""
         label = section["label"]
         doc_type = section["doc_type"]
-        base_url = f"{self.BASE_URL}{section['path']}"
+        base_path = section["path"]
 
         page = 1
         while page <= config.MAX_PAGES:
-            url = f"{base_url}?page={page}" if page > 1 else base_url
+            # Pagination links omit /en/ prefix, so use both forms
+            if page > 1:
+                # Pagination uses /legal-framework/circulars?page=N (no /en/)
+                path_no_en = base_path.replace("/en/", "/")
+                url = f"{self.BASE_URL}{path_no_en}?page={page}"
+            else:
+                url = f"{self.BASE_URL}{base_path}"
+
             print(f"  Fetching IBBI {label} page {page}...")
             resp = self.fetch(url)
             if not resp:
                 break
 
             soup = self.parse_html(resp.text)
-
-            # Extract CSRF token on first page
-            if page == 1:
-                self._csrf_token = self._get_csrf_token(soup)
-                if self._csrf_token:
-                    self.session.headers["X-CSRF-Token"] = self._csrf_token
-
             before = len(self.results)
-            self._parse_listing(soup, label, doc_type)
+            self._parse_table(soup, label, doc_type)
 
             found = len(self.results) - before
             print(f"  IBBI {label} page {page}: {found} records")
@@ -99,174 +90,113 @@ class IBBICrawler(BaseCrawler):
                 break
             page += 1
 
-        print(f"  Total IBBI {label}: {len([r for r in self.results if r.get('doc_type') == doc_type])}")
+        total = len([r for r in self.results if r.get("doc_type") == doc_type])
+        print(f"  Total IBBI {label}: {total}")
 
-    def _parse_listing(self, soup, label, doc_type):
-        """Parse an IBBI listing page for records."""
-        # IBBI uses HTML tables for document listings
-        for table in soup.find_all("table"):
-            rows = table.find_all("tr")
-            for row in rows:
-                cells = row.find_all("td")
-                if len(cells) < 2:
-                    continue
+    def _parse_table(self, soup, label, doc_type):
+        """Parse IBBI table rows.
 
-                # Extract title and link
-                link_tag = row.find("a", href=True)
-                if not link_tag:
-                    continue
+        Two formats:
+          5-col (circulars/regulations/guidelines):
+            td — Sr.No. | td — Date | td — Subject | td — PDF(English) | td — PDF(Hindi)
+          3-col (notifications):
+            td — Sr.No. | td — Date | td — Subject (PDF link embedded inside)
+        """
+        table = soup.find("table")
+        if not table:
+            return
 
-                title = link_tag.get_text(strip=True)
-                if not title or len(title) < 5:
-                    continue
+        rows = table.find_all("tr")
+        for row in rows[1:]:  # skip header
+            cells = row.find_all("td")
+            if len(cells) < 3:
+                continue
 
-                href = link_tag["href"]
+            # Date
+            date = cells[1].get_text(strip=True)
 
-                # Handle javascript:void(0) links — try to find onclick handler
-                if "javascript:" in href.lower():
-                    onclick = link_tag.get("onclick", "")
-                    href_match = re.search(r"(?:window\.open|location\.href)\s*[=(]\s*['\"]([^'\"]+)['\"]", onclick)
-                    if href_match:
-                        href = href_match.group(1)
-                    else:
-                        # Try data attributes
-                        href = link_tag.get("data-href", "") or link_tag.get("data-url", "")
+            # Title (subject) — clean up PDF size text like "(1.52 MB)"
+            raw_title = cells[2].get_text(strip=True)
+            title = re.sub(r'\(\d+(?:\.\d+)?\s*[KMG]?B\)\s*$', '', raw_title).strip()
+            if not title or len(title) < 5:
+                continue
 
-                if not href or "javascript:" in href.lower():
-                    continue
-
-                if not href.startswith("http"):
-                    href = urljoin(self.BASE_URL, href)
-
-                texts = [c.get_text(strip=True) for c in cells]
-
-                # Parse date (format: DD MMM, YYYY)
-                date = ""
-                for t in texts:
-                    if re.search(r'\d{1,2}\s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\w*,?\s+\d{4}', t, re.I):
-                        date = t.strip()
-                        break
-
-                # Collect PDF links
-                pdf_links = []
-                for a in row.find_all("a", href=True):
-                    a_href = a["href"]
-                    if ".pdf" in a_href.lower():
-                        if not a_href.startswith("http"):
-                            a_href = urljoin(self.BASE_URL, a_href)
-                        pdf_links.append(a_href)
-                    # Check onclick for PDF URLs
+            # Extract PDF URLs from onclick handlers — search ALL cells
+            # (5-col: PDFs in cells[3:], 3-col: PDF embedded in cells[2])
+            pdf_links = []
+            search_cells = cells[3:] if len(cells) >= 5 else cells[2:]
+            for cell in search_cells:
+                for a in cell.find_all("a"):
                     onclick = a.get("onclick", "")
-                    pdf_match = re.search(r"['\"]([^'\"]+\.pdf)['\"]", onclick, re.I)
+                    pdf_match = re.search(r"newwindow1\(['\"]([^'\"]+\.pdf)['\"]", onclick, re.I)
                     if pdf_match:
                         pdf_url = pdf_match.group(1)
                         if not pdf_url.startswith("http"):
                             pdf_url = urljoin(self.BASE_URL, pdf_url)
-                        if pdf_url not in pdf_links:
-                            pdf_links.append(pdf_url)
+                        pdf_links.append(pdf_url)
 
-                if href not in self.existing_links:
-                    self.results.append({
-                        "source": f"IBBI ({label})",
-                        "title": title,
-                        "date": date,
-                        "department": "IBBI",
-                        "link": href,
-                        "details": " | ".join(t for t in texts if t),
-                        "pdf_links": pdf_links,
-                        "doc_type": doc_type,
-                    })
+            # Use first PDF URL as unique link, fallback to generated URL
+            link = pdf_links[0] if pdf_links else f"{self.BASE_URL}/legal-framework/{label}/{date}"
 
-        # Also try div-based listings
-        for item in soup.select(".views-row, .view-content .item-list li, .legal-framework-list li"):
-            link_tag = item.find("a", href=True)
-            if not link_tag:
-                continue
-
-            title = link_tag.get_text(strip=True)
-            if not title or len(title) < 5:
-                continue
-
-            href = link_tag["href"]
-            if not href.startswith("http"):
-                href = urljoin(self.BASE_URL, href)
-            if "javascript:" in href.lower():
-                continue
-
-            date = ""
-            date_el = item.find("span", class_="date") or item.find(class_="views-field-created")
-            if date_el:
-                date = date_el.get_text(strip=True)
-
-            pdf_links = []
-            for a in item.find_all("a", href=True):
-                if ".pdf" in a["href"].lower():
-                    pdf_href = a["href"]
-                    if not pdf_href.startswith("http"):
-                        pdf_href = urljoin(self.BASE_URL, pdf_href)
-                    pdf_links.append(pdf_href)
-
-            if href not in self.existing_links:
+            if link not in self.existing_links:
                 self.results.append({
                     "source": f"IBBI ({label})",
                     "title": title,
                     "date": date,
                     "department": "IBBI",
-                    "link": href,
+                    "link": link,
                     "pdf_links": pdf_links,
                     "doc_type": doc_type,
                 })
 
     def _has_next_page(self, soup, current_page):
-        """Check if there's a next page link."""
-        # Check for ?page=N+1 links
-        for a in soup.find_all("a", href=True):
+        """Check if there's a next page in pagination."""
+        # IBBI uses ul.pagination with li > a[href="/legal-framework/X?page=N"]
+        for a in soup.select("ul.pagination a"):
             href = a.get("href", "")
             if f"page={current_page + 1}" in href:
                 return True
-            text = a.get_text(strip=True).lower()
-            if text in ("next", "next >", ">>", str(current_page + 1)):
-                return True
-
-        # Check pagination nav
-        pager = soup.select_one(".pagination, .pager, nav.pager")
-        if pager:
-            for a in pager.find_all("a", href=True):
-                if f"page={current_page + 1}" in a["href"]:
+            text = a.get_text(strip=True)
+            if text == ">":
+                # "Next" button — check it's not disabled
+                parent_li = a.parent
+                if parent_li and "disabled" not in " ".join(parent_li.get("class", [])):
                     return True
-                if a.get_text(strip=True) == str(current_page + 1):
-                    return True
-
         return False
 
     def parse_detail_page(self, soup, url):
-        """Extract content from an IBBI detail page."""
-        detail = {"content": "", "pdf_links": []}
+        """IBBI circulars are direct PDFs — no detail page parsing needed."""
+        return {}
 
-        # Collect PDF links
-        content_div = soup.select_one(".field-item") or soup.select_one("#content") or soup.body
-        if content_div:
-            for a in content_div.find_all("a", href=True):
-                href = a["href"]
-                if ".pdf" in href.lower():
-                    if not href.startswith("http"):
-                        href = urljoin(url, href)
-                    if href not in detail["pdf_links"]:
-                        detail["pdf_links"].append(href)
+    def crawl_details(self):
+        """Download PDFs and extract text."""
+        if not self.results:
+            return
 
-        # Download PDFs
-        if detail["pdf_links"]:
+        pdf_results = [r for r in self.results if r.get("pdf_links") and not r.get("content")]
+        if not pdf_results:
+            return
+
+        print(f"  Deep crawling {len(pdf_results)} IBBI PDFs...")
+        updated = 0
+        for i, record in enumerate(pdf_results):
+            pdf_links = record.get("pdf_links", [])
+            if not pdf_links:
+                continue
+
+            print(f"  [{i+1}/{len(pdf_results)}] {record.get('title', '')[:50]}...")
             content, method, _ = self._download_and_extract_all_pdfs(
-                detail["pdf_links"], url
+                pdf_links, record["link"]
             )
             if content:
-                detail["content"] = content
-                detail["extraction_method"] = method
-                detail["extraction_status"] = "success"
-                return detail
+                record["content"] = content
+                record["extraction_status"] = "success"
+                record["extraction_method"] = method
+                if config.DATABASE_URL:
+                    self._update_record_content(record["link"], record)
+                updated += 1
+                if updated % 25 == 0:
+                    print(f"  [deep checkpoint] {updated} records with content")
 
-        # Fallback to HTML
-        detail["content"] = self._extract_html_content(soup)
-        detail["extraction_method"] = "html"
-        detail["extraction_status"] = "success" if detail["content"] else "failed"
-        return detail
+        if updated:
+            print(f"  Deep crawl complete: {updated} IBBI records with content")

@@ -1,17 +1,23 @@
 """Crawler for CBDT (Central Board of Direct Taxes) — Income Tax circulars and notifications.
 
-incometaxindia.gov.in uses SharePoint/ASP.NET and returns 503 for non-browser
-requests, so we use Playwright (similar to MCA crawler).
+incometaxindia.gov.in is a SharePoint site that returns 503 for non-browser requests.
+Uses Playwright to render pages.
 
-Sections: Circulars, Notifications, Press Releases, Orders
+Page structure:
+- Items: div.search_result
+- Title: h3.search_title > a (with onclick containing PDF URL)
+- Circular number: span.NotificationNumber
+- Date: span.publishDate
+- PDF URL: extracted from onclick="javascript:OpenFormByType('URL&k=&opt=')"
+- Year filter: dropdown with __doPostBack
 """
 
-import json
 import re
 import time
 from urllib.parse import urljoin
 
 from playwright.sync_api import sync_playwright
+from bs4 import BeautifulSoup
 
 import config
 from crawlers.base import BaseCrawler
@@ -77,7 +83,11 @@ class CBDTCrawler(BaseCrawler):
         pass
 
     def _crawl_section(self, page, section):
-        """Navigate to a CBDT section and extract records."""
+        """Load a CBDT section and extract all div.search_result items.
+
+        The default view shows "All" years. We parse that first, then
+        optionally iterate by year if needed for completeness.
+        """
         url = f"{self.BASE_URL}{section['path']}"
         label = section["label"]
         doc_type = section["doc_type"]
@@ -85,187 +95,132 @@ class CBDTCrawler(BaseCrawler):
         print(f"  Loading CBDT {label}...")
         try:
             page.goto(url, wait_until="networkidle", timeout=60000)
-            time.sleep(3)
+            time.sleep(5)
         except Exception as e:
             print(f"  [ERROR] Failed to load {label}: {e}")
             return
 
-        page_num = 1
-        while page_num <= config.MAX_PAGES:
-            print(f"  Parsing CBDT {label} page {page_num}...")
-            before = len(self.results)
+        # Parse the default "All" view
+        before = len(self.results)
+        content = page.content()
+        soup = BeautifulSoup(content, "lxml")
+        self._parse_search_results(soup, label, doc_type)
+        found = len(self.results) - before
+        print(f"  CBDT {label} (all years): {found} records")
 
-            # Extract records from the current page
+        # If the default view seems truncated (SharePoint often limits to 10-30),
+        # iterate year by year using the dropdown
+        if found > 0 and found <= 30:
+            self._crawl_by_year(page, soup, label, doc_type)
+
+    def _crawl_by_year(self, page, initial_soup, label, doc_type):
+        """Iterate through years using the year dropdown to get complete listing."""
+        # Find the year dropdown
+        select = initial_soup.find("select", id=re.compile(r"ddlYear", re.I))
+        if not select:
+            return
+
+        years = [opt["value"] for opt in select.find_all("option") if opt["value"] != "All"]
+        print(f"  Crawling {len(years)} years for {label}...")
+
+        for year in years:
+            # Select the year via JavaScript
             try:
-                content = page.content()
-            except Exception:
-                break
-
-            from bs4 import BeautifulSoup
-            soup = BeautifulSoup(content, "lxml")
-            self._parse_listing(soup, label, doc_type)
-
-            found = len(self.results) - before
-            print(f"  CBDT {label} page {page_num}: {found} records")
-
-            if found == 0:
-                break
-
-            # Try to navigate to next page
-            if not self._goto_next_page(page, page_num):
-                break
-            page_num += 1
-
-    def _parse_listing(self, soup, label, doc_type):
-        """Parse a CBDT listing page for records."""
-        # CBDT pages typically use tables or div-based listings
-        # Try table rows first
-        for table in soup.find_all("table"):
-            rows = table.find_all("tr")
-            for row in rows:
-                cells = row.find_all(["td", "th"])
-                if len(cells) < 2:
-                    continue
-
-                link_tag = row.find("a", href=True)
-                if not link_tag:
-                    continue
-
-                title = link_tag.get_text(strip=True)
-                if not title or len(title) < 5:
-                    continue
-
-                href = link_tag["href"]
-                if not href.startswith("http"):
-                    href = urljoin(self.BASE_URL, href)
-
-                if any(skip in href.lower() for skip in ["javascript:", "mailto:", "#"]):
-                    continue
-
-                texts = [c.get_text(strip=True) for c in cells]
-
-                # Extract date and circular number from cells
-                date = ""
-                circular_number = ""
-                for t in texts:
-                    if re.search(r'\d{2}[/-]\d{2}[/-]\d{4}', t):
-                        date = t
-                    elif re.search(r'(?:Circular|Notification)\s*(?:No\.?)?\s*\d+', t, re.I):
-                        circular_number = t
-
-                # Detect PDF links
-                pdf_links = []
-                for a in row.find_all("a", href=True):
-                    if ".pdf" in a["href"].lower():
-                        pdf_href = a["href"]
-                        if not pdf_href.startswith("http"):
-                            pdf_href = urljoin(self.BASE_URL, pdf_href)
-                        pdf_links.append(pdf_href)
-
-                if href not in self.existing_links:
-                    self.results.append({
-                        "source": f"CBDT ({label})",
-                        "title": title,
-                        "date": date,
-                        "department": "CBDT - Income Tax",
-                        "link": href,
-                        "details": " | ".join(t for t in texts if t),
-                        "circular_number": circular_number,
-                        "pdf_links": pdf_links,
-                        "doc_type": doc_type,
-                    })
-
-        # Fallback: div-based listings
-        for div in soup.select(".comm-list li, .listing-content li, .content-area li"):
-            link_tag = div.find("a", href=True)
-            if not link_tag:
+                select_id = select.get("id", "")
+                page.select_option(f"#{select_id}", year)
+                page.wait_for_load_state("networkidle", timeout=30000)
+                time.sleep(3)
+            except Exception as e:
+                print(f"  [WARN] Failed to select year {year}: {e}")
                 continue
-            title = link_tag.get_text(strip=True)
+
+            before = len(self.results)
+            content = page.content()
+            soup = BeautifulSoup(content, "lxml")
+            self._parse_search_results(soup, label, doc_type)
+            found = len(self.results) - before
+            if found > 0:
+                print(f"  CBDT {label} {year}: {found} new records")
+
+    def _parse_search_results(self, soup, label, doc_type):
+        """Parse div.search_result items from the page.
+
+        Structure:
+            div.search_result
+                h3.search_title
+                    a[onclick="javascript:OpenFormByType('PDF_URL&k=&opt=')"]
+                        span > span.NotificationNumber
+                        span.publishDate
+                p.search_description (preview text)
+        """
+        items = soup.select("div.search_result")
+        for item in items:
+            title_link = item.select_one("h3.search_title a")
+            if not title_link:
+                continue
+
+            # Extract PDF URL from onclick handler
+            onclick = title_link.get("onclick", "")
+            pdf_url = ""
+            url_match = re.search(r"OpenFormByType\('([^']+?)(?:&k=|&amp;k=)", onclick)
+            if url_match:
+                pdf_url = url_match.group(1)
+                # Clean up HTML entities
+                pdf_url = pdf_url.replace("&amp;", "&")
+
+            # Extract circular number
+            notif_span = item.select_one("span.NotificationNumber")
+            circular_number = notif_span.get_text(strip=True).rstrip(":").strip() if notif_span else ""
+
+            # Extract date
+            date_span = item.select_one("span.publishDate")
+            date = date_span.get_text(strip=True) if date_span else ""
+
+            # Extract title (full text minus the number and date)
+            full_text = title_link.get_text(strip=True)
+            title = full_text
+            # Remove the circular number prefix and date suffix for cleaner title
+            if circular_number and title.startswith(circular_number):
+                title = title[len(circular_number):].lstrip(": \u200b")
+            if date and title.endswith(date):
+                title = title[:-len(date)].strip()
+            title = title.strip("\u200b :")
+
             if not title or len(title) < 5:
                 continue
 
-            href = link_tag["href"]
-            if not href.startswith("http"):
-                href = urljoin(self.BASE_URL, href)
+            # Use PDF URL as the unique link, or construct one
+            link = pdf_url if pdf_url else f"{self.BASE_URL}/communications/{label}/{circular_number}"
+            pdf_links = [pdf_url] if pdf_url else []
 
-            if any(skip in href.lower() for skip in ["javascript:", "mailto:", "#"]):
-                continue
-
-            date = ""
-            date_el = div.find("span", class_="date") or div.find("small")
-            if date_el:
-                date = date_el.get_text(strip=True)
-
-            pdf_links = []
-            for a in div.find_all("a", href=True):
-                if ".pdf" in a["href"].lower():
-                    pdf_href = a["href"]
-                    if not pdf_href.startswith("http"):
-                        pdf_href = urljoin(self.BASE_URL, pdf_href)
-                    pdf_links.append(pdf_href)
-
-            if href not in self.existing_links:
+            if link not in self.existing_links:
                 self.results.append({
                     "source": f"CBDT ({label})",
                     "title": title,
                     "date": date,
                     "department": "CBDT - Income Tax",
-                    "link": href,
+                    "link": link,
+                    "details": circular_number,
+                    "circular_number": circular_number,
                     "pdf_links": pdf_links,
                     "doc_type": doc_type,
                 })
 
-    def _goto_next_page(self, page, current_page):
-        """Try to navigate to the next page. Returns True on success."""
-        try:
-            # Try query parameter pagination
-            next_url = f"?c={current_page + 1}"
-            next_link = page.query_selector(f'a[href*="c={current_page + 1}"]')
-            if next_link:
-                next_link.click()
-                page.wait_for_load_state("networkidle", timeout=15000)
-                time.sleep(2)
-                return True
-
-            # Try ASP.NET postback pagination
-            next_link = page.query_selector(f'a[href*="Page${current_page + 1}"]')
-            if next_link:
-                next_link.click()
-                page.wait_for_load_state("networkidle", timeout=15000)
-                time.sleep(2)
-                return True
-
-            # Try "Next" link
-            for text in ["Next", "Next >", ">>"]:
-                next_link = page.query_selector(f'a:text-is("{text}")')
-                if next_link:
-                    next_link.click()
-                    page.wait_for_load_state("networkidle", timeout=15000)
-                    time.sleep(2)
-                    return True
-        except Exception:
-            pass
-        return False
-
     def _deep_crawl_pdfs(self, page):
-        """Download PDFs and extract text while browser is still open."""
-        pdf_results = [r for r in self.results if r.get("pdf_links")]
+        """Download PDFs and extract text."""
+        pdf_results = [r for r in self.results if r.get("pdf_links") and not r.get("content")]
         if not pdf_results:
             return
 
         print(f"  Deep crawling {len(pdf_results)} CBDT PDFs...")
         updated = 0
         for i, record in enumerate(pdf_results):
-            if record.get("content"):
-                continue
-
             pdf_links = record.get("pdf_links", [])
             if not pdf_links:
                 continue
 
-            print(f"  [{i+1}/{len(pdf_results)}] {record.get('title', '')[:60]}...")
+            print(f"  [{i+1}/{len(pdf_results)}] {record.get('circular_number', '')[:40]}...")
 
-            # Download and extract all PDFs
             content, method, _ = self._download_and_extract_all_pdfs(
                 pdf_links, record["link"], concurrent=False
             )
@@ -283,5 +238,5 @@ class CBDTCrawler(BaseCrawler):
             print(f"  Deep crawl complete: {updated} CBDT records with content")
 
     def parse_detail_page(self, soup, url):
-        """Not primarily used — CBDT deep crawl is handled via _deep_crawl_pdfs."""
+        """Not primarily used — CBDT deep crawl handled via _deep_crawl_pdfs."""
         return {}

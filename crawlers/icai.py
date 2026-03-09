@@ -1,9 +1,15 @@
 """Crawler for ICAI (Institute of Chartered Accountants of India).
 
 Crawls announcements, accounting standards, guidance notes, and exposure drafts.
-ICAI uses simple static HTML + jQuery — no anti-bot, no Playwright needed.
+ICAI uses simple static HTML — no anti-bot, no Playwright needed.
+
+Page structure:
+- Announcements: ul.list-group > li.list-group-item > a (dates in text as "- (DD-MM-YYYY)")
+- Standards/Guidance: direct PDF links from resource.cdn.icai.org
+- Pagination: /category/announcements/2, /category/announcements/3, etc.
 """
 
+import re
 from urllib.parse import urljoin
 
 import config
@@ -24,20 +30,19 @@ class ICAICrawler(BaseCrawler):
             "max_pages": 20,
         },
         {
-            "url": f"{BASE_URL}/category/accounting-standards",
-            "label": "accounting standards",
+            "url": f"{BASE_URL}/post/accounting-standards-as",
+            "label": "accounting standards (AS)",
+            "paginated": False,
+        },
+        {
+            "url": f"{BASE_URL}/post/indian-accounting-standards-indas",
+            "label": "accounting standards (Ind AS)",
             "paginated": False,
         },
         {
             "url": f"{BASE_URL}/post/guidance-notes",
             "label": "guidance notes",
             "paginated": False,
-        },
-        {
-            "url": f"{BASE_URL}/category/list-of-exposure-drafts",
-            "label": "exposure drafts",
-            "paginated": True,
-            "max_pages": 5,
         },
     ]
 
@@ -63,7 +68,7 @@ class ICAICrawler(BaseCrawler):
 
             soup = self.parse_html(resp.text)
             before = len(self.results)
-            self._parse_listing_page(soup, label)
+            self._parse_list_group(soup, label)
 
             found = len(self.results) - before
             print(f"  ICAI {label} page {page}: {found} records")
@@ -73,7 +78,7 @@ class ICAICrawler(BaseCrawler):
                 break
 
     def _crawl_single_page(self, section):
-        """Crawl a single-page ICAI section."""
+        """Crawl a single-page ICAI section (standards, guidance notes)."""
         label = section["label"]
         print(f"  Fetching ICAI {label}...")
         resp = self.fetch(section["url"])
@@ -82,23 +87,26 @@ class ICAICrawler(BaseCrawler):
 
         soup = self.parse_html(resp.text)
         before = len(self.results)
-        self._parse_listing_page(soup, label)
+        self._parse_content_links(soup, label)
         found = len(self.results) - before
         print(f"  ICAI {label}: {found} records")
         if found > 0:
             self.save_progress()
 
-    def _parse_listing_page(self, soup, label):
-        """Parse an ICAI listing page for announcements/standards."""
-        # Try multiple content patterns used across ICAI sections
+    def _parse_list_group(self, soup, label):
+        """Parse ICAI list-group pattern (used by announcements).
 
-        # Pattern 1: <li> items with links (announcements)
-        for li in soup.select("ul.listing li, ul.post-listing li, .announcements li, .content-area li"):
-            link_tag = li.find("a", href=True)
+        Structure: ul.list-group > li.list-group-item > a
+        Date embedded in link text: "Title text - (DD-MM-YYYY)"
+        """
+        items = soup.select("li.list-group-item")
+        for item in items:
+            link_tag = item.find("a", href=True)
             if not link_tag:
                 continue
-            title = link_tag.get_text(strip=True)
-            if not title or len(title) < 5:
+
+            raw_text = link_tag.get_text(strip=True)
+            if not raw_text or len(raw_text) < 10:
                 continue
 
             href = link_tag["href"]
@@ -106,30 +114,21 @@ class ICAICrawler(BaseCrawler):
                 href = urljoin(self.BASE_URL, href)
 
             # Skip navigation/non-content links
-            if any(skip in href.lower() for skip in ["javascript:", "mailto:", "#", "login"]):
+            if any(skip in href.lower() for skip in ["javascript:", "mailto:", "#"]):
                 continue
 
-            # Extract date if present (often in a span or nearby text)
+            # Extract date from text: "Title - (DD-MM-YYYY)"
+            title = raw_text
             date = ""
-            date_el = li.find("span", class_="date") or li.find("small")
-            if date_el:
-                date = date_el.get_text(strip=True)
-            else:
-                # Try to extract from parent text
-                li_text = li.get_text(strip=True)
-                import re
-                date_match = re.search(r'\d{2}-\d{2}-\d{4}', li_text)
-                if date_match:
-                    date = date_match.group()
+            date_match = re.search(r'-\s*\((\d{2}-\d{2}-\d{4})\)\s*$', raw_text)
+            if date_match:
+                date = date_match.group(1)
+                title = raw_text[:date_match.start()].strip()
 
-            # Check for PDF links
+            # Determine if link is a direct PDF
             pdf_links = []
-            for a in li.find_all("a", href=True):
-                if ".pdf" in a["href"].lower():
-                    pdf_href = a["href"]
-                    if not pdf_href.startswith("http"):
-                        pdf_href = urljoin(self.BASE_URL, pdf_href)
-                    pdf_links.append(pdf_href)
+            if ".pdf" in href.lower():
+                pdf_links = [href]
 
             if href not in self.existing_links:
                 self.results.append({
@@ -142,48 +141,52 @@ class ICAICrawler(BaseCrawler):
                     "doc_type": label,
                 })
 
-        # Pattern 2: Table rows (some standards pages use tables)
-        for table in soup.find_all("table"):
-            for row in table.find_all("tr"):
-                cells = row.find_all(["td", "th"])
-                if len(cells) < 2:
-                    continue
-                link_tag = row.find("a", href=True)
-                if not link_tag:
-                    continue
+    def _parse_content_links(self, soup, label):
+        """Parse direct PDF and content links (used by standards/guidance pages).
 
-                title = link_tag.get_text(strip=True)
-                if not title or len(title) < 5:
-                    continue
+        These pages have direct links to resource.cdn.icai.org PDFs and
+        sub-category links to /post/ pages inside div.shadow or the main content.
+        """
+        # Find main content container
+        shadow = soup.select_one("div.shadow")
+        container = shadow or soup.select_one("div.container.mx-3") or soup.body
+        if not container:
+            return
 
-                href = link_tag["href"]
-                if not href.startswith("http"):
-                    href = urljoin(self.BASE_URL, href)
+        seen_hrefs = set()
+        for a in container.find_all("a", href=True):
+            href = a["href"]
+            title = a.get_text(strip=True)
+            if not title or len(title) < 5:
+                continue
 
-                if any(skip in href.lower() for skip in ["javascript:", "mailto:", "#"]):
-                    continue
+            if not href.startswith("http"):
+                href = urljoin(self.BASE_URL, href)
 
-                texts = [c.get_text(strip=True) for c in cells]
+            # Only collect content links (PDFs and /post/ pages), skip nav
+            is_pdf = ".pdf" in href.lower()
+            is_post = "/post/" in href
+            if not is_pdf and not is_post:
+                continue
 
-                pdf_links = []
-                for a in row.find_all("a", href=True):
-                    if ".pdf" in a["href"].lower():
-                        pdf_href = a["href"]
-                        if not pdf_href.startswith("http"):
-                            pdf_href = urljoin(self.BASE_URL, pdf_href)
-                        pdf_links.append(pdf_href)
+            if any(skip in href.lower() for skip in ["javascript:", "mailto:", "#"]):
+                continue
 
-                if href not in self.existing_links:
-                    self.results.append({
-                        "source": f"ICAI ({label})",
-                        "title": title,
-                        "date": "",
-                        "department": "ICAI",
-                        "link": href,
-                        "details": " | ".join(t for t in texts if t),
-                        "pdf_links": pdf_links,
-                        "doc_type": label,
-                    })
+            if href in seen_hrefs or href in self.existing_links:
+                continue
+            seen_hrefs.add(href)
+
+            pdf_links = [href] if is_pdf else []
+
+            self.results.append({
+                "source": f"ICAI ({label})",
+                "title": title,
+                "date": "",
+                "department": "ICAI",
+                "link": href,
+                "pdf_links": pdf_links,
+                "doc_type": label,
+            })
 
     def parse_detail_page(self, soup, url):
         """Extract content from an ICAI detail page."""
@@ -191,10 +194,10 @@ class ICAICrawler(BaseCrawler):
 
         # Find main content area
         content_div = (
+            soup.select_one("div.shadow") or
             soup.select_one(".post-content") or
             soup.select_one(".content-area") or
             soup.select_one("#content") or
-            soup.select_one("article") or
             soup.body
         )
         if not content_div:
