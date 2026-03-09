@@ -24,6 +24,9 @@ from rag_app.models.schemas import (
     EvalResponse,
     IndexRequest,
     IndexResponse,
+    ObligationExtractRequest,
+    ObligationExtractResponse,
+    ObligationListResponse,
     UploadResponse,
     VALID_SOURCES,
 )
@@ -543,3 +546,193 @@ async def crawl_status(task_id: str):
     if not job:
         raise HTTPException(status_code=404, detail="Task not found")
     return {"task_id": task_id, **{k: v for k, v in job.items() if k != "queue"}}
+
+
+# ── Obligations endpoints ────────────────────────────────────
+
+
+def _get_obligations_conn():
+    """Get a psycopg2 connection for obligations queries."""
+    import psycopg2
+
+    if not settings.DATABASE_URL:
+        raise HTTPException(status_code=500, detail="DATABASE_URL not configured")
+    return psycopg2.connect(settings.DATABASE_URL)
+
+
+@app.post("/obligations/extract", response_model=ObligationExtractResponse)
+async def extract_obligation(request: ObligationExtractRequest):
+    """Extract compliance obligations from a PDF/HTML URL."""
+    import sys
+    import os
+
+    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    if project_root not in sys.path:
+        sys.path.insert(0, project_root)
+
+    from scripts.extract_obligations import extract_obligations
+
+    # 1. Fetch content
+    try:
+        text, title = _fetch_link_content(request.url)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Failed to fetch URL: {e}")
+
+    if not text or len(text) < 50:
+        raise HTTPException(status_code=400, detail="Extracted text too short for analysis.")
+
+    # 2. Extract obligations via LLM
+    try:
+        result, usage = extract_obligations(text)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Extraction failed: {e}")
+
+    # 3. Save to DB
+    conn = _get_obligations_conn()
+    try:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                INSERT INTO extracted_obligations
+                    (title, source_url, pdf_links, chain_type, repealed_by,
+                     extraction, model_used, token_count_in, token_count_out)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                RETURNING id, created_at
+                """,
+                (
+                    title,
+                    request.url,
+                    json.dumps([request.url] if request.url.lower().endswith(".pdf") else []),
+                    request.chain_type,
+                    request.repealed_by,
+                    json.dumps(result),
+                    "gpt-4o",
+                    usage.get("prompt_tokens", 0),
+                    usage.get("completion_tokens", 0),
+                ),
+            )
+            row = cur.fetchone()
+            conn.commit()
+
+        return ObligationExtractResponse(
+            status="success",
+            obligation={
+                "id": row[0],
+                "title": title,
+                "source_url": request.url,
+                "chain_type": request.chain_type,
+                "repealed_by": request.repealed_by,
+                "extraction": result,
+                "model_used": "gpt-4o",
+                "token_count_in": usage.get("prompt_tokens", 0),
+                "token_count_out": usage.get("completion_tokens", 0),
+                "created_at": row[1].isoformat(),
+            },
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        conn.rollback()
+        raise HTTPException(status_code=500, detail=f"Failed to save: {e}")
+    finally:
+        conn.close()
+
+
+@app.get("/obligations", response_model=ObligationListResponse)
+async def list_obligations(
+    page: int = 1,
+    limit: int = 20,
+    authority: str | None = None,
+    risk_level: str | None = None,
+    chain_type: str | None = None,
+):
+    """List extracted obligations with pagination and filters."""
+    import psycopg2.extras
+
+    page = max(1, page)
+    limit = min(limit, 100)
+    offset = (page - 1) * limit
+
+    conditions = []
+    params: list = []
+
+    if authority:
+        conditions.append("extraction->>'issuing_authority' = %s")
+        params.append(authority)
+    if risk_level:
+        conditions.append("extraction->>'compliance_risk_level' = %s")
+        params.append(risk_level)
+    if chain_type:
+        conditions.append("chain_type = %s")
+        params.append(chain_type)
+
+    where = ("WHERE " + " AND ".join(conditions)) if conditions else ""
+
+    conn = _get_obligations_conn()
+    try:
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+            cur.execute(f"SELECT COUNT(*) as cnt FROM extracted_obligations {where}", params)
+            total = cur.fetchone()["cnt"]
+
+            cur.execute(
+                f"""
+                SELECT id, doc_id, title, source_url, pdf_links, chain_type, repealed_by,
+                       extraction, model_used, token_count_in, token_count_out,
+                       created_at, updated_at
+                FROM extracted_obligations
+                {where}
+                ORDER BY created_at DESC
+                LIMIT %s OFFSET %s
+                """,
+                params + [limit, offset],
+            )
+            rows = cur.fetchall()
+
+        obligations = []
+        for r in rows:
+            ob = dict(r)
+            ob["created_at"] = ob["created_at"].isoformat() if ob["created_at"] else None
+            ob["updated_at"] = ob["updated_at"].isoformat() if ob["updated_at"] else None
+            obligations.append(ob)
+
+        total_pages = max(1, -(-total // limit))  # ceil division
+
+        return ObligationListResponse(
+            obligations=obligations,
+            page=page,
+            total_pages=total_pages,
+            total=total,
+        )
+    finally:
+        conn.close()
+
+
+@app.get("/obligations/{obligation_id}")
+async def get_obligation(obligation_id: int):
+    """Get a single obligation by ID."""
+    import psycopg2.extras
+
+    conn = _get_obligations_conn()
+    try:
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+            cur.execute(
+                """
+                SELECT id, doc_id, title, source_url, pdf_links, chain_type, repealed_by,
+                       extraction, model_used, token_count_in, token_count_out,
+                       created_at, updated_at
+                FROM extracted_obligations
+                WHERE id = %s
+                """,
+                (obligation_id,),
+            )
+            row = cur.fetchone()
+
+        if not row:
+            raise HTTPException(status_code=404, detail="Obligation not found")
+
+        ob = dict(row)
+        ob["created_at"] = ob["created_at"].isoformat() if ob["created_at"] else None
+        ob["updated_at"] = ob["updated_at"].isoformat() if ob["updated_at"] else None
+        return ob
+    finally:
+        conn.close()

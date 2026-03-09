@@ -148,8 +148,12 @@ def extract_obligations(circular_text, model="gpt-4o"):
 
     result = json.loads(response.choices[0].message.content)
     usage = response.usage
+    usage_dict = {
+        "prompt_tokens": usage.prompt_tokens,
+        "completion_tokens": usage.completion_tokens,
+    }
     print(f"  Tokens: {usage.prompt_tokens} in, {usage.completion_tokens} out")
-    return result
+    return result, usage_dict
 
 
 def save_extraction(conn, doc_id, obligations_json):
@@ -264,7 +268,7 @@ def main():
         doc_id, title, date, circ_num, content, crawler = row
         print(f"\n--- Processing ID={doc_id}: {title[:70]}... ---")
 
-        result = extract_obligations(content, model=args.model)
+        result, usage = extract_obligations(content, model=args.model)
         print_obligations(result, title=title)
 
         if not args.dry_run:

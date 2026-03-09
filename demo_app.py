@@ -6,6 +6,7 @@ Run: streamlit run demo_app.py
 """
 
 import json
+import os
 from datetime import datetime
 
 import streamlit as st
@@ -17,8 +18,29 @@ st.set_page_config(
 )
 
 # --- Load data ---
-@st.cache_data
+@st.cache_data(ttl=300)
 def load_obligations():
+    database_url = os.environ.get("DATABASE_URL", "")
+    if database_url:
+        import psycopg2
+        import psycopg2.extras
+
+        conn = psycopg2.connect(database_url)
+        try:
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+                cur.execute(
+                    """
+                    SELECT doc_id, title, source_url, pdf_links, chain_type,
+                           repealed_by, extraction
+                    FROM extracted_obligations
+                    ORDER BY created_at DESC
+                    """
+                )
+                rows = cur.fetchall()
+            return [dict(r) for r in rows]
+        finally:
+            conn.close()
+
     with open("demo_obligations.json", "r", encoding="utf-8") as f:
         return json.load(f)
 

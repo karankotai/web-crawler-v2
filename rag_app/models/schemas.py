@@ -203,6 +203,30 @@ class CrawlResponse(BaseModel):
 # ── Analysis chat schemas ────────────────────────────────────
 
 
+# ── Obligations schemas ─────────────────────────────────────
+
+
+class ObligationExtractRequest(BaseModel):
+    url: str = Field(max_length=2000)
+    chain_type: Optional[str] = None
+    repealed_by: Optional[str] = None
+
+
+class ObligationExtractResponse(BaseModel):
+    status: str
+    obligation: dict
+
+
+class ObligationListResponse(BaseModel):
+    obligations: list[dict]
+    page: int
+    total_pages: int
+    total: int
+
+
+# ── Analysis chat schemas ────────────────────────────────────
+
+
 class AnalysisChatMessage(BaseModel):
     role: str = Field(pattern="^(user|assistant)$")
     content: str = Field(max_length=10000)
