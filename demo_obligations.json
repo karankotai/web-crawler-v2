@@ -1,0 +1,480 @@
+[
+  {
+    "doc_id": 754100,
+    "title": "Specification of the consequential requirements with respect to Amendment of Securities and Exchange Board of India (Merchant Bankers) Regulations, 1992",
+    "extraction": {
+      "circular_reference": "HO/49/11/11(106)2025-CFD-RAC-DIL3/I/1796/2026",
+      "issuing_authority": "SEBI",
+      "date_issued": "2026-01-02",
+      "effective_date": "2026-01-03",
+      "subject": "Amendment of SEBI (Merchant Bankers) Regulations, 1992",
+      "summary": "The circular introduces amendments to the SEBI (Merchant Bankers) Regulations, 1992, focusing on revised capital adequacy, liquid net worth requirements, and other compliance obligations for Merchant Bankers. These changes aim to enhance financial stability and operational transparency within the merchant banking sector.",
+      "applies_to": [
+        {
+          "entity_type": "Registered Merchant Bankers",
+          "conditions": null
+        }
+      ],
+      "obligations": [
+        {
+          "action": "Fulfill revised capital adequacy and liquid net worth requirements.",
+          "deadline": "As on date of application for new applicants; phased manner for existing MBs.",
+          "penalty_for_non_compliance": null,
+          "form_or_filing": null,
+          "section_reference": "Regulation 7 and 7A of MB Regulations",
+          "is_new": true,
+          "notes": "Phased implementation for existing MBs as per Table I."
+        },
+        {
+          "action": "Categorize as Category I or II and submit Chartered Accountant certified Net worth Certificate.",
+          "deadline": "On or before January 02, 2027",
+          "penalty_for_non_compliance": "Automatic designation as Category II or restriction on activities.",
+          "form_or_filing": "Email to mb@sebi.gov.in",
+          "section_reference": "Regulation 3(4) of MB Regulations",
+          "is_new": true,
+          "notes": "Includes liquid net worth component."
+        },
+        {
+          "action": "Submit Chartered Accountant certificate as part of Half Yearly Report.",
+          "deadline": "Every half year",
+          "penalty_for_non_compliance": null,
+          "form_or_filing": "Half Yearly Report",
+          "section_reference": null,
+          "is_new": true,
+          "notes": "Certifies net worth and liquid net worth maintenance."
+        },
+        {
+          "action": "Comply with underwriting obligations not exceeding 20 times liquid net worth.",
+          "deadline": "By January 02, 2028",
+          "penalty_for_non_compliance": null,
+          "form_or_filing": "Half Yearly Report",
+          "section_reference": "Regulation 22B(2) of MB Regulations",
+          "is_new": true,
+          "notes": "Includes Chartered Accountant certification."
+        },
+        {
+          "action": "Ensure employees and compliance officer obtain requisite certifications.",
+          "deadline": "On or before January 02, 2027 for existing employees; within 90 days of appointment for new employees.",
+          "penalty_for_non_compliance": null,
+          "form_or_filing": null,
+          "section_reference": "Regulation 6(b) and 6(ba) of MB Regulations",
+          "is_new": true,
+          "notes": "NISM Series-IX and Series-IIIA certifications required."
+        },
+        {
+          "action": "Ensure compliance officer is independent from other employees.",
+          "deadline": "On or before April 03, 2026",
+          "penalty_for_non_compliance": null,
+          "form_or_filing": null,
+          "section_reference": "Regulation 28A(2)(i) of MB Regulations",
+          "is_new": true,
+          "notes": "Applies to existing MBs."
+        },
+        {
+          "action": "Ensure principal officer has relevant experience.",
+          "deadline": "On or before January 02, 2027",
+          "penalty_for_non_compliance": null,
+          "form_or_filing": null,
+          "section_reference": "Regulation 2(1)(d) of MB Regulations",
+          "is_new": true,
+          "notes": "Five years of experience in financial markets required."
+        },
+        {
+          "action": "Close outsourced core merchant banking activities.",
+          "deadline": "On or before April 03, 2026",
+          "penalty_for_non_compliance": null,
+          "form_or_filing": null,
+          "section_reference": "Regulation 9A(1)(i) of MB Regulations",
+          "is_new": true,
+          "notes": "Applies to existing MBs with open mandates."
+        },
+        {
+          "action": "Generate minimum revenue from permitted activities.",
+          "deadline": "First assessment from April 01, 2029",
+          "penalty_for_non_compliance": "Certificate of registration liable to be cancelled.",
+          "form_or_filing": null,
+          "section_reference": "Regulation 9A(1)(j) and 9C of MB Regulations",
+          "is_new": true,
+          "notes": "Minimum revenue thresholds specified for Category I and II."
+        },
+        {
+          "action": "Submit revenue details to SEBI.",
+          "deadline": "Within three months from the end of each financial year, starting FY 2026-27",
+          "penalty_for_non_compliance": null,
+          "form_or_filing": null,
+          "section_reference": null,
+          "is_new": true,
+          "notes": "Applies to revenue from permitted activities."
+        },
+        {
+          "action": "Disclose involvement in marketing of issues where holding exceeds specified limits.",
+          "deadline": "Applicable to public issues filed on or after January 03, 2026",
+          "penalty_for_non_compliance": null,
+          "form_or_filing": null,
+          "section_reference": "Regulation 21C of MB Regulations",
+          "is_new": true,
+          "notes": "Disclosure in offer document and marketing material required."
+        },
+        {
+          "action": "Segregate non-SEBI regulated activities into separate business units.",
+          "deadline": "On or before July 03, 2026",
+          "penalty_for_non_compliance": null,
+          "form_or_filing": null,
+          "section_reference": "Regulation 13A(2) of MB Regulations",
+          "is_new": true,
+          "notes": "Chinese Wall and ring-fencing required."
+        },
+        {
+          "action": "Disclose non-SEBI regulated activities on website.",
+          "deadline": "On or before February 02, 2026",
+          "penalty_for_non_compliance": null,
+          "form_or_filing": null,
+          "section_reference": null,
+          "is_new": true,
+          "notes": "Disclosure of non-availability of SEBI protection mechanisms required."
+        },
+        {
+          "action": "Submit compliance report for non-SEBI regulated activities.",
+          "deadline": "On or before July 03, 2026",
+          "penalty_for_non_compliance": null,
+          "form_or_filing": null,
+          "section_reference": null,
+          "is_new": true,
+          "notes": "Includes confirmation/acknowledgement from stakeholders."
+        }
+      ],
+      "key_thresholds": [
+        {
+          "parameter": "Capital adequacy for Category I",
+          "value": "Rs. 25 cr (Phase I), Rs. 50 cr (Phase II)",
+          "context": "Phased implementation for existing MBs"
+        },
+        {
+          "parameter": "Liquid net worth for Category I",
+          "value": "Rs. 6.25 cr (Phase I), Rs. 12.5 cr (Phase II)",
+          "context": "Phased implementation for existing MBs"
+        },
+        {
+          "parameter": "Capital adequacy for Category II",
+          "value": "Rs. 7.5 cr (Phase I), Rs. 10 cr (Phase II)",
+          "context": "Phased implementation for existing MBs"
+        },
+        {
+          "parameter": "Liquid net worth for Category II",
+          "value": "Rs. 1.875 cr (Phase I), Rs. 2.5 cr (Phase II)",
+          "context": "Phased implementation for existing MBs"
+        },
+        {
+          "parameter": "Underwriting obligations",
+          "value": "20 times liquid net worth",
+          "context": "Compliance by January 02, 2028"
+        },
+        {
+          "parameter": "Minimum revenue for Category I",
+          "value": "Rs. 25 crore",
+          "context": "Cumulative over three preceding financial years"
+        },
+        {
+          "parameter": "Minimum revenue for Category II",
+          "value": "Rs. 5 crore",
+          "context": "Cumulative over three preceding financial years"
+        }
+      ],
+      "supersedes": [],
+      "amendments_to": [
+        {
+          "regulation_name": "SEBI (Merchant Bankers) Regulations, 1992",
+          "specific_provisions": "Regulations 3, 6, 7, 7A, 9A, 13A, 21C, 22B, 28A"
+        }
+      ],
+      "compliance_risk_level": "HIGH",
+      "risk_rationale": "The circular introduces significant changes to capital and operational requirements, impacting the financial and operational stability of Merchant Bankers."
+    },
+    "source_url": "https://www.sebi.gov.in/legal/circulars/jan-2026/specification-of-the-consequential-requirements-with-respect-to-amendment-of-securities-and-exchange-board-of-india-merchant-bankers-regulations-1992_98831.html",
+    "pdf_links": [
+      "https://www.sebi.gov.in/sebi_data/attachdocs/jan-2026/1767358255887.pdf"
+    ]
+  },
+  {
+    "doc_id": 754080,
+    "title": "Revised Norms for appointment of an independent third-party reviewer/ certifier for green debt security",
+    "extraction": {
+      "circular_reference": "HO/17/11/24(1)2026-DDHS-POD1/I/5967/2026",
+      "issuing_authority": "SEBI",
+      "date_issued": "2026-02-27",
+      "effective_date": "immediate effect",
+      "subject": "Revised Norms for appointment of an independent third-party reviewer/certifier for green debt security",
+      "summary": "This circular modifies the requirements for appointing an independent third-party reviewer/certifier for green debt securities to align with those for social and sustainability bonds. It specifies the conditions under which the reviewer must operate and the forms the review may take.",
+      "applies_to": [
+        {
+          "entity_type": "Issuers of green debt securities",
+          "conditions": "listed or propose to list"
+        },
+        {
+          "entity_type": "Recognized Stock Exchanges",
+          "conditions": null
+        },
+        {
+          "entity_type": "Recognized Depositories",
+          "conditions": null
+        },
+        {
+          "entity_type": "Registered Merchant Bankers",
+          "conditions": null
+        },
+        {
+          "entity_type": "Registered Debenture Trustees",
+          "conditions": null
+        },
+        {
+          "entity_type": "Registered Credit Rating Agencies",
+          "conditions": null
+        },
+        {
+          "entity_type": "Registered ESG Ratings Providers",
+          "conditions": null
+        }
+      ],
+      "obligations": [
+        {
+          "action": "Appoint an independent third-party reviewer/certifier to ascertain compliance with the definition of green debt securities and review/certify processes.",
+          "deadline": "immediate effect",
+          "penalty_for_non_compliance": null,
+          "form_or_filing": "offer document",
+          "section_reference": "Regulation 2(1)(q) of the SEBI (Issue and Listing of Non-Convertible Securities) Regulations, 2021",
+          "is_new": true,
+          "notes": "Reviewer must be independent of issuer and have expertise in ESG debt securities."
+        },
+        {
+          "action": "Ensure the scope of the review by the independent third-party reviewer is specified in the offer document.",
+          "deadline": "immediate effect",
+          "penalty_for_non_compliance": null,
+          "form_or_filing": "offer document",
+          "section_reference": null,
+          "is_new": true,
+          "notes": null
+        },
+        {
+          "action": "Ensure details regarding the independent third-party reviewer are adequately disclosed in the offer document.",
+          "deadline": "immediate effect",
+          "penalty_for_non_compliance": null,
+          "form_or_filing": "offer document",
+          "section_reference": null,
+          "is_new": true,
+          "notes": null
+        }
+      ],
+      "key_thresholds": [],
+      "supersedes": [],
+      "amendments_to": [
+        {
+          "regulation_name": "NCS Master Circular",
+          "specific_provisions": "Chapter IX, Paragraph 1.8 deleted and new Paragraph 5 inserted"
+        }
+      ],
+      "compliance_risk_level": "MEDIUM",
+      "risk_rationale": "The changes require issuers to engage independent reviewers, which may involve additional compliance costs and processes."
+    },
+    "source_url": "https://www.sebi.gov.in/legal/circulars/feb-2026/revised-norms-for-appointment-of-an-independent-third-party-reviewer-certifier-for-green-debt-security_100043.html",
+    "pdf_links": [
+      "https://www.sebi.gov.in/sebi_data/attachdocs/feb-2026/1772193450819.pdf"
+    ]
+  },
+  {
+    "doc_id": 754090,
+    "title": "Revision of Order-to-Trade Ratio (OTR) framework",
+    "extraction": {
+      "circular_reference": "HO/47/11/16(2)2025-MRD-POD2/I/4113/2026",
+      "issuing_authority": "SEBI",
+      "date_issued": "2026-02-04",
+      "effective_date": "April 06, 2026",
+      "subject": "Revision of Order-to-Trade Ratio (OTR) framework",
+      "summary": "The circular revises the Order-to-Trade Ratio (OTR) framework for stock exchanges, exempting certain orders from penalties. It aims to address concerns raised by stakeholders and improve market efficiency.",
+      "applies_to": [
+        {
+          "entity_type": "Recognized Stock Exchanges (except Commodity Derivative Stock Exchanges)",
+          "conditions": null
+        }
+      ],
+      "obligations": [
+        {
+          "action": "Make necessary amendments to the relevant bye-laws, rules and regulations for the implementation of the above decision.",
+          "deadline": null,
+          "penalty_for_non_compliance": null,
+          "form_or_filing": null,
+          "section_reference": null,
+          "is_new": true,
+          "notes": "Applies to stock exchanges for implementing the revised OTR framework."
+        },
+        {
+          "action": "Bring the provisions of this circular to the notice of the market participants (including TMs) and disseminate the same on their website.",
+          "deadline": null,
+          "penalty_for_non_compliance": null,
+          "form_or_filing": null,
+          "section_reference": null,
+          "is_new": true,
+          "notes": "Ensures market participants are informed of the changes."
+        }
+      ],
+      "key_thresholds": [
+        {
+          "parameter": "Order price range for equity option contracts",
+          "value": "±40% of LTP (premium) or ±INR 20, whichever is higher",
+          "context": "Exempted from the framework for imposing penalty for high OTR."
+        },
+        {
+          "parameter": "Order price range for other orders",
+          "value": "±0.75% of the LTP",
+          "context": "Exempted from the framework for imposing penalty for high OTR."
+        }
+      ],
+      "supersedes": [
+        {
+          "circular_reference": "Master Circular dated December 30, 2024",
+          "description": "Modifies specific paragraphs related to the OTR framework."
+        }
+      ],
+      "amendments_to": [
+        {
+          "regulation_name": "Master Circular for Stock Exchanges and Clearing Corporations",
+          "specific_provisions": "Para 7.1.2.2, 7.1.2.3, 11.2.14, and 11.2.15 of Chapter 2"
+        }
+      ],
+      "compliance_risk_level": "MEDIUM",
+      "risk_rationale": "The changes affect trading operations and require stock exchanges to update their systems and inform participants, but do not introduce new penalties."
+    },
+    "source_url": "https://www.sebi.gov.in/legal/circulars/feb-2026/revision-of-order-to-trade-ratio-otr-framework_99501.html",
+    "pdf_links": [
+      "https://www.sebi.gov.in/sebi_data/attachdocs/feb-2026/1770204200812.pdf"
+    ]
+  },
+  {
+    "doc_id": 739155,
+    "title": "Late Submission Fee for reporting delays under Foreign Exchange Management Act, 1999 (FEMA)",
+    "extraction": {
+      "circular_reference": "RBI/2022-23/122 A.P. (DIR Series) Circular No. 16",
+      "issuing_authority": "RBI",
+      "date_issued": "2022-09-30",
+      "effective_date": "immediately for the delayed filings made on or after the date of this circular",
+      "subject": "Late Submission Fee for reporting delays under Foreign Exchange Management Act, 1999 (FEMA)",
+      "summary": "The circular introduces a uniform Late Submission Fee (LSF) structure for reporting delays under FEMA, applicable to various forms and returns. It aims to standardize penalties for late submissions across different types of foreign investment and borrowing reports.",
+      "applies_to": [
+        {
+          "entity_type": "Category-I Authorised Dealer Banks",
+          "conditions": null
+        }
+      ],
+      "obligations": [
+        {
+          "action": "Calculate and impose LSF for reporting delays using the specified matrix.",
+          "deadline": "immediately for the delayed filings made on or after the date of this circular",
+          "penalty_for_non_compliance": "liable for penal action under the provisions of FEMA, 1999",
+          "form_or_filing": null,
+          "section_reference": "section 10(4) and 11(1) of the Foreign Exchange Management Act, 1999",
+          "is_new": true,
+          "notes": "LSF is applicable per return, with specific calculations for different forms."
+        },
+        {
+          "action": "Bring the contents of this circular to the notice of constituents and customers.",
+          "deadline": null,
+          "penalty_for_non_compliance": null,
+          "form_or_filing": null,
+          "section_reference": null,
+          "is_new": true,
+          "notes": null
+        }
+      ],
+      "key_thresholds": [
+        {
+          "parameter": "Maximum LSF amount",
+          "value": "100 per cent of ‘A’",
+          "context": "LSF amount will be limited to 100 per cent of ‘A’ and rounded upwards to the nearest hundred."
+        }
+      ],
+      "supersedes": [],
+      "amendments_to": [
+        {
+          "regulation_name": "Master Direction – Reporting under Foreign Exchange Management Act, 1999",
+          "specific_provisions": "updated to reflect the changes"
+        },
+        {
+          "regulation_name": "Master Direction - External Commercial Borrowings, Trade Credits and Structured Obligations",
+          "specific_provisions": "updated to reflect the changes"
+        }
+      ],
+      "compliance_risk_level": "MEDIUM",
+      "risk_rationale": "The introduction of a standardized LSF structure increases the financial risk for non-compliance with reporting deadlines."
+    },
+    "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=12393&Mode=0",
+    "pdf_links": [
+      "https://rbidocs.rbi.org.in/rdocs/notification/PDFs/APDIRSERIES16B175DFF736684DCA87CB5546DCF4DA27.PDF"
+    ]
+  },
+  {
+    "doc_id": 741882,
+    "title": "Master Direction - Non-Banking Financial Companies Auditor’s Report (Reserve Bank) Directions, 2016",
+    "extraction": {
+      "circular_reference": "RBI/DNBS/2016-17/48",
+      "issuing_authority": "RBI",
+      "date_issued": "2016-09-29",
+      "effective_date": "immediate effect",
+      "subject": "Non-Banking Financial Companies Auditor’s Report (Reserve Bank) Directions, 2016",
+      "summary": "The RBI has issued new directions for auditors of non-banking financial companies (NBFCs), superseding the 2008 directions. These directions require auditors to submit additional reports to the Board of Directors and exception reports to the RBI, ensuring compliance with various financial and regulatory criteria.",
+      "applies_to": [
+        {
+          "entity_type": "Auditors of non-banking financial companies",
+          "conditions": null
+        }
+      ],
+      "obligations": [
+        {
+          "action": "Auditors must submit a separate report to the Board of Directors on specified matters.",
+          "deadline": "for every financial year ending on any day on or after the commencement of these Directions",
+          "penalty_for_non_compliance": null,
+          "form_or_filing": null,
+          "section_reference": "Section 143 of the Companies Act, 2013 or section 227 of the Companies Act, 1956",
+          "is_new": true,
+          "notes": "This is in addition to the report made under the Companies Act."
+        },
+        {
+          "action": "Auditors must submit an exception report to the RBI if the auditor's report is unfavorable or qualified.",
+          "deadline": null,
+          "penalty_for_non_compliance": null,
+          "form_or_filing": null,
+          "section_reference": "Chapter III B of RBI Act, Non-Banking Financial Companies Acceptance of Public Deposits Directions, 2016, Non-Systemically Important Non-Deposit taking Company Directions, 2016, Systemically Important Non-Deposit taking Company and Deposit taking Company Directions, 2016",
+          "is_new": true,
+          "notes": "The report should contain details of unfavorable or qualified statements and non-compliance."
+        }
+      ],
+      "key_thresholds": [
+        {
+          "parameter": "Net owned fund requirement",
+          "value": "as laid down in relevant Master Directions",
+          "context": "For NBFCs to continue holding a Certificate of Registration"
+        }
+      ],
+      "supersedes": [
+        {
+          "circular_reference": "DNBS (PD)201/DG(VL)/2008 dated September 18, 2008",
+          "description": "Non-Banking Financial Companies Auditor’s Report (Reserve Bank) Directions, 2008"
+        }
+      ],
+      "amendments_to": [
+        {
+          "regulation_name": "Non-Banking Financial Company – Non-Systemically Important Non-Deposit taking Company (Reserve Bank) Directions, 2016",
+          "specific_provisions": "Para 69"
+        },
+        {
+          "regulation_name": "Non-Banking Financial Company - Systemically Important Non-Deposit taking Company and Deposit taking Company (Reserve Bank) Directions, 2016",
+          "specific_provisions": "Para 82"
+        }
+      ],
+      "compliance_risk_level": "HIGH",
+      "risk_rationale": "Non-compliance could lead to significant regulatory action and impact the ability of NBFCs to operate legally."
+    },
+    "source_url": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=10621&Mode=0",
+    "pdf_links": [
+      "https://rbidocs.rbi.org.in/rdocs/notification/PDFs/MD48290920160255C86B033F4C4691FE7D44C22327B5.PDF"
+    ]
+  }
+]
