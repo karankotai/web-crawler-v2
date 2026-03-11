@@ -382,6 +382,52 @@ async def analyze_stream(
     return StreamingResponse(generate(), media_type="text/event-stream")
 
 
+# ── Meeting analysis endpoint ─────────────────────────────────
+
+
+@app.post("/analyze/meeting/stream")
+async def analyze_meeting_stream(
+    file: UploadFile | None = None,
+    text: str | None = Form(None),
+    use_rag: bool = Form(False),
+    source_filter: str | None = Form(None),
+):
+    """Stream multi-topic analysis of a council meeting press release.
+
+    Decomposes the document into distinct topics and produces a separate
+    Dhruva-style analysis for each, including Practitioner Insights.
+    """
+    meeting_text = None
+
+    if file and file.filename:
+        pdf_bytes = await file.read()
+        meeting_text = _extract_text_from_pdf(pdf_bytes)
+    elif text:
+        meeting_text = text.strip()
+
+    if not meeting_text or len(meeting_text) < 50:
+        raise HTTPException(
+            status_code=400,
+            detail="Provide meeting text (>=50 chars) or upload a PDF.",
+        )
+
+    # Parse source_filter from comma-separated string to list
+    filter_list = None
+    if source_filter and use_rag:
+        filter_list = [s.strip().lower() for s in source_filter.split(",") if s.strip()]
+        for s in filter_list:
+            if s not in VALID_SOURCES:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Invalid source '{s}' in source_filter. Choose from: {sorted(VALID_SOURCES)}",
+                )
+
+    return StreamingResponse(
+        pipeline.analyze_meeting_stream(meeting_text, use_rag=use_rag, source_filter=filter_list),
+        media_type="text/event-stream",
+    )
+
+
 # ── Analyze chat endpoint ────────────────────────────────────
 
 
@@ -442,6 +488,8 @@ def _get_crawler_map():
         from crawlers.mca import MCACrawler
         from crawlers.irdai import IRDAICrawler
         from crawlers.egazette import EGazetteCrawler
+        from crawlers.cbic import CBICCrawler
+        from crawlers.gst_council import GSTCouncilCrawler
 
         CRAWLER_MAP = {
             "rbi": RBICrawler,
@@ -449,6 +497,8 @@ def _get_crawler_map():
             "mca": MCACrawler,
             "irdai": IRDAICrawler,
             "egazette": EGazetteCrawler,
+            "cbic": CBICCrawler,
+            "gst_council": GSTCouncilCrawler,
         }
     return CRAWLER_MAP
 
