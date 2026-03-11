@@ -820,6 +820,126 @@ class RAGPipeline:
             pass
         return None
 
+    def _extract_topics(self, text: str) -> list[dict]:
+        """Pass 1: Extract topics from a meeting press release via LLM."""
+        from rag_app.prompts.meeting_analysis import TOPIC_EXTRACTION_SYSTEM_PROMPT
+
+        prompt = f"<press_release>\n{text}\n</press_release>"
+        raw = self.llm.generate(
+            prompt=prompt,
+            system=TOPIC_EXTRACTION_SYSTEM_PROMPT,
+            max_tokens=2000,
+            temperature=0,
+        )
+        topics = self._parse_topics_json(raw)
+        if topics:
+            print(f"Extracted {len(topics)} topics")
+            return topics
+
+        # Retry once
+        print("Topic extraction failed, retrying...")
+        raw = self.llm.generate(
+            prompt=prompt,
+            system=TOPIC_EXTRACTION_SYSTEM_PROMPT,
+            max_tokens=2000,
+            temperature=0.1,
+        )
+        topics = self._parse_topics_json(raw)
+        if topics:
+            print(f"Retry extracted {len(topics)} topics")
+            return topics
+
+        # Fallback: single topic covering entire document
+        print("Topic extraction failed after retry, using single-topic fallback")
+        return [{"title": "Meeting Analysis", "summary": "Full document analysis", "start_marker": "", "end_marker": ""}]
+
+    def analyze_meeting_stream(
+        self,
+        text: str,
+        use_rag: bool = False,
+        source_filter: list[str] | None = None,
+    ):
+        """Generator yielding SSE events for multi-topic meeting analysis."""
+        from rag_app.prompts.meeting_analysis import MEETING_ANALYSIS_SYSTEM_PROMPT
+
+        # Pass 1: extract topics
+        topics = self._extract_topics(text)
+        total = len(topics)
+
+        # Emit topics event
+        topics_summary = [
+            {
+                "title": t["title"],
+                "summary": t.get("summary", ""),
+                "excerpt_length": len(self._extract_excerpt(
+                    text, t.get("start_marker", ""), t.get("end_marker", ""),
+                )),
+            }
+            for t in topics
+        ]
+        yield _sse_event("topics", {"topics": topics_summary})
+
+        # Pass 2: per-topic analysis
+        for idx, topic in enumerate(topics):
+            yield _sse_event("topic_start", {
+                "index": idx,
+                "title": topic["title"],
+                "total": total,
+            })
+
+            try:
+                # Extract excerpt
+                excerpt = self._extract_excerpt(
+                    text,
+                    topic.get("start_marker", ""),
+                    topic.get("end_marker", ""),
+                )
+
+                # Build prompt
+                context_parts = [f"<press_release_excerpt>\n{excerpt}\n</press_release_excerpt>"]
+
+                # Optional RAG augmentation
+                if use_rag:
+                    rag_query = f"{topic['title']} {topic.get('summary', '')}"
+                    query_vector = self.embedding_service.embed_single(rag_query)
+                    rag_results = self.vector_store.search(
+                        query_vector=query_vector,
+                        top_k=8,
+                        source_filter=source_filter,
+                    )
+                    if rag_results:
+                        rag_context = self._build_context(rag_results)
+                        context_parts.append(
+                            f"\n<related_circulars>\n{rag_context}\n</related_circulars>"
+                        )
+
+                prompt = (
+                    "\n".join(context_parts)
+                    + f"\n\n<topic_title>{topic['title']}</topic_title>"
+                    + f"\n<topic_summary>{topic.get('summary', '')}</topic_summary>"
+                )
+
+                # Stream analysis
+                for chunk in self.llm.generate_stream(
+                    prompt=prompt,
+                    system=MEETING_ANALYSIS_SYSTEM_PROMPT,
+                    max_tokens=4000,
+                    temperature=0,
+                ):
+                    yield _sse_event("token", chunk)
+
+            except Exception as e:
+                print(f"Error generating analysis for topic '{topic['title']}': {e}")
+                yield _sse_event("error", {
+                    "index": idx,
+                    "title": topic["title"],
+                    "error_message": str(e),
+                })
+
+            yield _sse_event("topic_end", {"index": idx})
+
+        yield _sse_event("done", None)
+
     # ── Source extraction ────────────────────────────────────
 
     _RECENCY_PATTERN = re.compile(
