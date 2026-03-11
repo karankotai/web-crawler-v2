@@ -3,7 +3,7 @@ import re
 from pydantic import BaseModel, Field, field_validator
 from typing import Optional
 
-VALID_SOURCES = {"rbi", "sebi", "mca", "irdai", "egazette", "cbic", "legislation", "other"}
+VALID_SOURCES = {"rbi", "sebi", "mca", "irdai", "egazette", "cbic", "cbdt", "icai", "ibbi", "dgft", "legislation", "other"}
 
 
 class ChunkMetadata(BaseModel):
@@ -16,7 +16,10 @@ class ChunkMetadata(BaseModel):
     total_chunks: int = 0
     file_name: str = ""
     pdf_links: list[str] = []
-    chunk_type: str = "general"  # rule, exception, definition, threshold, applicability, general
+    chunk_type: str = "general"  # rule, exception, definition, threshold, applicability, procedure, general
+    topic: str = ""               # short subject label (e.g. "asset classification")
+    section_index: int = 0        # which section (0-based) this chunk came from
+    section_heading: str = ""     # raw heading text of the section
 
 
 class TextChunk(BaseModel):
@@ -72,6 +75,7 @@ class RetrievedChunk(BaseModel):
     circular_number: str
     relevance_score: float
     chunk_type: str = "general"
+    topic: str = ""
 
 
 class AskResponse(BaseModel):

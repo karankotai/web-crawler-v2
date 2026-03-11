@@ -31,6 +31,7 @@ class VectorStore:
         self.collection_name = settings.COLLECTION_NAME
         self._ensure_text_index()
         self._ensure_chunk_type_index()
+        self._ensure_topic_index()
 
     def ensure_collection(self, recreate: bool = False):
         """Create collection, optionally recreating it."""
@@ -53,6 +54,7 @@ class VectorStore:
 
         self._ensure_text_index()
         self._ensure_chunk_type_index()
+        self._ensure_topic_index()
 
     def _ensure_text_index(self):
         """Create a full-text index on the 'text' payload field if missing."""
@@ -100,6 +102,26 @@ class VectorStore:
         except Exception as e:
             print(f"chunk_type index creation skipped: {e}")
 
+    def _ensure_topic_index(self):
+        """Create a keyword index on the 'topic' payload field if missing."""
+        try:
+            info = self.client.get_collection(self.collection_name)
+            existing = info.payload_schema or {}
+            if "topic" in existing:
+                return
+        except Exception:
+            return
+
+        try:
+            self.client.create_payload_index(
+                collection_name=self.collection_name,
+                field_name="topic",
+                field_schema=KeywordIndexParams(type="keyword"),
+            )
+            print("Created keyword index on 'topic' field")
+        except Exception as e:
+            print(f"topic index creation skipped: {e}")
+
     def upsert_chunks(self, chunks: list[TextChunk], embeddings: list[list[float]]) -> int:
         """Upsert chunks with their embeddings into Qdrant. Returns count of points stored."""
         batch_size = 50
@@ -127,6 +149,9 @@ class VectorStore:
                     "file_name": chunk.metadata.file_name,
                     "pdf_links": chunk.metadata.pdf_links,
                     "chunk_type": chunk.metadata.chunk_type,
+                    "topic": chunk.metadata.topic,
+                    "section_index": chunk.metadata.section_index,
+                    "section_heading": chunk.metadata.section_heading,
                 }
                 points.append(PointStruct(id=point_id, vector=embedding, payload=payload))
 
@@ -179,6 +204,8 @@ class VectorStore:
                     "total_chunks": hit.payload.get("total_chunks", 0),
                     "pdf_links": hit.payload.get("pdf_links", []),
                     "chunk_type": hit.payload.get("chunk_type", "general"),
+                    "topic": hit.payload.get("topic", ""),
+                    "section_heading": hit.payload.get("section_heading", ""),
                 },
             }
             for hit in results
@@ -234,6 +261,8 @@ class VectorStore:
                     "total_chunks": hit.payload.get("total_chunks", 0),
                     "pdf_links": hit.payload.get("pdf_links", []),
                     "chunk_type": hit.payload.get("chunk_type", "general"),
+                    "topic": hit.payload.get("topic", ""),
+                    "section_heading": hit.payload.get("section_heading", ""),
                 },
             }
             for hit in results

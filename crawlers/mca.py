@@ -119,6 +119,96 @@ class MCACrawler(BaseCrawler):
                 "doc_size": doc_size,
             })
 
+    def _deep_crawl_missing_content(self):
+        """Override: use Playwright to deep-crawl MCA records missing content.
+
+        BaseCrawler's version uses requests.fetch() which gets 403'd by Akamai.
+        We need to open a browser, establish Akamai cookies, then use JS fetch.
+        """
+        from crawlers.base import _get_db_conn
+
+        conn = _get_db_conn()
+        if not conn:
+            return
+        try:
+            with conn.cursor() as cur:
+                cur.execute(
+                    "SELECT link FROM scraped_documents WHERE crawler = %s AND (content IS NULL OR content = '') AND link IS NOT NULL",
+                    (self.name,),
+                )
+                missing = [row[0] for row in cur.fetchall()]
+        except Exception as e:
+            print(f"  [WARN] Failed to query missing content: {e}")
+            return
+        finally:
+            conn.close()
+
+        if not missing:
+            return
+
+        print(f"  Deep crawling {len(missing)} MCA records missing content (Playwright)...")
+
+        with sync_playwright() as p:
+            browser = p.chromium.launch(
+                headless=False,
+                args=["--disable-blink-features=AutomationControlled"],
+            )
+            ctx = browser.new_context(
+                user_agent=config.HEADERS["User-Agent"],
+                viewport={"width": 1920, "height": 1080},
+            )
+            page = ctx.new_page()
+            page.add_init_script(
+                "Object.defineProperty(navigator, 'webdriver', {get: () => undefined})"
+            )
+
+            # Establish Akamai session cookies
+            print("  Loading MCA homepage to establish session...")
+            page.goto(self.HOME_URL, wait_until="networkidle", timeout=45000)
+            time.sleep(3)
+
+            updated = 0
+            for i, link in enumerate(missing):
+                print(f"  [deep {i+1}/{len(missing)}] {link[:80]}...")
+                try:
+                    b64_data = page.evaluate(JS_FETCH_BASE64, link)
+                    pdf_bytes = base64.b64decode(b64_data)
+
+                    if len(pdf_bytes) < 500:
+                        print(f"    [WARN] Response too small ({len(pdf_bytes)} bytes), skipping.")
+                        continue
+
+                    # Cache raw PDF bytes
+                    self._cache_raw_content(link, link, "pdf", pdf_bytes)
+
+                    from utils.pdf_extract import extract_text_from_pdf
+                    content = extract_text_from_pdf(pdf_bytes)
+
+                    if content and len(content.strip()) > 10:
+                        detail = {
+                            "content": content,
+                            "pdf_links": [link],
+                            "extraction_status": "success",
+                            "extraction_method": "pdfplumber",
+                            "extraction_error": "",
+                            "circular_number": "",
+                        }
+                        self._update_record_content(link, detail)
+                        updated += 1
+                        print(f"    OK: {len(content)} chars")
+                    else:
+                        print(f"    [WARN] Empty extraction")
+                except Exception as e:
+                    print(f"    [ERROR] Failed: {e}")
+                    self._log_extraction_failure(link, link, "mca_deep_crawl_missing", str(e))
+
+                time.sleep(config.DELAY_BETWEEN_REQUESTS)
+
+            browser.close()
+
+        if updated:
+            print(f"  MCA deep crawl complete: {updated}/{len(missing)} records with content")
+
     def _deep_crawl_pdfs(self, page):
         """Download each PDF using browser JS fetch and extract text."""
         pdf_results = [r for r in self.results if r.get("doc_type", "").lower() == "pdf"]

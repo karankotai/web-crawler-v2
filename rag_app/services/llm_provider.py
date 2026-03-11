@@ -31,7 +31,7 @@ class GeminiProvider(LLMProvider):
                 max_output_tokens=max_tokens,
             ),
         )
-        return response.text.strip()
+        return (response.text or "").strip()
 
     def generate_stream(self, prompt: str, system: str, max_tokens: int = 2000, temperature: float = 0) -> Generator[str, None, None]:
         from google.genai import types
@@ -65,7 +65,7 @@ class OpenAIProvider(LLMProvider):
             max_tokens=max_tokens,
             temperature=temperature,
         )
-        return response.choices[0].message.content.strip()
+        return (response.choices[0].message.content or "").strip()
 
     def generate_stream(self, prompt: str, system: str, max_tokens: int = 2000, temperature: float = 0) -> Generator[str, None, None]:
         response = self._client.chat.completions.create(

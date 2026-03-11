@@ -3,6 +3,24 @@ import re
 from datetime import datetime
 from pathlib import Path
 
+from rag_app.models.schemas import VALID_SOURCES
+
+
+def _normalize_source(raw: str) -> str:
+    """Normalize DB source values like 'RBI (circular)' → 'rbi'.
+
+    Extracts the base name before any parenthesized sub-type,
+    lowercases it, and validates against VALID_SOURCES.
+    Falls back to the lowercased raw value if no match.
+    """
+    if not raw:
+        return "other"
+    # Strip parenthesized sub-type: "CBDT (notifications)" → "CBDT"
+    base = re.sub(r"\s*\(.*\)\s*$", "", raw).strip().lower()
+    if base in VALID_SOURCES:
+        return base
+    return raw.lower()
+
 
 def load_all_records(output_dir: str = "output") -> list[dict]:
     """Load all JSON files from output directory and return flat list of records."""
@@ -16,6 +34,7 @@ def load_all_records(output_dir: str = "output") -> list[dict]:
                 continue
             for record in data:
                 record["_file_name"] = json_file.name
+                record["source"] = _normalize_source(record.get("source", ""))
             records.extend(data)
         except (json.JSONDecodeError, UnicodeDecodeError) as e:
             print(f"Skipping {json_file.name}: {e}")
@@ -44,6 +63,8 @@ def load_all_records_from_pg(database_url: str) -> list[dict]:
                 record.pop("id", None)
                 record.pop("created_at", None)
                 record.pop("updated_at", None)
+                # Normalize source for consistent filtering
+                record["source"] = _normalize_source(record.get("source", ""))
                 # Set _file_name from crawler for compatibility
                 record["_file_name"] = record.get("crawler", "")
                 records.append(record)
@@ -62,6 +83,7 @@ def load_all_records_from_db(uri: str, db_name: str) -> list[dict]:
     for collection_name in db.list_collection_names():
         for doc in db[collection_name].find({}, {"_id": 0}):
             doc["_file_name"] = collection_name
+            doc["source"] = _normalize_source(doc.get("source", ""))
             records.append(doc)
     client.close()
     return records

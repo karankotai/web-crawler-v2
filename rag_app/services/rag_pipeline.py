@@ -42,6 +42,7 @@ _TYPE_KEYWORDS: dict[str, list[str]] = {
     "threshold": ["threshold", "limit", "percentage", "ratio", "amount", "cap", "ceiling", "minimum", "maximum", "how much"],
     "rule": ["rule", "regulation", "requirement", "mandatory", "must", "shall", "obligation", "compliance", "provision"],
     "applicability": ["applicable", "applicability", "applies to", "who", "which entities", "scope"],
+    "procedure": ["procedure", "process", "how to", "steps", "filing", "submit", "report", "manner of"],
 }
 
 
@@ -394,6 +395,7 @@ class RAGPipeline:
                 circular_number=r["metadata"].get("circular_number", ""),
                 relevance_score=round(r["score"], 4),
                 chunk_type=r["metadata"].get("chunk_type", "general"),
+                topic=r["metadata"].get("topic", ""),
             )
             for r in results
         ]
@@ -561,6 +563,10 @@ class RAGPipeline:
                 header_items.append(f"Date: {meta['date']}")
             if meta.get("link"):
                 header_items.append(f"Link: {meta['link']}")
+            if meta.get("topic"):
+                header_items.append(f"Topic: {meta['topic']}")
+            if meta.get("chunk_type") and meta["chunk_type"] != "general":
+                header_items.append(f"Type: {meta['chunk_type']}")
             chunk_idx = meta.get("chunk_index", 0)
             total_chunks = meta.get("total_chunks", 0)
             if total_chunks > 1:

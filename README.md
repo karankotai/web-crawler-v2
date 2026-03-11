@@ -68,8 +68,7 @@ uvicorn rag_app.main:app --reload
 
 ```bash
 # Index documents
-curl -X POST http://localhost:8000/index -H "Content-Type: application/json" \
-  -d '{"force_reindex": true}'
+curl -X POST http://localhost:8000/index -H "Content-Type: application/json" \ -d '{"force_reindex": true}'
 
 # Ask a question
 curl -X POST http://localhost:8000/ask -H "Content-Type: application/json" \
