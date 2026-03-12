@@ -821,14 +821,18 @@ class RAGPipeline:
         return None
 
     def _extract_topics(self, text: str) -> list[dict]:
-        """Pass 1: Extract topics from a meeting press release via LLM."""
+        """Pass 1: Extract topics from a meeting press release via LLM.
+
+        Uses a high max_tokens (16000) to accommodate thinking-model overhead
+        (e.g., Gemini 2.5 Pro consumes output tokens for internal reasoning).
+        """
         from rag_app.prompts.meeting_analysis import TOPIC_EXTRACTION_SYSTEM_PROMPT
 
         prompt = f"<press_release>\n{text}\n</press_release>"
         raw = self.llm.generate(
             prompt=prompt,
             system=TOPIC_EXTRACTION_SYSTEM_PROMPT,
-            max_tokens=2000,
+            max_tokens=16000,
             temperature=0,
         )
         topics = self._parse_topics_json(raw)
@@ -841,7 +845,7 @@ class RAGPipeline:
         raw = self.llm.generate(
             prompt=prompt,
             system=TOPIC_EXTRACTION_SYSTEM_PROMPT,
-            max_tokens=2000,
+            max_tokens=16000,
             temperature=0.1,
         )
         topics = self._parse_topics_json(raw)
@@ -919,11 +923,11 @@ class RAGPipeline:
                     + f"\n<topic_summary>{topic.get('summary', '')}</topic_summary>"
                 )
 
-                # Stream analysis
+                # Stream analysis (high max_tokens for thinking-model overhead)
                 for chunk in self.llm.generate_stream(
                     prompt=prompt,
                     system=MEETING_ANALYSIS_SYSTEM_PROMPT,
-                    max_tokens=4000,
+                    max_tokens=16000,
                     temperature=0,
                 ):
                     yield _sse_event("token", chunk)
