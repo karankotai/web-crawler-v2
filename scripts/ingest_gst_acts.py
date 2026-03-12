@@ -14,6 +14,7 @@ Usage:
 """
 
 import argparse
+import base64
 import os
 import re
 import sys
@@ -22,10 +23,15 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import requests
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
 import config
 from utils.pdf_extract import extract_text_from_pdf
 
 CRAWLER_NAME = "gst_acts_ingest"
+
+CBIC_API_BASE = "https://taxinformation.cbic.gov.in/content/pdf"
 
 GST_ACTS = [
     {
@@ -33,32 +39,36 @@ GST_ACTS = [
         "act_name": "Central Goods and Services Tax Act, 2017",
         "short_name": "CGST Act",
         "pdf_filename": "cgst_act.pdf",
-        "url": "https://cbic-gst.gov.in/pdf/cgst-act-updated-30092020.pdf",
+        "url": f"{CBIC_API_BASE}/tax_repository/gst/acts/2017_CGST_act/documents/Central_Goods_and_Services_Tax_Act__2017_28-September-2022.pdf",
         "date": "2017-04-12",
+        "api_format": "base64_json",
     },
     {
         "act_id": "igst",
         "act_name": "Integrated Goods and Services Tax Act, 2017",
         "short_name": "IGST Act",
         "pdf_filename": "igst_act.pdf",
-        "url": "https://cbic-gst.gov.in/pdf/igst-act-updated-30092020.pdf",
+        "url": f"{CBIC_API_BASE}/tax_repository/gst/acts/2017_IGST_Act/documents/Integrated_Goods_And_Services_Tax_Act,_2017_27-March-2020.pdf",
         "date": "2017-04-12",
+        "api_format": "base64_json",
     },
     {
         "act_id": "utgst",
         "act_name": "Union Territory Goods and Services Tax Act, 2017",
         "short_name": "UTGST Act",
         "pdf_filename": "utgst_act.pdf",
-        "url": "https://cbic-gst.gov.in/pdf/utgst-act.pdf",
+        "url": f"{CBIC_API_BASE}/tax_repository/gst/acts/2017_ut_gst_act/documents/Union_Territory_Goods_And_Services_Tax_Act,_2017_27-March-2020.pdf",
         "date": "2017-04-12",
+        "api_format": "base64_json",
     },
     {
         "act_id": "gst_compensation",
         "act_name": "Goods and Services Tax (Compensation to States) Act, 2017",
         "short_name": "GST Compensation Act",
         "pdf_filename": "gst_compensation_act.pdf",
-        "url": "https://cbic-gst.gov.in/pdf/gst-compensation-to-states-act.pdf",
+        "url": f"{CBIC_API_BASE}/tax_repository/gst/acts/2017_gst_compensation_to_states_act/documents/Goods_And_Services_Tax_(Compensation_To_States)_Act,_2017_19-January-2018.pdf",
         "date": "2017-04-12",
+        "api_format": "base64_json",
     },
 ]
 
@@ -193,7 +203,6 @@ def fetch_pdf_text(act: dict, pdf_dir: str | None) -> str:
     if pdf_dir:
         pdf_path = os.path.join(pdf_dir, act["pdf_filename"])
         if not os.path.exists(pdf_path):
-            # Also try act_id-based name
             alt_path = os.path.join(pdf_dir, f"{act['act_id']}.pdf")
             if os.path.exists(alt_path):
                 pdf_path = alt_path
@@ -204,10 +213,20 @@ def fetch_pdf_text(act: dict, pdf_dir: str | None) -> str:
         with open(pdf_path, "rb") as f:
             pdf_bytes = f.read()
     else:
-        print(f"  Downloading from {act['url']}")
+        print(f"  Downloading from {act['url'][:80]}...")
         resp = requests.get(act["url"], headers=config.HEADERS, timeout=config.PDF_TIMEOUT, verify=False)
         resp.raise_for_status()
-        pdf_bytes = resp.content
+
+        # CBIC API returns JSON with base64-encoded PDF
+        if act.get("api_format") == "base64_json":
+            data = resp.json()
+            b64 = data.get("data", "")
+            if not b64:
+                print(f"  ERROR: API returned JSON but no 'data' field")
+                return ""
+            pdf_bytes = base64.b64decode(b64)
+        else:
+            pdf_bytes = resp.content
 
     text = extract_text_from_pdf(pdf_bytes)
     if not text or len(text) < 200:

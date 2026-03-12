@@ -3,7 +3,7 @@ import re
 from pydantic import BaseModel, Field, field_validator
 from typing import Optional
 
-VALID_SOURCES = {"rbi", "sebi", "mca", "irdai", "egazette", "cbic", "cbdt", "icai", "ibbi", "dgft", "legislation", "other"}
+VALID_SOURCES = {"rbi", "sebi", "mca", "irdai", "egazette", "cbic", "cbdt", "icai", "ibbi", "dgft", "legislation", "gst_council", "practitioner_knowledge", "other"}
 
 
 class ChunkMetadata(BaseModel):
@@ -47,14 +47,19 @@ class IndexResponse(BaseModel):
 class AskRequest(BaseModel):
     question: str = Field(max_length=2000)
     top_k: int = Field(default=12, ge=1, le=20)
-    source_filter: Optional[str] = Field(default=None, max_length=50)
+    source_filter: Optional[str | list[str]] = Field(default=None)
     multi_query: Optional[bool] = None  # None = use server default (MULTI_QUERY_ENABLED)
 
     @field_validator("source_filter")
     @classmethod
-    def validate_source_filter(cls, v: str | None) -> str | None:
-        if v is not None and v.lower() not in VALID_SOURCES:
-            raise ValueError(f"source_filter must be one of: {', '.join(sorted(VALID_SOURCES))}")
+    def validate_source_filter(cls, v: str | list[str] | None) -> str | list[str] | None:
+        if v is None:
+            return v
+        # Normalize single string to check, keep as-is for type
+        sources = [v] if isinstance(v, str) else v
+        for s in sources:
+            if s.lower() not in VALID_SOURCES:
+                raise ValueError(f"Invalid source '{s}'. Must be one of: {', '.join(sorted(VALID_SOURCES))}")
         return v
 
 

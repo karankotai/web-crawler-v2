@@ -29,6 +29,7 @@ from crawlers.cbdt import CBDTCrawler
 from crawlers.icai import ICAICrawler
 from crawlers.ibbi import IBBICrawler
 from crawlers.dgft import DGFTCrawler
+from crawlers.gst_council import GSTCouncilCrawler
 from crawlers.generic import GenericGovCrawler
 
 
@@ -43,6 +44,7 @@ CRAWLERS = {
     "icai": ICAICrawler,
     "ibbi": IBBICrawler,
     "dgft": DGFTCrawler,
+    "gst_council": GSTCouncilCrawler,
 }
 
 

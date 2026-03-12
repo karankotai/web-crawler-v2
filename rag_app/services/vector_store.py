@@ -6,6 +6,7 @@ from qdrant_client.models import (
     FieldCondition,
     Filter,
     KeywordIndexParams,
+    MatchAny,
     MatchText,
     MatchValue,
     PointStruct,
@@ -122,6 +123,16 @@ class VectorStore:
         except Exception as e:
             print(f"topic index creation skipped: {e}")
 
+        try:
+            self.client.create_payload_index(
+                collection_name=self.collection_name,
+                field_name="circular_number",
+                field_schema=KeywordIndexParams(type="keyword"),
+            )
+            print("Created keyword index on 'circular_number' field")
+        except Exception as e:
+            print(f"circular_number index creation skipped: {e}")
+
     def upsert_chunks(self, chunks: list[TextChunk], embeddings: list[list[float]]) -> int:
         """Upsert chunks with their embeddings into Qdrant. Returns count of points stored."""
         batch_size = 50
@@ -160,20 +171,33 @@ class VectorStore:
 
         return total_stored
 
+    @staticmethod
+    def _source_filter_condition(source_filter: str | list[str] | None) -> FieldCondition | None:
+        """Build a Qdrant FieldCondition for source filtering.
+
+        Supports a single source string or a list of sources (MatchAny).
+        """
+        if not source_filter:
+            return None
+        if isinstance(source_filter, list):
+            if len(source_filter) == 1:
+                return FieldCondition(key="source", match=MatchValue(value=source_filter[0]))
+            return FieldCondition(key="source", match=MatchAny(any=source_filter))
+        return FieldCondition(key="source", match=MatchValue(value=source_filter))
+
     def search(
         self,
         query_vector: list[float],
         top_k: int = settings.TOP_K,
         score_threshold: float = settings.SCORE_THRESHOLD,
-        source_filter: str | None = None,
+        source_filter: str | list[str] | None = None,
         circular_number_filter: str | None = None,
     ) -> list[dict]:
         """Search for similar chunks. Returns list of dicts with text, score, metadata."""
         must_conditions = []
-        if source_filter:
-            must_conditions.append(
-                FieldCondition(key="source", match=MatchValue(value=source_filter))
-            )
+        src_cond = self._source_filter_condition(source_filter)
+        if src_cond:
+            must_conditions.append(src_cond)
         if circular_number_filter:
             must_conditions.append(
                 FieldCondition(key="circular_number", match=MatchValue(value=circular_number_filter))
@@ -217,7 +241,7 @@ class VectorStore:
         keywords: list[str],
         top_k: int = settings.TOP_K,
         score_threshold: float = settings.SCORE_THRESHOLD,
-        source_filter: str | None = None,
+        source_filter: str | list[str] | None = None,
     ) -> list[dict]:
         """Vector search with keyword filter on text payload (OR logic for keywords)."""
         keyword_conditions = [
@@ -225,10 +249,9 @@ class VectorStore:
             for kw in keywords
         ]
         must_conditions = []
-        if source_filter:
-            must_conditions.append(
-                FieldCondition(key="source", match=MatchValue(value=source_filter))
-            )
+        src_cond = self._source_filter_condition(source_filter)
+        if src_cond:
+            must_conditions.append(src_cond)
 
         query_filter = Filter(
             should=keyword_conditions,
@@ -274,7 +297,7 @@ class VectorStore:
         preferred_types: list[str],
         top_k: int = settings.TOP_K,
         score_threshold: float = settings.SCORE_THRESHOLD,
-        source_filter: str | None = None,
+        source_filter: str | list[str] | None = None,
         boost_amount: float = 0.1,
     ) -> list[dict]:
         """Search with over-fetch and boost preferred chunk types."""
@@ -294,7 +317,7 @@ class VectorStore:
         self,
         query_vector: list[float],
         top_k_circulars: int = 5,
-        source_filter: str | None = None,
+        source_filter: str | list[str] | None = None,
     ) -> list[str]:
         """Over-fetch chunks, deduplicate by circular_number, return top N circular IDs by best score."""
         results = self.search(
