@@ -47,6 +47,57 @@ _TYPE_KEYWORDS: dict[str, list[str]] = {
 }
 
 
+# ── Auto-domain detection (keyword-based source filtering) ──
+
+_DOMAIN_KEYWORDS: dict[str, dict] = {
+    "gst": {
+        "keywords": [
+            "gst", "cgst", "igst", "sgst", "utgst", "itc", "input tax credit",
+            "gstr", "gstr-1", "gstr-3b", "gstr-9", "gstr-9c",
+            "section 128a", "section 16", "section 17", "section 54",
+            "rule 89", "rule 36", "rule 42", "rule 43",
+            "compensation cess", "e-way bill", "ims", "invoice management",
+            "anti-profiteering", "advance ruling", "gstat",
+            "spl-01", "drc-03", "rcm", "reverse charge",
+            "hsn", "sac", "gta", "job worker", "inverted duty",
+        ],
+        "sources": ["cbic", "legislation", "gst_council", "practitioner_knowledge"],
+    },
+    "rbi": {
+        "keywords": [
+            "rbi", "nbfc", "npa", "crar", "kyc", "ecb",
+            "sbr", "scale-based", "gold loan", "securitisation",
+            "master direction", "reserve bank",
+        ],
+        "sources": ["rbi"],
+    },
+    "sebi": {
+        "keywords": [
+            "sebi", "lodr", "sast", "stock broker", "mutual fund",
+            "ipo", "insider trading", "takeover",
+        ],
+        "sources": ["sebi"],
+    },
+}
+
+
+def _detect_domain_sources(question: str) -> list[str] | None:
+    """Auto-detect domain from question keywords. Returns source filter list or None."""
+    q_lower = question.lower()
+    matches = {}
+    for domain, config in _DOMAIN_KEYWORDS.items():
+        count = sum(1 for kw in config["keywords"] if kw in q_lower)
+        if count > 0:
+            matches[domain] = count
+    if not matches:
+        return None
+    # Combine sources from all matched domains (handles cross-domain questions)
+    sources: list[str] = []
+    for domain in matches:
+        sources.extend(_DOMAIN_KEYWORDS[domain]["sources"])
+    return list(set(sources))
+
+
 def _detect_preferred_types(question: str) -> list[str]:
     """Detect preferred chunk types from question keywords."""
     q_lower = question.lower()
@@ -69,6 +120,114 @@ class RAGPipeline:
         self.embedding_service = EmbeddingService()
         self.vector_store = VectorStore()
         self.llm = create_llm_provider()
+        self.fast_llm = create_llm_provider(model=settings.GEMINI_FAST_MODEL)
+
+    # ── Contextualized Embedding Helpers ─────────────────────
+
+    _CONTEXT_SYSTEM = (
+        "You generate 1-2 sentence context summaries for chunks of Indian government regulatory documents "
+        "(RBI, SEBI, IRDAI, MCA, CBIC/GST, CBDT, ICAI, IBBI, DGFT).\n"
+        "For each chunk, write a concise factual summary that includes:\n"
+        "- The specific regulatory topic\n"
+        "- Who it applies to (if clear)\n"
+        "- Temporal context (effective date, amendment, supersession) if mentioned\n"
+        "If the chunk is garbled OCR, page numbers, or has no substantive content, respond with 'SKIP'.\n"
+        "Input: JSON array of {id, source, title, date, section, text}.\n"
+        "Output: JSON array of {id, summary}. Output ONLY valid JSON, no markdown fences."
+    )
+
+    @staticmethod
+    def _build_embedding_text(chunk) -> str:
+        """Build enriched text for embedding: metadata prefix + optional context summary + chunk text.
+
+        Phase 1: Every chunk gets a metadata prefix with source, title, date, section, and type.
+        Phase 2: Chunks with a context_summary get it prepended after the metadata prefix.
+        The original chunk.text is preserved unchanged in the Qdrant payload.
+        """
+        m = chunk.metadata
+        parts = [m.source.upper()] if m.source else []
+        if m.title:
+            parts.append(m.title[:100])
+        if m.date:
+            parts.append(m.date)
+        if m.section_heading:
+            parts.append(f"Section: {m.section_heading[:80]}")
+        if m.chunk_type and m.chunk_type != "general":
+            parts.append(f"Type: {m.chunk_type}")
+
+        lines = []
+        if parts:
+            lines.append(f"[{' | '.join(parts)}]")
+        if m.context_summary:
+            lines.append(m.context_summary)
+        lines.append(chunk.text)
+        return "\n".join(lines)
+
+    def _generate_context_summaries(self, chunks: list) -> list:
+        """Generate LLM context summaries for general-typed chunks. Modifies chunks in-place."""
+        general_indices = [i for i, c in enumerate(chunks) if c.metadata.chunk_type == "general"]
+
+        if not general_indices:
+            return chunks
+
+        print(f"Generating context summaries for {len(general_indices)} general-typed chunks...")
+
+        batch_size = 10
+        generated = 0
+        consecutive_failures = 0
+        max_failures = 5
+
+        for batch_start in range(0, len(general_indices), batch_size):
+            batch_idx = general_indices[batch_start : batch_start + batch_size]
+            items = []
+            for j, idx in enumerate(batch_idx):
+                c = chunks[idx]
+                items.append({
+                    "id": j,
+                    "source": c.metadata.source,
+                    "title": c.metadata.title[:80],
+                    "date": c.metadata.date,
+                    "section": c.metadata.section_heading[:80],
+                    "text": c.text[:400],
+                })
+
+            try:
+                raw = self.fast_llm.generate(
+                    prompt=json.dumps(items),
+                    system=self._CONTEXT_SYSTEM,
+                    max_tokens=1500,
+                    temperature=0,
+                )
+                consecutive_failures = 0
+
+                if not raw:
+                    continue
+
+                raw = raw.strip()
+                if raw.startswith("```"):
+                    raw = re.sub(r"^```\w*\n?", "", raw)
+                    raw = re.sub(r"\n?```$", "", raw)
+
+                results = json.loads(raw)
+                for entry in results:
+                    j = entry.get("id")
+                    summary = entry.get("summary", "")
+                    if j is not None and 0 <= j < len(batch_idx) and summary and summary != "SKIP":
+                        chunks[batch_idx[j]].metadata.context_summary = summary
+                        generated += 1
+
+            except Exception as e:
+                consecutive_failures += 1
+                if consecutive_failures >= max_failures:
+                    print(f"Context generation aborted after {max_failures} consecutive failures: {e}")
+                    break
+                print(f"Context generation batch failed (offset {batch_start}): {e}")
+
+            if (batch_start + batch_size) % 500 == 0:
+                print(f"  Context summaries: {generated}/{len(general_indices)} generated...")
+
+        print(f"Generated {generated} context summaries for {len(general_indices)} general chunks")
+        return chunks
 
     # ── Indexing ─────────────────────────────────────────────
 
@@ -142,13 +301,17 @@ class RAGPipeline:
         all_chunks = classify_chunks(all_chunks, self.llm)
         print(f"Classified {len(all_chunks)} chunks by type")
 
+        # Generate context summaries for general-typed chunks
+        all_chunks = self._generate_context_summaries(all_chunks)
+
         # Embed and store in batches to limit memory usage
+        # Uses contextualized embedding text (metadata prefix + context summary + chunk text)
         self.vector_store.ensure_collection(recreate=force_reindex)
         total_stored = 0
         index_batch = 1000
         for i in range(0, len(all_chunks), index_batch):
             batch_chunks = all_chunks[i : i + index_batch]
-            texts = [c.text for c in batch_chunks]
+            texts = [self._build_embedding_text(c) for c in batch_chunks]
             embeddings = self.embedding_service.embed_texts(texts)
             total_stored += self.vector_store.upsert_chunks(batch_chunks, embeddings)
             print(f"Indexed {total_stored}/{len(all_chunks)} vectors")
@@ -194,12 +357,15 @@ class RAGPipeline:
         # Classify chunks by type using LLM
         all_chunks = classify_chunks(all_chunks, self.llm)
 
+        # Generate context summaries for general-typed chunks
+        all_chunks = self._generate_context_summaries(all_chunks)
+
         self.vector_store.ensure_collection(recreate=False)
         total_stored = 0
         batch_size = 1000
         for i in range(0, len(all_chunks), batch_size):
             batch_chunks = all_chunks[i : i + batch_size]
-            texts = [c.text for c in batch_chunks]
+            texts = [self._build_embedding_text(c) for c in batch_chunks]
             embeddings = self.embedding_service.embed_texts(texts)
             total_stored += self.vector_store.upsert_chunks(batch_chunks, embeddings)
 
@@ -219,7 +385,7 @@ class RAGPipeline:
     def _expand_queries(self, question: str) -> list[str]:
         """Use LLM to generate 2 alternative search queries. Returns [original, alt1, alt2]."""
         try:
-            raw = self.llm.generate(
+            raw = self.fast_llm.generate(
                 prompt=f"User question: {question}",
                 system=self._EXPAND_SYSTEM,
                 max_tokens=200,
@@ -302,9 +468,20 @@ class RAGPipeline:
 
     def ask(self, request: AskRequest) -> AskResponse:
         """Answer a question using RAG pipeline."""
+        # Auto-detect domain sources if no explicit source_filter provided
+        source_filter = request.source_filter
+        if not source_filter:
+            detected = _detect_domain_sources(request.question)
+            if detected:
+                source_filter = detected
+                print(f"Auto-detected domain sources: {source_filter}")
+
         # Rewrite query for better retrieval
         rewritten = self._rewrite_query(request.question)
         print(f"Rewritten query: {rewritten}")
+
+        # Cache query embedding for reuse across search calls and title-relevance computation
+        query_embedding = self.embedding_service.embed_single(rewritten)
 
         # Determine if multi-query is enabled
         use_multi_query = request.multi_query if request.multi_query is not None else settings.MULTI_QUERY_ENABLED
@@ -325,9 +502,9 @@ class RAGPipeline:
             print(f"Detected circular number: {circular_number}")
             analysis_top_k = 50 if is_analysis else request.top_k
             results = self.vector_store.search(
-                query_vector=self.embedding_service.embed_single(rewritten),
+                query_vector=query_embedding,
                 top_k=analysis_top_k,
-                source_filter=request.source_filter,
+                source_filter=source_filter,
                 circular_number_filter=circular_number,
             )
             if not results:
@@ -340,12 +517,12 @@ class RAGPipeline:
 
             all_results = []
             for q in queries:
-                query_vector = self.embedding_service.embed_single(q)
+                qv = query_embedding if q == rewritten else self.embedding_service.embed_single(q)
                 # Use hierarchical search
                 search_results = self._hierarchical_search(
-                    query_vector=query_vector,
+                    query_vector=qv,
                     top_k=request.top_k,
-                    source_filter=request.source_filter,
+                    source_filter=source_filter,
                     preferred_types=preferred_types if preferred_types else None,
                 )
                 all_results.extend(search_results)
@@ -356,13 +533,12 @@ class RAGPipeline:
             # Extract keywords and boost with keyword search
             keywords = self._extract_keywords(request.question)
             if keywords:
-                query_vector = self.embedding_service.embed_single(rewritten)
                 keyword_results = self.vector_store.keyword_search(
-                    query_vector=query_vector,
+                    query_vector=query_embedding,
                     keywords=keywords,
                     top_k=request.top_k,
                     score_threshold=0.0,
-                    source_filter=request.source_filter,
+                    source_filter=source_filter,
                 )
                 results = self._merge_results(results, keyword_results, request.top_k)
 
@@ -375,18 +551,26 @@ class RAGPipeline:
             )
 
         # Sort by chunk_index for analysis mode to reassemble document order
+        title_relevance = None
         if is_analysis:
             results.sort(key=lambda r: r["metadata"].get("chunk_index", 0))
+        else:
+            # Prune low-relevance chunks using topic coherence (title relevance + density)
+            pre_prune = len(results)
+            title_relevance = self._compute_title_relevance(results, query_embedding)
+            results = self._prune_with_topic_coherence(results, query_embedding, title_relevance)
+            if len(results) < pre_prune:
+                print(f"Pruned {pre_prune - len(results)} low-relevance chunks (kept {len(results)})")
 
         # Build context and generate answer
-        context = self._build_context(results)
+        context = self._build_context(results, include_scores=not is_analysis)
         if is_analysis:
             answer = self._generate_analysis(request.question, context, circular_number)
         else:
             answer = self._generate_answer(
                 request.question, context, matched_circular=circular_number if circular_number and results else None,
             )
-        sources = self._extract_sources(results, question=request.question)
+        sources = self._extract_sources(results, question=request.question, title_relevance=title_relevance)
 
         retrieved_chunks = [
             RetrievedChunk(
@@ -413,9 +597,19 @@ class RAGPipeline:
 
     def ask_stream(self, question: str, top_k: int = 12, source_filter: str | list[str] | None = None, multi_query: bool | None = None):
         """Generator that yields SSE-formatted events for streaming answers."""
+        # Auto-detect domain sources if no explicit source_filter provided
+        if not source_filter:
+            detected = _detect_domain_sources(question)
+            if detected:
+                source_filter = detected
+                print(f"Auto-detected domain sources: {source_filter}")
+
         # Rewrite query for better retrieval
         rewritten = self._rewrite_query(question)
         print(f"Rewritten query: {rewritten}")
+
+        # Cache query embedding for reuse across search calls and title-relevance computation
+        query_embedding = self.embedding_service.embed_single(rewritten)
 
         # Determine if multi-query is enabled
         use_multi_query = multi_query if multi_query is not None else settings.MULTI_QUERY_ENABLED
@@ -434,7 +628,7 @@ class RAGPipeline:
             print(f"Detected circular number: {circular_number}")
             analysis_top_k = 50 if is_analysis else top_k
             results = self.vector_store.search(
-                query_vector=self.embedding_service.embed_single(rewritten),
+                query_vector=query_embedding,
                 top_k=analysis_top_k,
                 source_filter=source_filter,
                 circular_number_filter=circular_number,
@@ -449,9 +643,9 @@ class RAGPipeline:
 
             all_results = []
             for q in queries:
-                query_vector = self.embedding_service.embed_single(q)
+                qv = query_embedding if q == rewritten else self.embedding_service.embed_single(q)
                 search_results = self._hierarchical_search(
-                    query_vector=query_vector,
+                    query_vector=qv,
                     top_k=top_k,
                     source_filter=source_filter,
                     preferred_types=preferred_types if preferred_types else None,
@@ -462,9 +656,8 @@ class RAGPipeline:
 
             keywords = self._extract_keywords(question)
             if keywords:
-                query_vector = self.embedding_service.embed_single(rewritten)
                 keyword_results = self.vector_store.keyword_search(
-                    query_vector=query_vector,
+                    query_vector=query_embedding,
                     keywords=keywords,
                     top_k=top_k,
                     score_threshold=0.0,
@@ -479,11 +672,15 @@ class RAGPipeline:
             return
 
         # Sort by chunk_index for analysis mode to reassemble document order
+        title_relevance = None
         if is_analysis:
             results.sort(key=lambda r: r["metadata"].get("chunk_index", 0))
+        else:
+            title_relevance = self._compute_title_relevance(results, query_embedding)
+            results = self._prune_with_topic_coherence(results, query_embedding, title_relevance)
 
         # Yield sources before starting answer generation
-        sources = [s.model_dump() for s in self._extract_sources(results, question=question)]
+        sources = [s.model_dump() for s in self._extract_sources(results, question=question, title_relevance=title_relevance)]
         yield _sse_event("sources", {
             "sources": sources,
             "query_used": rewritten,
@@ -491,17 +688,28 @@ class RAGPipeline:
         })
 
         # Build context and stream answer
-        context = self._build_context(results)
+        context = self._build_context(results, include_scores=not is_analysis)
         if is_analysis:
             system_prompt = self._analysis_system_prompt(circular_number)
             max_tokens = 4000
+            prompt = f"<context>\n{context}\n</context>\n\n<user_question>\n{question}\n</user_question>"
         else:
             matched_circular = circular_number if circular_number and results else None
-            system_prompt = self._answer_system_prompt(matched_circular)
+            system_prompt = self._answer_system_prompt(matched_circular, question)
             max_tokens = 2000
-
-        prompt = f"<context>\n{context}\n</context>\n\n<user_question>\n{question}\n</user_question>"
-        for text_chunk in self.llm.generate_stream(prompt=prompt, system=system_prompt, max_tokens=max_tokens, temperature=0):
+            sub_qs = self._extract_sub_questions(question)
+            sub_q_block = ""
+            if len(sub_qs) > 1:
+                numbered = "\n".join(f"  {i}. {q}" for i, q in enumerate(sub_qs, 1))
+                sub_q_block = f"\n\nYou MUST address each of these specific sub-questions:\n{numbered}"
+            prompt = (
+                f"<user_question>\n{question}\n</user_question>\n\n"
+                f"<context>\n{context}\n</context>\n\n"
+                f"<user_question>\n{question}\n</user_question>"
+                f"{sub_q_block}"
+            )
+        llm = self.llm if is_analysis else self.fast_llm
+        for text_chunk in llm.generate_stream(prompt=prompt, system=system_prompt, max_tokens=max_tokens, temperature=0):
             yield _sse_event("token", text_chunk)
 
         yield _sse_event("done", None)
@@ -511,7 +719,7 @@ class RAGPipeline:
     def _rewrite_query(self, question: str) -> str:
         """Use LLM to rewrite question for better retrieval."""
         try:
-            rewritten = self.llm.generate(
+            rewritten = self.fast_llm.generate(
                 prompt=f"<user_question>\n{question}\n</user_question>",
                 system=(
                     "You are a query rewriter for a search system over Indian government "
@@ -541,9 +749,20 @@ class RAGPipeline:
 
     def _generate_answer(self, question: str, context: str, matched_circular: str | None = None) -> str:
         """Generate a grounded answer from context."""
-        system_prompt = self._answer_system_prompt(matched_circular)
-        return self.llm.generate(
-            prompt=f"<context>\n{context}\n</context>\n\n<user_question>\n{question}\n</user_question>",
+        system_prompt = self._answer_system_prompt(matched_circular, question)
+        sub_qs = self._extract_sub_questions(question)
+        sub_q_block = ""
+        if len(sub_qs) > 1:
+            numbered = "\n".join(f"  {i}. {q}" for i, q in enumerate(sub_qs, 1))
+            sub_q_block = f"\n\nYou MUST address each of these specific sub-questions:\n{numbered}"
+        prompt = (
+            f"<user_question>\n{question}\n</user_question>\n\n"
+            f"<context>\n{context}\n</context>\n\n"
+            f"<user_question>\n{question}\n</user_question>"
+            f"{sub_q_block}"
+        )
+        return self.fast_llm.generate(
+            prompt=prompt,
             system=system_prompt,
             max_tokens=2000,
             temperature=0,
@@ -551,7 +770,7 @@ class RAGPipeline:
 
     # ── Context & prompts ────────────────────────────────────
 
-    def _build_context(self, results: list[dict]) -> str:
+    def _build_context(self, results: list[dict], include_scores: bool = False) -> str:
         """Format search results into context for the LLM."""
         context_parts = []
         for i, result in enumerate(results, 1):
@@ -572,6 +791,8 @@ class RAGPipeline:
             total_chunks = meta.get("total_chunks", 0)
             if total_chunks > 1:
                 header_items.append(f"Part {chunk_idx + 1} of {total_chunks}")
+            if include_scores and "score" in result:
+                header_items.append(f"Relevance: {result['score']:.2f}")
             header = " | ".join(header_items)
             context_parts.append(f"<document id='{i}'>\n[{header}]\n{result['text']}\n</document>")
         return "\n\n".join(context_parts)
@@ -586,7 +807,149 @@ class RAGPipeline:
             return None
         return value
 
-    def _answer_system_prompt(self, matched_circular: str | None = None) -> str:
+    @staticmethod
+    def _prune_low_relevance(results: list[dict], threshold_ratio: float = 0.7, min_keep: int = 3) -> list[dict]:
+        """Drop chunks scoring below threshold_ratio of top chunk's score, keep at least min_keep."""
+        if not results:
+            return results
+        top_score = results[0]["score"]
+        if top_score <= 0:
+            return results
+        cutoff = top_score * threshold_ratio
+        pruned = [r for r in results if r["score"] >= cutoff]
+        if len(pruned) < min_keep:
+            return results[:min_keep]
+        return pruned
+
+    @staticmethod
+    def _cosine_similarity(vec_a: list[float], vec_b: list[float]) -> float:
+        """Compute cosine similarity between two vectors (pure Python, no numpy)."""
+        dot = sum(a * b for a, b in zip(vec_a, vec_b))
+        norm_a = sum(a * a for a in vec_a) ** 0.5
+        norm_b = sum(b * b for b in vec_b) ** 0.5
+        if norm_a == 0 or norm_b == 0:
+            return 0.0
+        return dot / (norm_a * norm_b)
+
+    def _compute_title_relevance(
+        self, results: list[dict], query_embedding: list[float]
+    ) -> dict[str, float]:
+        """Compute cosine similarity between query and each unique document title.
+
+        Returns {doc_key: similarity_score} where doc_key is link or title.
+        Typically 2-5 unique titles → 1 cheap batch embedding call.
+        """
+        title_by_key: dict[str, str] = {}
+        for r in results:
+            meta = r["metadata"]
+            key = meta.get("link", "") or meta.get("title", "")
+            if key and key not in title_by_key:
+                title_by_key[key] = meta.get("title", "")
+
+        if not title_by_key:
+            return {}
+
+        keys = list(title_by_key.keys())
+        titles = [title_by_key[k] for k in keys]
+
+        try:
+            title_embeddings = self.embedding_service.embed_texts(titles)
+        except Exception as e:
+            print(f"Title embedding failed: {e}")
+            return {}
+
+        relevance = {}
+        for key, emb in zip(keys, title_embeddings):
+            relevance[key] = self._cosine_similarity(query_embedding, emb)
+
+        return relevance
+
+    @staticmethod
+    def _compute_chunk_density(results: list[dict]) -> dict[str, int]:
+        """Count how many chunks each document contributes. Returns {doc_key: count}."""
+        density: dict[str, int] = {}
+        for r in results:
+            meta = r["metadata"]
+            key = meta.get("link", "") or meta.get("title", "")
+            density[key] = density.get(key, 0) + 1
+        return density
+
+    def _prune_with_topic_coherence(
+        self,
+        results: list[dict],
+        query_embedding: list[float],
+        title_relevance: dict[str, float],
+        threshold_ratio: float = 0.7,
+        min_keep: int = 3,
+    ) -> list[dict]:
+        """Prune chunks using composite scoring: original score * title relevance * density factor.
+
+        adjusted_score = original_score * (0.7 + 0.3 * title_relevance) * density_factor
+        - title_relevance: cosine sim between query and document title (0-1)
+        - density_factor: 1.0 if document has >=2 chunks, 0.85 if singleton
+
+        Falls back to basic _prune_low_relevance if title_relevance is empty.
+        """
+        if not title_relevance:
+            return self._prune_low_relevance(results, threshold_ratio, min_keep)
+
+        if not results:
+            return results
+
+        density = self._compute_chunk_density(results)
+
+        scored = []
+        for r in results:
+            meta = r["metadata"]
+            key = meta.get("link", "") or meta.get("title", "")
+            title_rel = title_relevance.get(key, 0.5)
+            chunk_count = density.get(key, 1)
+            density_factor = 1.0 if chunk_count >= 2 else 0.85
+
+            adjusted = r["score"] * (0.7 + 0.3 * title_rel) * density_factor
+            scored.append((r, adjusted))
+
+        scored.sort(key=lambda x: x[1], reverse=True)
+
+        top_adjusted = scored[0][1]
+        if top_adjusted <= 0:
+            return results
+        cutoff = top_adjusted * threshold_ratio
+        pruned = [(r, s) for r, s in scored if s >= cutoff]
+
+        if len(pruned) < min_keep:
+            return [r for r, _ in scored[:min_keep]]
+
+        return [r for r, _ in pruned]
+
+    @staticmethod
+    def _extract_sub_questions(question: str) -> list[str]:
+        """Split a compound question into individual sub-questions."""
+        parts = re.split(r'\?', question)
+        sub_qs = [p.strip() + '?' for p in parts if p.strip() and len(p.strip()) > 10]
+        return sub_qs if sub_qs else [question.strip()]
+
+    _ENTITY_PATTERN = re.compile(
+        r'(?:we are|I am|as a|our company is|we\'re)\s+'
+        r'(?:a |an )?'
+        r'((?:Type\s*[1-4]\s+)?'
+        r'(?:NBFC|HFC|bank|manufacturer|manufacturing company|'
+        r'exporter|importer|borrower|listed company|unlisted company|'
+        r'SIDBI|shipping company|infrastructure company|'
+        r'startup|MSME|corporate|partnership firm|LLP|'
+        r'mutual fund|insurance company|broker|dealer|'
+        r'registered entity|category [I-IV]+ ?(?:AIF|FPI|merchant banker)?)'
+        r')',
+        re.IGNORECASE,
+    )
+
+    @staticmethod
+    def _extract_user_scenario(question: str) -> str | None:
+        """Extract the user's self-identified entity type from the question."""
+        m = RAGPipeline._ENTITY_PATTERN.search(question)
+        return m.group(1).strip() if m else None
+
+    def _answer_system_prompt(self, matched_circular: str | None = None, question: str | None = None) -> str:
         """Build the system prompt used for answer generation."""
         system_prompt = (
             "You are an expert analyst of Indian government regulatory circulars "
@@ -613,22 +976,32 @@ class RAGPipeline:
             "6. If multiple circulars are relevant, synthesize and cross-reference them "
             "with exact citations.\n\n"
             "REASONING FRAMEWORK:\n"
-            "Step 1: Identify relevant rule(s)/provision(s) in context\n"
-            "Step 2: Extract thresholds, conditions, numerical limits\n"
-            "Step 3: Apply rules/conditions to the scenario in the question\n"
-            "Step 4: Formulate answer with exact citations (circular number, authority, date)\n\n"
+            "Before writing your answer, mentally perform these steps:\n"
+            "Step 1: Identify the specific rule(s)/provision(s) in context that address "
+            "the user's question\n"
+            "Step 2: For each provision, classify it: PERMITS / PROHIBITS / CONDITIONALLY ALLOWS "
+            "— then extract the exact thresholds, conditions, and numerical limits\n"
+            "Step 3: If the user describes their scenario (entity type, amount, purpose), "
+            "apply the rules to THEIR specific situation\n"
+            "Step 4: Formulate a DECISIVE answer — use 'is permitted', 'is prohibited', "
+            "'is required' — NEVER hedge with 'might be', 'could be', 'appears to be' "
+            "when the provision is clear. If the context genuinely does not contain enough "
+            "information, say explicitly: 'The available context does not address this.'\n\n"
             "ANSWER FORMAT:\n"
-            "Structure your response with these sections as applicable "
-            "(skip sections that do not apply):\n\n"
-            "**Overview**: Brief summary based on the context documents.\n\n"
-            "**Key Obligations & Requirements**: Bullet each compliance requirement, "
-            "mandatory action, or prohibition found in the context. Include who it applies to.\n\n"
-            "**Important Dates & Deadlines**: List any effective dates, compliance deadlines, "
-            "or transition periods explicitly mentioned in the context.\n\n"
-            "**Exceptions & Conditions**: Note any exemptions, carve-outs, thresholds, "
-            "or applicability limitations stated in the context.\n\n"
-            "**Additional Context**: Any other relevant details from the context, including "
-            "references to related circulars or master directions.\n"
+            "- Lead with a DIRECT answer to the question in the first 1-2 sentences. "
+            "Do not start with background or definitions.\n"
+            "- Support your answer with cited evidence (circular number, authority, date).\n"
+            "- Use question-driven headings ONLY when the question covers multiple distinct "
+            "sub-topics (e.g., 'Eligible end-uses' and 'Reporting requirements'). Do NOT "
+            "use generic fixed headings like 'Overview' or 'Key Obligations'.\n"
+            "- SKIP information from the context that does not help answer the specific "
+            "question asked. Not every retrieved document needs to be mentioned.\n"
+            "- Keep the answer focused and concise — a targeted 5-paragraph answer is better "
+            "than an exhaustive 15-paragraph dump.\n\n"
+            "CONTEXT WEIGHTING:\n"
+            "Each context document has a Relevance score. Prioritize higher-scoring documents. "
+            "Low-relevance documents may have been included for breadth — use them only if they "
+            "directly address the question.\n"
         )
         if matched_circular:
             sanitized = self._sanitize_circular_number(matched_circular)
@@ -639,6 +1012,17 @@ class RAGPipeline:
                     "to the user's question. If the circular does not address a specific aspect of the question, "
                     "explain what the circular actually covers and clarify that it does not mention the specific "
                     "aspect asked about.\n"
+                )
+        # Scenario focus: when the user identifies their entity type, focus the answer
+        if question:
+            entity = self._extract_user_scenario(question)
+            if entity:
+                system_prompt += (
+                    f"\nSCENARIO FOCUS: The user has identified themselves as a '{entity}'. "
+                    f"Focus your answer on provisions applicable to this entity type. "
+                    f"Skip or briefly note rules that apply only to other entity types "
+                    f"(unless they provide useful contrast). Do NOT dump all entity-type "
+                    f"rules from the context.\n"
                 )
         return system_prompt
 
@@ -953,11 +1337,15 @@ class RAGPipeline:
     )
 
     def _extract_sources(
-        self, results: list[dict], question: str = ""
+        self,
+        results: list[dict],
+        question: str = "",
+        title_relevance: dict[str, float] | None = None,
     ) -> list[SourceReference]:
         """Deduplicate sources by link, keeping highest score per source.
         Applies a date recency boost so newer circulars rank higher.
-        When the question signals recency intent, the boost is much steeper."""
+        When the question signals recency intent, the boost is much steeper.
+        When title_relevance is provided, penalizes off-topic sources (title_rel < 0.5)."""
         wants_recent = bool(self._RECENCY_PATTERN.search(question))
 
         seen: dict[str, SourceReference] = {}
@@ -992,6 +1380,14 @@ class RAGPipeline:
                 years_old = 5 if wants_recent else 0
             boost = max(floor, 1.0 - years_old * decay_rate)
             src.relevance_score = round(src.relevance_score * boost, 4)
+
+        # Penalize off-topic sources based on title relevance
+        if title_relevance:
+            for key, src in seen.items():
+                title_rel = title_relevance.get(key, 0.5)
+                if title_rel < 0.5:
+                    penalty = 0.7 + 0.6 * title_rel  # ranges 0.7→1.0
+                    src.relevance_score = round(src.relevance_score * penalty, 4)
 
         ranked = sorted(seen.values(), key=lambda x: x.relevance_score, reverse=True)
         if not ranked:
