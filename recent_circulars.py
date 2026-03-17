@@ -119,7 +119,7 @@ st.divider()
 # --- Filters ---
 all_sources = sorted(set(d["_source"] for d in all_data if d.get("_source")))
 
-filter_col1, filter_col2, filter_col3 = st.columns([1, 1, 1])
+filter_col1, filter_col2 = st.columns([1, 1])
 with filter_col1:
     selected_source = st.selectbox(
         "Filter by Authority",
@@ -129,11 +129,6 @@ with filter_col2:
     selected_risk = st.selectbox(
         "Filter by Risk Level",
         ["All", "HIGH", "MEDIUM", "LOW"],
-    )
-with filter_col3:
-    display_count = st.slider(
-        "Circulars to show",
-        min_value=5, max_value=50, value=5, step=5,
     )
 
 # --- Apply filters ---
@@ -146,8 +141,6 @@ if selected_risk != "All":
         if d.get("extraction", {}).get("compliance_risk_level") == selected_risk
     ]
 
-# Limit display
-filtered = filtered[:display_count]
 
 if not filtered:
     st.warning("No circulars match your filters. Try adjusting the filters above.")
