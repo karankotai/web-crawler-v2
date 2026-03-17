@@ -25,6 +25,23 @@ services:
       - mongo_data:/data/db
     restart: unless-stopped
 
+  recent-circulars:
+    build:
+      context: .
+      dockerfile: Dockerfile.recent
+    ports:
+      - "8502:8502"
+    env_file: .env
+    restart: unless-stopped
+
+  extraction-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.recent
+    env_file: .env
+    entrypoint: ["sh", "-c", "while true; do python scripts/extract_recent.py --batch-size 10; sleep 21600; done"]
+    restart: unless-stopped
+
   caddy:
     image: caddy:2
     ports:

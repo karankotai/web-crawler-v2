@@ -15,10 +15,10 @@ class LLMProvider(ABC):
 
 
 class GeminiProvider(LLMProvider):
-    def __init__(self):
+    def __init__(self, model: str | None = None):
         from google import genai
         self._client = genai.Client(api_key=settings.GEMINI_API_KEY)
-        self._model = settings.GEMINI_MODEL
+        self._model = model or settings.GEMINI_MODEL
 
     def generate(self, prompt: str, system: str, max_tokens: int = 2000, temperature: float = 0) -> str:
         from google.genai import types
@@ -90,9 +90,11 @@ _PROVIDERS = {
 }
 
 
-def create_llm_provider() -> LLMProvider:
+def create_llm_provider(model: str | None = None) -> LLMProvider:
     provider_name = settings.LLM_PROVIDER.lower()
     cls = _PROVIDERS.get(provider_name)
     if cls is None:
         raise ValueError(f"Unknown LLM_PROVIDER '{provider_name}'. Choose from: {list(_PROVIDERS.keys())}")
+    if model and provider_name == "gemini":
+        return cls(model=model)
     return cls()

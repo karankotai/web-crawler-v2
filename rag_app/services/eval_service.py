@@ -309,15 +309,15 @@ class EvalService:
     ) -> str:
         """Format RAG sources with chunk text for the judge prompt.
 
-        Sends the top 6 chunks with up to 1500 chars each to avoid
-        overwhelming the judge with too much text.
+        Sends the top 12 chunks with up to 1200 chars each to give the judge
+        sufficient context to verify citations without exceeding token limits.
         """
         if not sources and not chunks:
             return "(No sources retrieved)"
         parts = []
         if chunks:
-            for i, chunk in enumerate(chunks[:6], 1):
-                text = chunk.text[:1500]
+            for i, chunk in enumerate(chunks[:12], 1):
+                text = chunk.text[:1200]
                 parts.append(
                     f"[Source {i}] {chunk.source} — {chunk.title} "
                     f"(Circular: {chunk.circular_number}, "
