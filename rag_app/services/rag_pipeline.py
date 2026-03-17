@@ -56,28 +56,48 @@ _DOMAIN_KEYWORDS: dict[str, dict] = {
             "gst", "cgst", "igst", "sgst", "utgst", "itc", "input tax credit",
             "gstr", "gstr-1", "gstr-3b", "gstr-9", "gstr-9c",
             "section 128a", "section 16", "section 17", "section 54",
-            "rule 89", "rule 36", "rule 42", "rule 43",
+            "section 14", "section 103", "section 143", "section 171",
+            "rule 89", "rule 36", "rule 42", "rule 43", "rule 164",
             "compensation cess", "e-way bill", "ims", "invoice management",
-            "anti-profiteering", "advance ruling", "gstat",
-            "spl-01", "drc-03", "rcm", "reverse charge",
+            "anti-profiteering", "advance ruling", "gstat", "appellate tribunal",
+            "spl-01", "spl-02", "drc-03", "rcm", "reverse charge",
             "hsn", "sac", "gta", "job worker", "inverted duty",
+            "job work", "challan", "moulds", "dies", "jigs", "fixtures",
+            "credit note", "debit note", "banquet", "advance payment",
+            "health insurance premium", "blocked credit",
+            "mrp", "legal metrology", "binding effect",
+            "table 8a", "table 8c", "qrmp", "quarterly return",
+            "capital subsidy", "state incentive", "emi deferred duty",
         ],
         "sources": ["cbic", "legislation", "gst_council", "practitioner_knowledge"],
+    },
+    "customs": {
+        "keywords": [
+            "customs", "bill of entry", "hs code", "import duty",
+            "reassessment", "voluntary compliance", "customs act",
+            "importer", "customs duty",
+        ],
+        "sources": ["cbic", "legislation", "practitioner_knowledge"],
     },
     "rbi": {
         "keywords": [
             "rbi", "nbfc", "npa", "crar", "kyc", "ecb",
             "sbr", "scale-based", "gold loan", "securitisation",
             "master direction", "reserve bank",
+            "ucb", "urban co-operative bank", "cooperative bank",
+            "gold lending", "ltv", "loan-to-value",
+            "uapa", "sanctions", "str", "fiu-ind", "fiu",
+            "nbfc-factor", "factoring",
+            "floating rate", "floating-rate", "emi reset",
         ],
-        "sources": ["rbi"],
+        "sources": ["rbi", "practitioner_knowledge"],
     },
     "sebi": {
         "keywords": [
             "sebi", "lodr", "sast", "stock broker", "mutual fund",
             "ipo", "insider trading", "takeover",
         ],
-        "sources": ["sebi"],
+        "sources": ["sebi", "practitioner_knowledge"],
     },
 }
 
@@ -571,6 +591,21 @@ class RAGPipeline:
 
     # ── Ask (non-streaming) ──────────────────────────────────
 
+    @staticmethod
+    def _is_multi_part_question(question: str) -> bool:
+        """Detect if the question has multiple distinct sub-parts requiring broader retrieval."""
+        q = question.lower()
+        # Lettered sub-parts: (a), (b), (c)
+        if re.search(r"\(a\).*\(b\)", q):
+            return True
+        # Multiple question marks
+        if q.count("?") >= 2:
+            return True
+        # Enumerated requirements: "Walk through X, Y, and Z"
+        if re.search(r"(walk through|explain|describe|what are)\b.+,\s+.+,\s+and\s+", q):
+            return True
+        return False
+
     def ask(self, request: AskRequest) -> AskResponse:
         """Answer a question using RAG pipeline."""
         # Auto-detect domain sources if no explicit source_filter provided
@@ -580,6 +615,13 @@ class RAGPipeline:
             if detected:
                 source_filter = detected
                 print(f"Auto-detected domain sources: {source_filter}")
+
+        # Boost top_k for multi-part questions
+        effective_top_k = request.top_k
+        is_multi_part = self._is_multi_part_question(request.question)
+        if is_multi_part and effective_top_k <= 12:
+            effective_top_k = 20
+            print(f"Multi-part question detected: boosting top_k to {effective_top_k}")
 
         # Rewrite query for better retrieval
         rewritten = self._rewrite_query(request.question)
@@ -605,7 +647,7 @@ class RAGPipeline:
         results = []
         if circular_number:
             print(f"Detected circular number: {circular_number}")
-            analysis_top_k = 50 if is_analysis else request.top_k
+            analysis_top_k = 50 if is_analysis else effective_top_k
             results = self.vector_store.search(
                 query_vector=query_embedding,
                 top_k=analysis_top_k,
@@ -626,14 +668,14 @@ class RAGPipeline:
                 # Use hierarchical search
                 search_results = self._hierarchical_search(
                     query_vector=qv,
-                    top_k=request.top_k,
+                    top_k=effective_top_k,
                     source_filter=source_filter,
                     preferred_types=preferred_types if preferred_types else None,
                 )
                 all_results.extend(search_results)
 
             # Deduplicate merged results
-            results = self._deduplicate_results(all_results, request.top_k)
+            results = self._deduplicate_results(all_results, effective_top_k)
 
             # Extract keywords and boost with keyword search
             keywords = self._extract_keywords(request.question)
@@ -641,11 +683,11 @@ class RAGPipeline:
                 keyword_results = self.vector_store.keyword_search(
                     query_vector=query_embedding,
                     keywords=keywords,
-                    top_k=request.top_k,
+                    top_k=effective_top_k,
                     score_threshold=0.0,
                     source_filter=source_filter,
                 )
-                results = self._merge_results(results, keyword_results, request.top_k)
+                results = self._merge_results(results, keyword_results, effective_top_k)
 
         if not results:
             return AskResponse(
@@ -1072,10 +1114,12 @@ class RAGPipeline:
             f"<user_question>\n{question}\n</user_question>"
             f"{sub_q_block}"
         )
+        # Use higher token limit for multi-part questions
+        max_tokens = 3000 if self._is_multi_part_question(question) else 2000
         return self.fast_llm.generate(
             prompt=prompt,
             system=system_prompt,
-            max_tokens=2000,
+            max_tokens=max_tokens,
             temperature=0,
         )
 
@@ -1301,7 +1345,10 @@ class RAGPipeline:
             "ANSWER FORMAT:\n"
             "- Lead with a DIRECT answer to the question in the first 1-2 sentences. "
             "Do not start with background or definitions.\n"
-            "- Support your answer with cited evidence (circular number, authority, date).\n"
+            "- Support your answer with cited evidence (circular number, authority, date). "
+            "For practitioner_knowledge sources (documents with IDs starting with PKB-), "
+            "cite the SECTION or PROVISION reference from the text (e.g., 'Section 17(5)(b)', "
+            "'Rule 89(5)') rather than the PKB document ID.\n"
             "- Use question-driven headings ONLY when the question covers multiple distinct "
             "sub-topics (e.g., 'Eligible end-uses' and 'Reporting requirements'). Do NOT "
             "use generic fixed headings like 'Overview' or 'Key Obligations'.\n"
@@ -1312,14 +1359,24 @@ class RAGPipeline:
             "CONTEXT WEIGHTING:\n"
             "Each context document has a Relevance score. Prioritize higher-scoring documents. "
             "Low-relevance documents may have been included for breadth — use them only if they "
-            "directly address the question.\n\n"
+            "directly address the question.\n"
+            "Documents from 'practitioner_knowledge' are curated analytical summaries that "
+            "synthesize multiple regulations into clear, practitioner-ready guidance. When both "
+            "a practitioner_knowledge document and raw circulars address the same topic, prefer "
+            "the practitioner_knowledge analysis for the synthesized answer, citing specific "
+            "provision references (Section X, Rule Y) from the text.\n\n"
             "GRAPH CONTEXT:\n"
             "Bracketed annotations at the start of the context (e.g. [AMENDMENT CHAIN], "
             "[APPLIES TO], [RELATED CIRCULARS], [CROSS-REGULATOR VIEW]) provide structured "
             "knowledge from the regulatory graph. Use amendment chains to determine which "
             "version is current. Use APPLIES_TO to scope your answer to the relevant entity "
             "types. Use freshness warnings (⚠ Superseded) to flag superseded information. "
-            "Use cross-regulator views to compare requirements across different regulators.\n"
+            "Use cross-regulator views to compare requirements across different regulators.\n\n"
+            "MULTI-PART QUESTIONS:\n"
+            "When the question has multiple distinct sub-parts (marked with (a), (b), (c) or "
+            "separated by multiple question marks), address EACH sub-part with a clearly "
+            "labeled section. Do not stop after answering only one sub-part. If context covers "
+            "some sub-parts but not others, answer what you can and state what is missing.\n"
         )
         if matched_circular:
             sanitized = self._sanitize_circular_number(matched_circular)
@@ -1644,6 +1701,56 @@ class RAGPipeline:
 
             yield _sse_event("topic_end", {"index": idx})
 
+        yield _sse_event("done", None)
+
+    def analyze_meeting_consolidated_stream(
+        self,
+        text: str,
+        use_rag: bool = False,
+        source_filter: list[str] | None = None,
+    ):
+        """Generator yielding SSE events for single-pass consolidated meeting analysis."""
+        from rag_app.prompts.meeting_analysis import MEETING_ANALYSIS_CONSOLIDATED_PROMPT
+
+        # Build prompt
+        context_parts = [f"<press_release>\n{text}\n</press_release>"]
+
+        # Optional RAG augmentation
+        if use_rag:
+            rag_query = text[:500]
+            query_vector = self.embedding_service.embed_single(rag_query)
+            rag_results = self.vector_store.search(
+                query_vector=query_vector,
+                top_k=8,
+                source_filter=source_filter,
+            )
+            if rag_results:
+                rag_context = self._build_context(rag_results)
+                context_parts.append(
+                    f"\n<related_circulars>\n{rag_context}\n</related_circulars>"
+                )
+
+        prompt = "\n".join(context_parts)
+
+        # Emit single topic_start for SSE contract compatibility
+        yield _sse_event("topics", {"topics": [
+            {"title": "Consolidated Analysis", "summary": "Full document analysis", "excerpt_length": len(text)},
+        ]})
+        yield _sse_event("topic_start", {"index": 0, "title": "Consolidated Analysis", "total": 1})
+
+        try:
+            for chunk in self.llm.generate_stream(
+                prompt=prompt,
+                system=MEETING_ANALYSIS_CONSOLIDATED_PROMPT,
+                max_tokens=16000,
+                temperature=0,
+            ):
+                yield _sse_event("token", chunk)
+        except Exception as e:
+            print(f"Error generating consolidated meeting analysis: {e}")
+            yield _sse_event("error", {"index": 0, "title": "Consolidated Analysis", "error_message": str(e)})
+
+        yield _sse_event("topic_end", {"index": 0})
         yield _sse_event("done", None)
 
     # ── Source extraction ────────────────────────────────────

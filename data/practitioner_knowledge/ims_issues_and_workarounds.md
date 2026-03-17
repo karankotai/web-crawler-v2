@@ -82,8 +82,61 @@ The Invoice Management System (IMS) was introduced on the GST portal from Octobe
 - Export feature: Download IMS data in Excel for reconciliation
 - IMS history: Previous period actions are viewable for audit trail
 
+### 6. Credit Note Rejection After Invoice Acceptance
+
+**Problem**: A supplier issues a credit note, but the recipient has already accepted the original invoice on IMS. The recipient now wants to reject the credit note to prevent ITC reduction.
+
+**Step-by-Step Process on GST Portal**:
+
+1. **Navigate to IMS Dashboard**: GST Portal → Returns → IMS Dashboard
+2. **Locate the credit note**: Filter by document type = "Credit Note" and search by supplier GSTIN or credit note number
+3. **Check status**: If the credit note shows "No Action" (pending), you can still reject it
+4. **Click "Reject"**: Select the credit note and click the "Reject" action button
+5. **Confirm rejection**: The system will show a confirmation — verify the credit note details and confirm
+6. **Result**: After rejection, the credit note will NOT reduce your ITC in the next GSTR-2B generation
+7. **Supplier notification**: The supplier will see the rejection in their IMS dashboard and in GSTR-1 return status
+
+**If rejection was missed (credit note was deemed accepted)**:
+- If the credit note was auto-accepted (deemed accepted after due date), you CANNOT reverse it through IMS
+- **Workaround 1**: Raise a **grievance** on the GST portal (Services → User Services → Grievance) explaining the erroneous acceptance
+- **Workaround 2**: Ask the supplier to issue a fresh debit note to reverse the credit note effect
+- **Workaround 3**: Manually add the ITC back in GSTR-3B Table 4 with a clear audit trail (take screenshot of the IMS credit note and the communication with supplier)
+
+**Important**: The ITC adjustment happens only when GSTR-2B is generated. If you reject before the GSTR-2B generation date (typically 14th of the month), the rejection will reflect in the current period's GSTR-2B.
+
+### 7. QRMP Taxpayer and Disputed Credit Notes — ITC Impact
+
+**Problem**: A QRMP (Quarterly Return Monthly Payment) taxpayer receives a credit note from a supplier. Under IMS, credit notes are auto-accepted if not acted upon. If the taxpayer disputes the credit note, what happens to ITC in the next quarterly GSTR-3B?
+
+**How It Works**:
+
+1. **Monthly IMS visibility**: Even though QRMP taxpayers file returns quarterly, IMS shows credit notes monthly
+2. **Action window**: QRMP taxpayers can take IMS actions in any month (M1, M2, or M3) of the quarter
+3. **If taxpayer REJECTS the credit note**:
+   - The credit note will be excluded from the quarterly GSTR-2B
+   - ITC will NOT be reduced in the next quarterly GSTR-3B
+   - The supplier is notified of the rejection
+4. **If taxpayer takes NO ACTION** (misses the window):
+   - Credit note is **deemed accepted** after the quarterly GSTR-3B filing due date
+   - ITC WILL be reduced in the next quarter's GSTR-2B
+   - The taxpayer would need to use grievance mechanism to reverse
+
+**Best Practice for QRMP Taxpayers**:
+- Review IMS dashboard **monthly** (not just before quarterly filing)
+- Set reminders for the 11th-13th of each month to review new invoices and credit notes
+- Reject disputed credit notes immediately upon appearance — don't wait for M3
+- Download and save IMS data each month for reconciliation
+
+**ITC Flow for Rejected Credit Note**:
+- Quarter 1: Supplier issues credit note → appears in IMS
+- QRMP taxpayer rejects in IMS during the quarter
+- Quarterly GSTR-2B generated: Credit note NOT included (no ITC reduction)
+- GSTR-3B for the quarter: ITC remains as claimed from original invoice
+- Supplier sees rejection → must resolve the dispute commercially
+
 ## Regulatory References
 
 - CGST Rule 60 (as amended by Notification No. 20/2024-Central Tax dated 08.10.2024)
 - GSTN Advisory on IMS dated 14.10.2024
 - CBIC Circular No. 237/31/2024-GST dated 15.10.2024
+- GSTN FAQ on IMS for QRMP Taxpayers (December 2024)

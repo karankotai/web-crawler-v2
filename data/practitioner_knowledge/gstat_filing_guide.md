@@ -23,6 +23,22 @@ The Goods and Services Tax Appellate Tribunal (GSTAT) is the second appellate fo
 - Each state has one or more benches based on the caseload
 - The bench jurisdiction depends on the location of the assessing authority
 
+### State-Wise Bench Jurisdiction (as notified)
+
+| State | Bench Location | Jurisdiction |
+|-------|---------------|-------------|
+| Rajasthan | Jaipur | All divisions of Rajasthan — Jaipur, Jodhpur, Ajmer, Bikaner, Kota, Udaipur |
+| Maharashtra | Mumbai, Pune | Mumbai bench (Mumbai, Thane, Konkan); Pune bench (rest of Maharashtra) |
+| Tamil Nadu | Chennai | All divisions of Tamil Nadu including Puducherry |
+| Karnataka | Bengaluru | All divisions of Karnataka |
+| Gujarat | Ahmedabad | All divisions of Gujarat including Daman/Diu/Dadra |
+| Uttar Pradesh | Lucknow, Prayagraj | Lucknow bench (Western UP); Prayagraj bench (Eastern UP) |
+| Delhi | New Delhi | NCT of Delhi (Principal Bench also sits in Delhi) |
+| West Bengal | Kolkata | West Bengal, Sikkim, Andaman & Nicobar |
+| Telangana | Hyderabad | Telangana |
+
+**For a taxpayer in Rajasthan**: The Jaipur bench of GSTAT has jurisdiction over all appeals from Rajasthan, regardless of the division or zone of the assessing officer.
+
 ### Bench Composition
 
 | Dispute Value | Bench Composition |
@@ -47,6 +63,13 @@ Before filing the appeal, the appellant must deposit:
 - **20%** of the disputed tax amount (in addition to the amount already paid under the first appeal pre-deposit of 10%)
 - Total pre-deposit at GSTAT stage: **20% of disputed tax** (over and above what was paid at first appellate stage)
 - Pre-deposit can be made through **electronic cash ledger** only (not ITC)
+
+**Pre-deposit calculation example (Rs. 80 lakh demand)**:
+- First appellate authority pre-deposit (already paid): 10% = Rs. 8 lakh
+- GSTAT pre-deposit: 20% of disputed tax = Rs. 16 lakh
+- Total pre-deposit for tribunal appeal: Rs. 16 lakh additional (Rs. 24 lakh cumulative)
+- Remaining demand stayed pending appeal: Rs. 56 lakh (80 - 24)
+- The 20% is calculated on the disputed tax amount only (excluding interest and penalty components)
 
 ### Step 3: File Form GST APL-05
 
