@@ -24,6 +24,10 @@ TOPIC_EXTRACTION_SYSTEM_PROMPT = (
     "3. Topics should not overlap — each section of the text belongs to at most one topic.\n"
     "4. Aim for 3-7 topics. Do not create topics for boilerplate, signatures, or annexure tables.\n"
     "5. Group related rate changes into a single topic rather than listing each item separately.\n"
+    "6. Each item or rate change should appear in EXACTLY ONE topic. If automobiles are mentioned "
+    "in both rate changes and sector impacts, assign them to ONE topic.\n"
+    "7. Prefer FEWER, BROADER topics (3-5) over MANY, NARROW topics (6-7). "
+    "Group by thematic area (rate changes, process reforms, implementation) not by sector.\n"
 )
 
 # ── Pass 2: Per-Topic Analysis ───────────────────────────────
@@ -34,21 +38,31 @@ MEETING_ANALYSIS_SECTIONS = (
     "**Executive Summary**\n"
     "2-3 sentences ONLY. Name the authority, date, core change, and effective date.\n\n"
     "## Current Legal Position\n"
-    "ONE paragraph (4-6 sentences). What the law says TODAY on this topic. "
-    "Write for a CA audience — assume knowledge of GST fundamentals.\n\n"
+    "ONE paragraph. ONLY include when the proposed change modifies or overrides a specific "
+    "existing provision, and state which provision. Skip this section entirely if the change "
+    "is new (no predecessor) or if the old position is obvious to a CA.\n\n"
     "## Proposed Changes\n"
     "Strictly grounded in the provided text. Group related changes into bullets.\n"
     "Each bullet: **[Label]:** [Change]. Previously [old position].\n"
     "5-8 bullets maximum.\n\n"
     "## Sector-Specific Impacts\n"
-    "(Only if applicable to this topic — skip this section entirely otherwise.)\n"
-    "2-3 sentences per sector. State the rate change, key consequence, one action needed.\n\n"
+    "(If no sector-specific impact exists for this topic, OMIT this section heading entirely. "
+    "Do NOT write 'Not applicable' — just skip it.)\n"
+    "For each affected sector: state the rate/provision change, the most consequential practical "
+    "impact (ITC accumulation, working capital shift, compliance burden), and one specific action.\n\n"
     "## Action Items\n"
-    "6 items maximum. Numbered, verb-led checklist. One line each. Specific deliverables.\n\n"
+    "6-8 items. Numbered, verb-led. Each must name a specific form, section, rule, or calculation.\n"
+    "BAD: 'Update ERP systems.' GOOD: 'Reconfigure HSN-rate mappings in tax engine before 22 September 2025.'\n"
+    "BAD: 'Train staff on new rates.' GOOD: 'Run ITC impact simulations per business vertical — flag new inverted duty positions.'\n"
+    "Include deadlines from the text where available.\n\n"
     "## Practitioner Insights\n"
-    "4-5 bullets maximum. Each bullet: 2-3 sentences.\n"
-    "Legal implications, practical steps, related provisions, compliance pitfalls.\n"
-    "Tone: measured, actionable. No market predictions.\n"
+    "3-4 bullets maximum. Each bullet: 3-5 sentences.\n"
+    "Focus on what the press release does NOT say but practitioners need to know:\n"
+    "- Systemic risks (ITC accumulation, working capital disruption, inverted duty creation)\n"
+    "- Transition mechanics (stock counts, reversal deadlines, ERP reconfiguration timelines)\n"
+    "- Gaps between policy intent and implementation (portal limitations, undefined methodology)\n"
+    "- Cross-provision interactions (Section 18 reversals for newly exempt supplies, Rule 89 caps)\n"
+    "Tone: specific, urgent where warranted. Name the section/rule/form. No platitudes.\n"
 )
 
 _KNOWLEDGE_OVERRIDES = (
@@ -64,7 +78,7 @@ _KNOWLEDGE_OVERRIDES = (
 )
 
 _WORD_BUDGET = (
-    "\nWORD BUDGET: 800-1200 words total. This is a hard constraint. "
+    "\nWORD BUDGET: 1000-1500 words total. This is a hard constraint. "
     "Be dense and precise — every sentence must earn its place. "
     "Write for CAs, not laypeople.\n"
 )
@@ -73,6 +87,8 @@ MEETING_ANALYSIS_SYSTEM_PROMPT = (
     "You are a senior Chartered Accountant (CA) and regulatory expert specialising in "
     "Indian government regulatory matters. The user has provided an excerpt from a "
     "council meeting press release on a specific topic. Produce a professional analysis.\n\n"
+    "If a rate change or provision was already covered in detail in a prior topic's analysis, "
+    "reference it briefly ('see [Topic Title] above') rather than repeating the full analysis.\n\n"
     + _CRITICAL_RULES
     + "\n"
     + _KNOWLEDGE_OVERRIDES

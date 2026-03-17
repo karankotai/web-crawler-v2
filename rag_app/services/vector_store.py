@@ -33,6 +33,7 @@ class VectorStore:
         self._ensure_text_index()
         self._ensure_chunk_type_index()
         self._ensure_topic_index()
+        self._ensure_source_index()
 
     def ensure_collection(self, recreate: bool = False):
         """Create collection, optionally recreating it."""
@@ -56,6 +57,7 @@ class VectorStore:
         self._ensure_text_index()
         self._ensure_chunk_type_index()
         self._ensure_topic_index()
+        self._ensure_source_index()
 
     def _ensure_text_index(self):
         """Create a full-text index on the 'text' payload field if missing."""
@@ -133,6 +135,26 @@ class VectorStore:
         except Exception as e:
             print(f"circular_number index creation skipped: {e}")
 
+    def _ensure_source_index(self):
+        """Create a keyword index on the 'source' payload field if missing."""
+        try:
+            info = self.client.get_collection(self.collection_name)
+            existing = info.payload_schema or {}
+            if "source" in existing:
+                return
+        except Exception:
+            return
+
+        try:
+            self.client.create_payload_index(
+                collection_name=self.collection_name,
+                field_name="source",
+                field_schema=KeywordIndexParams(type="keyword"),
+            )
+            print("Created keyword index on 'source' field")
+        except Exception as e:
+            print(f"source index creation skipped: {e}")
+
     def upsert_chunks(self, chunks: list[TextChunk], embeddings: list[list[float]]) -> int:
         """Upsert chunks with their embeddings into Qdrant. Returns count of points stored."""
         batch_size = 50
@@ -163,6 +185,7 @@ class VectorStore:
                     "topic": chunk.metadata.topic,
                     "section_index": chunk.metadata.section_index,
                     "section_heading": chunk.metadata.section_heading,
+                    "context_summary": chunk.metadata.context_summary,
                 }
                 points.append(PointStruct(id=point_id, vector=embedding, payload=payload))
 
@@ -318,8 +341,20 @@ class VectorStore:
         query_vector: list[float],
         top_k_circulars: int = 5,
         source_filter: str | list[str] | None = None,
-    ) -> list[str]:
-        """Over-fetch chunks, deduplicate by circular_number, return top N circular IDs by best score."""
+    ) -> tuple[list[tuple[str, float]], list[dict]]:
+        """Over-fetch chunks, deduplicate by circular_number, return top N circular IDs
+        (with scores) plus high-scoring orphan results (chunks without circular_number).
+
+        Many IRDAI and other source documents lack a circular_number in Qdrant.
+        Dropping them silently causes entire documents to become invisible to
+        the hierarchical search.  Orphans are grouped by title instead and the
+        best chunks from the top-scoring orphan groups are returned alongside
+        the circular numbers so the caller can merge them into the final set.
+
+        Returns:
+            (ranked_circulars, orphan_results) where ranked_circulars is a list
+            of (circular_number, best_score) tuples sorted by score descending.
+        """
         results = self.search(
             query_vector=query_vector,
             top_k=top_k_circulars * 10,
@@ -327,14 +362,32 @@ class VectorStore:
             source_filter=source_filter,
         )
         best_per_circular: dict[str, float] = {}
+        orphans_by_title: dict[str, list[dict]] = {}
+
         for r in results:
             cn = r["metadata"].get("circular_number", "")
             if not cn:
+                title = r["metadata"].get("title", "unknown")
+                orphans_by_title.setdefault(title, []).append(r)
                 continue
             if cn not in best_per_circular or r["score"] > best_per_circular[cn]:
                 best_per_circular[cn] = r["score"]
+
         ranked = sorted(best_per_circular.items(), key=lambda x: x[1], reverse=True)
-        return [cn for cn, _ in ranked[:top_k_circulars]]
+        ranked_circulars = [(cn, score) for cn, score in ranked[:top_k_circulars]]
+
+        # Rank orphan groups by best chunk score, keep top chunks from each
+        orphan_groups = sorted(
+            orphans_by_title.values(),
+            key=lambda chunks: max(c["score"] for c in chunks),
+            reverse=True,
+        )
+        top_orphans: list[dict] = []
+        for chunks in orphan_groups[:top_k_circulars]:
+            chunks.sort(key=lambda x: x["score"], reverse=True)
+            top_orphans.extend(chunks[:3])
+
+        return ranked_circulars, top_orphans
 
     def search_within_circulars(
         self,

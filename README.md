@@ -72,7 +72,7 @@ curl -X POST http://localhost:8000/index -H "Content-Type: application/json" \ -
 
 # Ask a question
 curl -X POST http://localhost:8000/ask -H "Content-Type: application/json" \
-  -d '{"question": "What are the latest RBI guidelines on digital lending?"}'
+  -d '{"question": "Client got a single demand order covering 2018-19 and 2020-21. Wants to settle only the older year under 128A. The order doesn't split the amount year-wise. How do I file for partial settlement?"}'
 
 # Health check
 curl http://localhost:8000/health

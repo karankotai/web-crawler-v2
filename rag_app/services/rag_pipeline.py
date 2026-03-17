@@ -8,6 +8,7 @@ from rag_app.models.schemas import (
     AskRequest,
     AskResponse,
     ChunkMetadata,
+    GraphContext,
     IndexResponse,
     RetrievedChunk,
     SourceReference,
@@ -108,6 +109,54 @@ def _detect_preferred_types(question: str) -> list[str]:
     return matched
 
 
+# ── Graph intent detection (keyword-based) ────────────────
+
+_GRAPH_INTENT_KEYWORDS: dict[str, list[str]] = {
+    "chain": [
+        "amendment chain", "history of", "previous version", "superseded by",
+        "evolution", "amendment history", "how has", "changed over time",
+        "earlier version", "prior circular",
+    ],
+    "latest": [
+        "latest", "current version", "most recent", "in force",
+        "currently applicable", "current circular", "latest version",
+    ],
+    "impact": [
+        "impact", "affected entities", "who does this apply to",
+        "blast radius", "who is affected", "which entities",
+        "who must comply", "applicability",
+    ],
+    "summary": [
+        "all circulars from", "summary of rbi", "summary of sebi",
+        "summary of irdai", "summary of mca", "overview of recent",
+        "recent circulars", "all recent",
+    ],
+    "related": [
+        "related circulars", "similar circulars", "other circulars about",
+        "related regulations", "other regulations on", "connected circulars",
+    ],
+    "cross_reference": [
+        "across regulators", "both rbi and sebi", "both sebi and rbi",
+        "cross-regulator", "cross regulator", "compare requirements",
+        "rbi and irdai", "irdai and rbi", "sebi and mca", "mca and sebi",
+        "how do different regulators", "multiple regulators",
+    ],
+}
+
+
+def _detect_graph_intent(question: str) -> str | None:
+    """Detect if the question needs graph-specific retrieval. Returns intent or None."""
+    q_lower = question.lower()
+    best_intent = None
+    best_count = 0
+    for intent, keywords in _GRAPH_INTENT_KEYWORDS.items():
+        count = sum(1 for kw in keywords if kw in q_lower)
+        if count > best_count:
+            best_count = count
+            best_intent = intent
+    return best_intent
+
+
 class RAGPipeline:
     _ANALYSIS_FILLER_PATTERN = re.compile(
         r"\b(analyze|analyse|analysis|explain|summary|summarize|summarise|"
@@ -121,6 +170,14 @@ class RAGPipeline:
         self.vector_store = VectorStore()
         self.llm = create_llm_provider()
         self.fast_llm = create_llm_provider(model=settings.GEMINI_FAST_MODEL)
+        self.graph_store = None
+        if settings.GRAPH_ENABLED:
+            try:
+                from rag_app.services.graph_store import GraphStore
+                self.graph_store = GraphStore()
+                print("GraphStore initialized (Neo4j connected)")
+            except Exception as e:
+                print(f"GraphStore init failed, continuing without graph: {e}")
 
     # ── Contextualized Embedding Helpers ─────────────────────
 
@@ -423,15 +480,24 @@ class RAGPipeline:
         source_filter: str | list[str] | None = None,
         preferred_types: list[str] | None = None,
     ) -> list[dict]:
-        """Two-stage hierarchical search: find top circulars, then get chunks from each."""
-        # Stage 1: identify top circulars
-        circular_numbers = self.vector_store.search_circular_level(
+        """Two-stage hierarchical search: find top circulars, then get chunks from each.
+
+        Uses score-weighted chunk allocation so that the highest-scoring circular
+        gets proportionally more chunks.  This prevents deadline/obligation
+        aggregation queries from losing information when a single circular contains
+        many relevant sections spread across chunks.
+
+        Also merges orphan results — high-scoring chunks from documents that lack
+        a circular_number (common for IRDAI and other sources).
+        """
+        # Stage 1: identify top circulars (with scores) + orphan results
+        ranked_circulars, orphan_results = self.vector_store.search_circular_level(
             query_vector=query_vector,
             top_k_circulars=5,
             source_filter=source_filter,
         )
 
-        if not circular_numbers:
+        if not ranked_circulars and not orphan_results:
             # Fallback to flat search
             if preferred_types:
                 return self.vector_store.search_with_type_boost(
@@ -448,20 +514,59 @@ class RAGPipeline:
                 source_filter=source_filter,
             )
 
-        # Stage 2: get chunks from top circulars
-        results = self.vector_store.search_within_circulars(
-            query_vector=query_vector,
-            circular_numbers=circular_numbers,
-            top_k_per_circular=max(3, top_k // len(circular_numbers)),
-        )
+        # Stage 2: score-weighted chunk allocation across circulars.
+        # When one circular clearly dominates (>1.2× the runner-up), give it
+        # most of the budget so aggregation queries (all deadlines, key
+        # requirements) can pull enough chunks for full coverage.
+        results = []
+        if ranked_circulars:
+            top_cn, top_score = ranked_circulars[0]
+            runner_up_score = ranked_circulars[1][1] if len(ranked_circulars) > 1 else 0
+            dominant = top_score > 0.6 and (
+                len(ranked_circulars) == 1 or top_score > runner_up_score * 1.2
+            )
+
+            if dominant:
+                # Give dominant circular a large budget, reserve 2 per remaining
+                others_budget = 2 * (len(ranked_circulars) - 1)
+                allocations = {top_cn: max(top_k - others_budget, top_k // 2)}
+                for cn, _ in ranked_circulars[1:]:
+                    allocations[cn] = 2
+            else:
+                # Score-weighted allocation across circulars
+                total_score = sum(s for _, s in ranked_circulars)
+                allocations = {}
+                remaining = top_k
+                for cn, score in ranked_circulars:
+                    slots = max(2, round(top_k * score / total_score))
+                    allocations[cn] = min(slots, remaining)
+                    remaining -= allocations[cn]
+                    if remaining <= 0:
+                        break
+
+            for cn, slots in allocations.items():
+                chunk_results = self.vector_store.search_within_circulars(
+                    query_vector=query_vector,
+                    circular_numbers=[cn],
+                    top_k_per_circular=slots,
+                )
+                results.extend(chunk_results)
+
+        # Merge orphan results, deduplicating by text prefix
+        if orphan_results:
+            seen = {r["text"][:200] for r in results}
+            for o in orphan_results:
+                if o["text"][:200] not in seen:
+                    results.append(o)
+                    seen.add(o["text"][:200])
 
         # Apply type boost if preferred types detected
         if preferred_types:
             for r in results:
                 if r["metadata"].get("chunk_type", "general") in preferred_types:
                     r["score"] += 0.1
-            results.sort(key=lambda x: x["score"], reverse=True)
 
+        results.sort(key=lambda x: x["score"], reverse=True)
         return results[:top_k]
 
     # ── Ask (non-streaming) ──────────────────────────────────
@@ -550,6 +655,116 @@ class RAGPipeline:
                 chunks_retrieved=0,
             )
 
+        # ── Graph: detect intent and run freshness check ──────
+        graph_intent = _detect_graph_intent(request.question) if self.graph_store else None
+        graph_ctx = GraphContext() if self.graph_store else None
+        graph_context_text = ""
+
+        if self.graph_store and graph_intent:
+            graph_ctx.graph_intent = graph_intent
+            print(f"Graph intent: {graph_intent}")
+            try:
+                cn_for_graph = circular_number or ""
+                if graph_intent == "chain" and cn_for_graph:
+                    chain = self.graph_store.get_amendment_chain(cn_for_graph)
+                    graph_ctx.amendment_chain = [c["number"] for c in chain]
+                    if chain:
+                        chain_desc = " → ".join(
+                            f"{c['number']} ({c.get('date', '?')})" for c in chain
+                        )
+                        graph_context_text = f"[AMENDMENT CHAIN: {chain_desc}]\n"
+                        latest = next((c for c in chain if c.get("is_latest")), chain[-1])
+                        graph_context_text += f"[LATEST VERSION: {latest['number']} — {latest.get('title', '')}]\n\n"
+
+                elif graph_intent == "latest" and cn_for_graph:
+                    latest = self.graph_store.get_latest_version(cn_for_graph)
+                    if latest and latest["number"] != cn_for_graph:
+                        graph_ctx.freshness_notes[cn_for_graph] = f"Latest version is {latest['number']}"
+                        graph_context_text = (
+                            f"[NOTE: {cn_for_graph} has been superseded. "
+                            f"Latest version: {latest['number']} — {latest.get('title', '')}]\n\n"
+                        )
+
+                elif graph_intent == "impact" and cn_for_graph:
+                    impact = self.graph_store.get_impact_analysis(cn_for_graph)
+                    entities = [e["type"] for e in impact.get("entities", [])]
+                    graph_ctx.impact_entities = entities
+                    if entities:
+                        graph_context_text = f"[APPLIES TO: {', '.join(entities)}]\n"
+                    regs = impact.get("regulations", [])
+                    if regs:
+                        reg_names = ", ".join(r["name"] for r in regs)
+                        graph_context_text += f"[AMENDS: {reg_names}]\n"
+                    if graph_context_text:
+                        graph_context_text += "\n"
+
+                elif graph_intent == "summary":
+                    # Extract source from question for summary queries
+                    for src in ["rbi", "sebi", "irdai", "mca", "cbic", "cbdt", "icai", "ibbi", "dgft"]:
+                        if src in request.question.lower():
+                            summaries = self.graph_store.get_source_summary(src.upper())
+                            if summaries:
+                                lines = [f"- {s['number']}: {s.get('title', '')} ({s.get('date', '')})" for s in summaries[:15]]
+                                graph_context_text = f"[CIRCULARS FROM {src.upper()}]\n" + "\n".join(lines) + "\n\n"
+                            break
+
+                elif graph_intent == "related" and cn_for_graph:
+                    related = self.graph_store.get_related_circulars(cn_for_graph)
+                    if related:
+                        lines = [f"- {r['number']}: {r.get('title', '')} ({r.get('source', '')}, {r.get('date', '')})" for r in related[:10]]
+                        graph_context_text = f"[RELATED CIRCULARS for {cn_for_graph}]\n" + "\n".join(lines) + "\n\n"
+
+                elif graph_intent == "cross_reference":
+                    # Extract topic from question for cross-regulator queries
+                    q_lower = request.question.lower()
+                    # Try to find a matching topic from the question
+                    import json as _json
+                    from pathlib import Path as _Path
+                    taxonomy_path = _Path(__file__).resolve().parent.parent.parent / "data" / "topic_taxonomy.json"
+                    best_topic = None
+                    if taxonomy_path.exists():
+                        topics = _json.loads(taxonomy_path.read_text())
+                        best_score, best_topic = 0, None
+                        for t in topics:
+                            score = sum(1 for kw in t["keywords"] if kw in q_lower)
+                            if score > best_score:
+                                best_score, best_topic = score, t["name"]
+                    if best_topic:
+                        cross_results = self.graph_store.get_cross_source_by_topic(best_topic)
+                        if cross_results:
+                            by_source: dict[str, list] = {}
+                            for cr in cross_results:
+                                by_source.setdefault(cr["source"] or "Unknown", []).append(cr)
+                            lines = [f"[CROSS-REGULATOR VIEW: {best_topic}]"]
+                            for src, circs in sorted(by_source.items()):
+                                lines.append(f"\n  {src}:")
+                                for c in circs[:5]:
+                                    lines.append(f"  - {c['number']}: {c.get('title', '')} ({c.get('date', '')})")
+                            graph_context_text = "\n".join(lines) + "\n\n"
+
+            except Exception as e:
+                print(f"Graph intent query failed: {e}")
+
+        # Freshness check on vector search results (applies to ALL queries)
+        if self.graph_store and results:
+            try:
+                circular_numbers_in_results = [
+                    r["metadata"].get("circular_number")
+                    for r in results
+                    if r["metadata"].get("circular_number")
+                ]
+                if circular_numbers_in_results:
+                    freshness = self.graph_store.check_freshness(list(set(circular_numbers_in_results)))
+                    for r in results:
+                        cn = r["metadata"].get("circular_number")
+                        if cn in freshness and not freshness[cn]["is_latest"]:
+                            superseded_by = freshness[cn].get("superseded_by", "unknown")
+                            r["metadata"]["freshness_note"] = f"⚠ Superseded by {superseded_by}"
+                            if graph_ctx:
+                                graph_ctx.freshness_notes[cn] = f"Superseded by {superseded_by}"
+            except Exception as e:
+                print(f"Freshness check failed: {e}")
+
         # Sort by chunk_index for analysis mode to reassemble document order
         title_relevance = None
         if is_analysis:
@@ -562,8 +777,11 @@ class RAGPipeline:
             if len(results) < pre_prune:
                 print(f"Pruned {pre_prune - len(results)} low-relevance chunks (kept {len(results)})")
 
-        # Build context and generate answer
+        # Build context and generate answer (prepend graph context if available)
         context = self._build_context(results, include_scores=not is_analysis)
+        if graph_context_text:
+            context = graph_context_text + context
+
         if is_analysis:
             answer = self._generate_analysis(request.question, context, circular_number)
         else:
@@ -591,6 +809,7 @@ class RAGPipeline:
             query_used=rewritten,
             chunks_retrieved=len(results),
             retrieved_chunks=retrieved_chunks,
+            graph_context=graph_ctx if graph_ctx and (graph_ctx.amendment_chain or graph_ctx.freshness_notes or graph_ctx.impact_entities) else None,
         )
 
     # ── Ask (streaming) ──────────────────────────────────────
@@ -671,6 +890,96 @@ class RAGPipeline:
             yield _sse_event("done", None)
             return
 
+        # ── Graph: detect intent and build graph context ──────
+        graph_context_text = ""
+        if self.graph_store:
+            graph_intent = _detect_graph_intent(question)
+            if graph_intent:
+                print(f"Graph intent (stream): {graph_intent}")
+                try:
+                    if graph_intent == "chain" and circular_number:
+                        chain = self.graph_store.get_amendment_chain(circular_number)
+                        if chain:
+                            chain_desc = " → ".join(f"{c['number']} ({c.get('date', '?')})" for c in chain)
+                            graph_context_text = f"[AMENDMENT CHAIN: {chain_desc}]\n"
+                            latest = next((c for c in chain if c.get("is_latest")), chain[-1])
+                            graph_context_text += f"[LATEST VERSION: {latest['number']} — {latest.get('title', '')}]\n\n"
+
+                    elif graph_intent == "latest" and circular_number:
+                        latest = self.graph_store.get_latest_version(circular_number)
+                        if latest and latest["number"] != circular_number:
+                            graph_context_text = (
+                                f"[NOTE: {circular_number} has been superseded. "
+                                f"Latest version: {latest['number']} — {latest.get('title', '')}]\n\n"
+                            )
+
+                    elif graph_intent == "impact" and circular_number:
+                        impact = self.graph_store.get_impact_analysis(circular_number)
+                        entities = [e["type"] for e in impact.get("entities", [])]
+                        if entities:
+                            graph_context_text = f"[APPLIES TO: {', '.join(entities)}]\n"
+                        regs = impact.get("regulations", [])
+                        if regs:
+                            graph_context_text += f"[AMENDS: {', '.join(r['name'] for r in regs)}]\n"
+                        if graph_context_text:
+                            graph_context_text += "\n"
+
+                    elif graph_intent == "summary":
+                        for src in ["rbi", "sebi", "irdai", "mca", "cbic", "cbdt", "icai", "ibbi", "dgft"]:
+                            if src in question.lower():
+                                summaries = self.graph_store.get_source_summary(src.upper())
+                                if summaries:
+                                    lines = [f"- {s['number']}: {s.get('title', '')} ({s.get('date', '')})" for s in summaries[:15]]
+                                    graph_context_text = f"[CIRCULARS FROM {src.upper()}]\n" + "\n".join(lines) + "\n\n"
+                                break
+
+                    elif graph_intent == "related" and circular_number:
+                        related = self.graph_store.get_related_circulars(circular_number)
+                        if related:
+                            lines = [f"- {r['number']}: {r.get('title', '')} ({r.get('source', '')}, {r.get('date', '')})" for r in related[:10]]
+                            graph_context_text = f"[RELATED CIRCULARS for {circular_number}]\n" + "\n".join(lines) + "\n\n"
+
+                    elif graph_intent == "cross_reference":
+                        q_lower = question.lower()
+                        import json as _json
+                        from pathlib import Path as _Path
+                        taxonomy_path = _Path(__file__).resolve().parent.parent.parent / "data" / "topic_taxonomy.json"
+                        best_topic = None
+                        if taxonomy_path.exists():
+                            topics = _json.loads(taxonomy_path.read_text())
+                            best_score, best_topic = 0, None
+                            for t in topics:
+                                score = sum(1 for kw in t["keywords"] if kw in q_lower)
+                                if score > best_score:
+                                    best_score, best_topic = score, t["name"]
+                        if best_topic:
+                            cross_results = self.graph_store.get_cross_source_by_topic(best_topic)
+                            if cross_results:
+                                by_source: dict[str, list] = {}
+                                for cr in cross_results:
+                                    by_source.setdefault(cr["source"] or "Unknown", []).append(cr)
+                                lines = [f"[CROSS-REGULATOR VIEW: {best_topic}]"]
+                                for src, circs in sorted(by_source.items()):
+                                    lines.append(f"\n  {src}:")
+                                    for c in circs[:5]:
+                                        lines.append(f"  - {c['number']}: {c.get('title', '')} ({c.get('date', '')})")
+                                graph_context_text = "\n".join(lines) + "\n\n"
+
+                except Exception as e:
+                    print(f"Graph intent query failed in stream: {e}")
+
+            # Freshness check (all queries)
+            try:
+                cn_list = list({r["metadata"].get("circular_number") for r in results if r["metadata"].get("circular_number")})
+                if cn_list:
+                    freshness = self.graph_store.check_freshness(cn_list)
+                    for r in results:
+                        cn = r["metadata"].get("circular_number")
+                        if cn in freshness and not freshness[cn]["is_latest"]:
+                            r["metadata"]["freshness_note"] = f"⚠ Superseded by {freshness[cn].get('superseded_by', 'unknown')}"
+            except Exception as e:
+                print(f"Freshness check failed in stream: {e}")
+
         # Sort by chunk_index for analysis mode to reassemble document order
         title_relevance = None
         if is_analysis:
@@ -687,8 +996,10 @@ class RAGPipeline:
             "chunks_retrieved": len(results),
         })
 
-        # Build context and stream answer
+        # Build context and stream answer (prepend graph context)
         context = self._build_context(results, include_scores=not is_analysis)
+        if graph_context_text:
+            context = graph_context_text + context
         if is_analysis:
             system_prompt = self._analysis_system_prompt(circular_number)
             max_tokens = 4000
@@ -1001,7 +1312,14 @@ class RAGPipeline:
             "CONTEXT WEIGHTING:\n"
             "Each context document has a Relevance score. Prioritize higher-scoring documents. "
             "Low-relevance documents may have been included for breadth — use them only if they "
-            "directly address the question.\n"
+            "directly address the question.\n\n"
+            "GRAPH CONTEXT:\n"
+            "Bracketed annotations at the start of the context (e.g. [AMENDMENT CHAIN], "
+            "[APPLIES TO], [RELATED CIRCULARS], [CROSS-REGULATOR VIEW]) provide structured "
+            "knowledge from the regulatory graph. Use amendment chains to determine which "
+            "version is current. Use APPLIES_TO to scope your answer to the relevant entity "
+            "types. Use freshness warnings (⚠ Superseded) to flag superseded information. "
+            "Use cross-regulator views to compare requirements across different regulators.\n"
         )
         if matched_circular:
             sanitized = self._sanitize_circular_number(matched_circular)
