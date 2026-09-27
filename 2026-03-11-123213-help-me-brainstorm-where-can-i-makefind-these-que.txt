@@ -1,0 +1,586 @@
+▗ ▗   ▖ ▖  Claude Code v2.1.72
+           Opus 4.6 · Claude Max
+  ▘▘ ▝▝    ~/dev/gov-circular-crawler
+
+  ✻ Voice mode is now available · /voice to enable
+
+❯ help me brainstorm where can i make/find these questions                      
+  ⎿  [Image #1]
+
+⏺ This is a great product validation exercise. Let me brainstorm concrete
+  sources for those 10 complex regulatory questions.
+
+  Where to Find/Create the Questions
+
+  Tier 1: Your Own Data (Highest Signal)
+
+  1. Recent circulars from your crawlers — Pick circulars from the last 2-3
+  months (post-training cutoff for most LLMs). Formulate questions like "What
+  are the new KYC requirements for NBFCs under RBI's Feb 2026 circular?" Generic
+   LLMs literally can't answer these.
+  2. Your obligations extraction output — You already extract compliance
+  obligations. Turn them into questions: "What is the deadline for submitting
+  XYZ return under SEBI's latest directive?" or "Which entity categories are
+  exempt from this IRDAI requirement?"
+  3. Cross-regulator questions from your corpus — Questions that span two
+  regulators: "If my company is both SEBI-registered and RBI-regulated, which
+  AML guidelines take precedence for customer due diligence?" These require
+  synthesizing across your 10 crawler sources.
+
+  Tier 2: Real Customer Pain Points
+
+  4. Compliance officer interviews — Talk to 5 compliance officers (NBFCs,
+  mid-size banks, insurance companies). Ask: "What was the last regulatory
+  question you spent >1 hour researching?" Those are your benchmark questions.
+  5. Regulatory penalty orders — RBI and SEBI publish enforcement actions. The
+  violations reveal what companies actually get wrong. Frame questions around
+  those: "What reporting frequency does an NBFC need to maintain under [specific
+   circular] to avoid the penalty imposed in [enforcement order]?"
+  6. Industry association webinars/events — FICCI, CII, ASSOCHAM host compliance
+   webinars. The Q&A sections are gold mines. Check recordings or event
+  summaries on YouTube/their websites.
+
+  Tier 3: Online Communities
+
+  7. Taxmann / CAClubIndia forums — Compliance professionals post real questions
+   here. Filter for regulatory interpretation questions (not tax computation).
+  8. LinkedIn compliance groups — Search for Indian regulatory compliance
+  groups. Professionals share ambiguous situations they need help interpreting.
+  9. IndiaCorpLaw blog — Academic analysis of regulatory changes. The edge cases
+   they discuss make excellent benchmark questions.
+  10. SEBI/RBI FAQ pages — Regulators publish FAQs in response to common
+  confusion. If even the regulator needed to clarify it, it's a good test
+  question.
+
+  ---
+  Question Design Strategy
+
+  Design questions in 4 difficulty tiers to measure the moat precisely:
+
+  Tier: Easy
+  Type: Well-known regulation, basic facts
+  Generic LLM Expected Score: ~80%
+  Example: "What is the minimum capital requirement for an NBFC?"
+  ────────────────────────────────────────
+  Tier: Medium
+  Type: Specific circular interpretation
+  Generic LLM Expected Score: ~40-50%
+  Example: "Under SEBI's Nov 2025 circular on mutual fund lite, what are the
+    reduced compliance requirements?"
+  ────────────────────────────────────────
+  Tier: Hard
+  Type: Entity-specific applicability
+  Generic LLM Expected Score: ~20%
+  Example: "My NBFC has AUM of 800cr. Does the scale-based regulation Tier 2
+    apply, and what are the specific additional requirements vs Tier 1?"
+  ────────────────────────────────────────
+  Tier: Killer
+  Type: Cross-regulator + recent + entity-specific
+  Generic LLM Expected Score: ~5%
+  Example: "My company received an IRDAI insurance broking license in Jan 2026
+    and is also SEBI-registered. Which anti-money laundering reporting takes
+    precedence, and what's the reconciliation process when the two frameworks
+    conflict?"
+
+  ---
+  Practical Next Step
+
+  The fastest path: pull 5-10 of your most recent crawled circulars (last 60
+  days), read through them, and write one question per circular that a
+  compliance officer would realistically ask. That gives you questions that are:
+  - Grounded in real regulation
+  - Impossible for generic LLMs (not in training data)
+  - Answerable by your system (you have the source text)
+  - Verifiable (you can cite the exact circular)
+
+  Want me to look through your crawled data or obligations output to help draft
+  some of these questions?
+
+✻ Cooked for 52s
+
+❯ first lets check the online communities                                       
+
+⏺ Let me search across the key communities in parallel.
+
+⏺ Web Search("site:caclubindia.com RBI circular NBFC compliance questions 2025
+            2026")
+  ⎿  Did 1 search in 7s
+
+⏺ Web Search("site:taxmann.com RBI SEBI regulatory compliance interpretation
+            questions 2025 2026")
+  ⎿  Did 1 search in 8s
+
+⏺ Web Search("site:indiacorplaw.in regulatory compliance SEBI RBI circular
+            analysis 2025 2026")
+  ⎿  Did 1 search in 8s
+
+⏺ Web Search("Indian regulatory compliance questions forum NBFC bank SEBI RBI
+            2025 2026")
+  ⎿  Did 1 search in 11s
+
+⏺ Good findings. Let me dig deeper into the most promising sources.
+
+⏺ Web Search("site:indiacorplaw.in "SEBI-RBI conflict" NBFC takeover regulatory
+            gridlock 2025")
+  ⎿  Did 1 search in 9s
+
+⏺ Web Search("site:vinodkothari.com NBFC compliance questions interpretation
+            circular 2025 2026")
+  ⎿  Did 1 search in 7s
+
+⏺ Web Search("site:resources.probe42.in regulatory updates RBI SEBI MCA 2025
+            2026")
+  ⎿  Did 1 search in 13s
+
+⏺ Web Search("compliancecalendar.in NBFC RBI compliance deadlines returns 2025
+            2026")
+  ⎿  Did 1 search in 10s
+
+⏺ Here's what I found across the online communities. There are some excellent
+  sources for benchmark questions:
+
+  ---
+  Top Online Sources (Ranked by Question Quality)
+
+  1. IndiaCorpLaw — Best for Cross-Regulator Conflict Questions
+
+  This is your killer tier question source. They write academic analysis of edge
+   cases where regulators clash.
+
+  Gold mine article: https://indiacorplaw.in/2025/03/15/the-sebi-rbi-conflict-re
+  gulatory-gridlock-in-nbfc-takeovers/ — When an NBFC takeover triggers both
+  SEBI's SAST Regulations and RBI's SBR Master Directions, the acquirer
+  literally cannot comply with both simultaneously. This is the kind of question
+   generic LLMs will fumble.
+
+  Other strong articles:
+  - https://indiacorplaw.in/2025/09/02/the-rbis-new-directions-on-investments-by
+  -regulated-entities-in-alternative-investment-funds/ — dual SEBI+RBI
+  compliance
+  - https://indiacorplaw.in/2025/09/29/decoding-ecb-restrictions-through-the-cor
+  e-business-lens/
+  - https://indiacorplaw.in/2026/01/18/the-bankers-are-coming-rbis-architecture-
+  for-bank-financed-takeovers/ — very recent
+
+  2. Vinod Kothari Consultants — Best for NBFC-Specific Interpretation Questions
+
+  Practitioners who write about the ambiguities in new circulars. Great for hard
+   tier questions.
+
+  Key resources:
+  - https://vinodkothari.com/2025/12/rbi-consolidation-of-circulars/ — 9000+
+  circulars consolidated into 238 Master Directions. Lots of interpretation
+  gaps.
+  - https://vinodkothari.com/2025/12/rbi-brings-major-regulatory-restrictions-on
+  -banks-and-group-entities/ — all bank-group NBFCs now treated as Upper Layer
+  - https://vinodkothari.com/2026/02/regulators-february-bonanza/ — very recent
+  - https://vinodkothari.com/2025/10/rbi-proposes-revised-norms-on-related-party
+  -lending-and-contracting/
+  - https://vinodkothari.com/wp-content/uploads/2026/01/RBI-Regulatory-Developme
+  nts-2025-1.pdf
+
+  3. Probe42 — Best for Quick Regulatory Summaries
+
+  https://resources.probe42.in/regulatory-updates/ covers RBI, SEBI, MCA,
+  Insurance, Tax with AI summaries. Good for finding recent circulars to turn
+  into questions. Also a competitor to watch — they're doing AI summaries of
+  regulatory updates.
+
+  4. ComplianceCalendar.in — Best for Deadline/Filing Questions
+
+  https://www.compliancecalendar.in/learn/nbfc-rbi-compliance-calendar-for-2025-
+  26 — Good source for "when is XYZ due" questions. These are medium tier
+  (factual but recent).
+
+  5. RBI's Own FAQ Document
+
+  https://www.rbi.org.in/commonman/Upload/English/FAQs/PDFs/ALLNBFC23042025.pdf
+  — If RBI had to clarify it officially, it's a question compliance officers
+  actually ask.
+
+  ---
+  Concrete Question Ideas from These Sources
+
+  From what I've found, here are 5 strong benchmark questions you could use
+  right now:
+
+  #: 1
+  Question: "My NBFC is being acquired by a listed entity. SEBI's SAST
+    regulations require an open offer, but RBI's SBR Directions require prior
+    approval before any change of control. The target NBFC hasn't applied to
+  RBI.
+     What's the legal deadlock and how do we resolve it?"
+  Source: IndiaCorpLaw
+  Expected LLM Failure: Cross-regulator conflict
+  ────────────────────────────────────────
+  #: 2
+  Question: "Our bank-group NBFC was Middle Layer. After the Dec 2025
+    consolidation, are we automatically Upper Layer now? What additional
+    compliance requirements kick in?"
+  Source: Vinod Kothari
+  Expected LLM Failure: Very recent (Dec 2025)
+  ────────────────────────────────────────
+  #: 3
+  Question: "RBI's new Related Party Lending Directions take effect April 2026.
+    We have existing related party exposures that were compliant under old norms
+
+    but exceed new limits. What's the transition path?"
+  Source: Vinod Kothari
+  Expected LLM Failure: Not in training data
+  ────────────────────────────────────────
+  #: 4
+  Question: "We're a Type 1 NBFC with no public funds and no customer interface,
+
+    AUM below 1000cr. Under the 2026 amendments, are we exempt from
+  registration?
+     What's the process?"
+  Source: Legal500 / RBI
+  Expected LLM Failure: Brand new regulation
+  ────────────────────────────────────────
+  #: 5
+  Question: "Our NBFC has IT outsourcing agreements signed in 2023. Under the
+  new
+    IT Outsourcing Directions 2025, what needs to change by the April 2026
+    deadline?"
+  Source: Vinod Kothari
+  Expected LLM Failure: Recent, specific
+
+  ---
+  What's Missing
+
+  The search didn't surface much from CAClubIndia forums directly (the
+  site:caclubindia.com search didn't return forum threads). That community tends
+   to be more tax-focused. For regulatory compliance questions specifically,
+  Vinod Kothari and IndiaCorpLaw are much richer sources.
+
+  Want me to dig deeper into any of these sources, or should we also look at the
+   RBI/SEBI enforcement orders (penalty actions) as another question source?
+
+✻ Crunched for 1m 13s
+
+❯ save these questions to a questions.md and look for more                      
+
+⏺ Write(questions.md)
+  ⎿  Wrote 116 lines to questions.md
+       1 # Benchmark Questions: Generic LLM vs Specialized Compliance AI
+       2 
+       3 ## Purpose
+       4 10+ complex regulatory questions that target customers actually
+         have.
+       5 Test against Claude, GPT-4, and Gemini directly.
+       6 Score for: accuracy, specificity to Indian law, citation quality
+         .
+       7 
+       8 ## Moat Categories
+       9 - (a) Recent circulars (not in training data)
+      10 - (b) Cross-regulator conflicts
+     … +106 lines (ctrl+o to expand)
+
+⏺ Now let me search for more questions from enforcement orders, IRDAI/MCA
+  specific areas, and other angles.
+
+⏺ Web Search("RBI enforcement penalty NBFC non-compliance 2025 2026 circular
+            violation")
+  ⎿  Did 1 search in 8s
+
+⏺ Web Search("SEBI enforcement adjudication order penalty listed company
+            compliance failure 2025 2026")
+  ⎿  Did 1 search in 8s
+
+⏺ Web Search("IRDAI circular insurance compliance questions interpretation 2025
+            2026")
+  ⎿  Did 1 search in 10s
+
+⏺ Web Search("MCA Companies Act compliance questions ROC filing interpretation
+            2025 2026 India")
+  ⎿  Did 1 search in 7s
+
+⏺ Good findings. Let me get a few more from enforcement orders and the newer
+  regulatory areas.
+
+⏺ Web Search("DPDP Act 2023 rules 2025 compliance intersection RBI SEBI IRDAI
+            financial services India")
+  ⎿  Did 1 search in 8s
+
+⏺ Web Search("RBI cybersecurity framework NBFC bank compliance CSITE 2025 2026
+            requirements")
+  ⎿  Did 1 search in 9s
+
+⏺ Web Search(""scale based regulation" NBFC compliance questions middle layer
+            upper layer transition 2025 2026")
+  ⎿  Did 1 search in 7s
+
+⏺ Excellent findings. Now let me update the questions file with the new ones.
+
+⏺ Read 1 file (ctrl+o to expand)
+
+⏺ Update(questions.md)
+  ⎿  Added 95 lines
+      106 
+      107  ---
+      108 
+      109 +### 11. DPDP Act vs RBI Data Localization (Cross-regulator — H
+          +orizontal law vs Sectoral)
+      110 +**Source:** [K&S Partners - DPDP Cross-over with Sectoral Regu
+          +lators](https://ksandk.com/data-protection-and-data-privacy/dp
+          +dp-sector-regulators-navigating-rbi-sebi-irdai-trai/)
+      111 +
+      112 +> We're an NBFC using AWS for cloud infrastructure. The DPDP R
+          +ules 2025 have an 18-month compliance window, but RBI already 
+          +mandates data localization for payment data. Our customer KYC 
+          +data is stored in Singapore. Under the DPDP Act, is cross-bord
+          +er transfer permitted if we have consent? Does RBI's data loca
+          +lization directive override the DPDP Act's consent-based frame
+          +work, or do we need to comply with both separately?
+      113 +
+      114 +**Why LLMs fail:** Horizontal law (DPDP) vs sectoral regulator
+          + (RBI) conflict. No clear precedent. Requires reading both fra
+          +meworks and understanding the "without displacing" principle.
+      115 +
+      116 +---
+      117 +
+      118 +### 12. IRDAI Health Insurance Master Circular Compliance (Sec
+          +tor-specific)
+      119 +**Source:** [Business Standard - IRDAI Flags Issues at 8 Insur
+          +ers](https://www.business-standard.com/finance/insurance/irdai
+          +-flags-compliance-issues-in-health-insurance-inspections-12506
+          +2601177_1.html)
+      120 +
+      121 +> IRDAI flagged compliance issues at 8 major health insurers a
+          +round the new Health Insurance Master Circular. We're a genera
+          +l insurer. What are the specific Customer Information Sheet (C
+          +IS) simplification requirements, Claims Review Committee compo
+          +sition rules, and portability data submission timelines to IIB
+          + that triggered these flags?
+      122 +
+      123 +**Why LLMs fail:** Specific IRDAI inspection findings from Jun
+          +e 2025. Requires knowledge of the Master Circular's operationa
+          +l requirements, not just high-level regulations.
+      124 +
+      125 +---
+      126 +
+      127 +### 13. RBI Cybersecurity Framework — NBFC Asset Threshold (En
+          +tity-specific)
+      128 +**Source:** [Astra Security - RBI Cybersecurity Compliance 202
+          +6](https://www.getastra.com/blog/compliance/rbi-cybersecurity-
+          +compliance-checklist/)
+      129 +
+      130 +> Our NBFC has assets of ₹450 crore. The RBI Master Direction 
+          +on IT Framework imposes different requirements based on asset 
+          +value, with a higher standard above ₹500 crore. We expect to c
+          +ross ₹500 crore by Q3 FY26. What additional cybersecurity requ
+          +irements (CSITE reporting, board-level cyber policy, VAPT freq
+          +uency) kick in at the ₹500 crore threshold, and how much lead 
+          +time do we need?
+      131 +
+      132 +**Why LLMs fail:** Entity-specific threshold question. Require
+          +s mapping asset size to specific tiered obligations in the IT
+          +framework Master Direction.
+      133 +
+      134 +---
+      135 +
+      136 +### 14. NBFC NPA Recognition Glide Path (Transition — March 20
+          +26 deadline)
+      137 +**Source:** [NBFC Advisory - Middle Layer Compliance](https://
+          +nbfcadvisory.in/middle-layer-nbfcs-navigating-scale-based-regu
+          +lations/)
+      138 +
+      139 +> Our Middle Layer NBFC currently recognizes NPAs at 120 days 
+          +overdue (as per the March 2025 glide path). By March 2026, we 
+          +must move to 90 days. We have a large agriculture loan portfol
+          +io with seasonal repayment patterns. How do we handle accounts
+          + that were standard at 120 days but will become NPA at 90 days
+          +? Is there a one-time restructuring provision, or do we need t
+          +o provision for the entire reclassified pool?
+      140 +
+      141 +**Why LLMs fail:** Transition question with sector-specific tw
+          +ist (agriculture seasonality). Requires knowing both the SBR g
+          +lide path AND RBI's agricultural lending norms.
+      142 +
+      143 +---
+      144 +
+      145 +### 15. RBI Penalty — KYC Non-Compliance Pattern (Enforcement-
+          +derived)
+      146 +**Source:** [Chambers & Partners - RBI 2024 Penalty Wave](http
+          +s://chambers.com/articles/when-compliance-fails-stories-behind
+          +-rbis-2024-penalty-wave)
+      147 +
+      148 +> RBI penalized 62 NBFCs between 2023-2025 for KYC violations 
+          +and cancelled 35 CoRs in Jan 2026. Our NBFC was recently flagg
+          +ed for "allotment of multiple customer identification codes in
+          +stead of unique codes." What is the typical enforcement escala
+          +tion path — warning, monetary penalty, business restriction, o
+          +r CoR cancellation? Can we remediate and avoid escalation, and
+          + what does the remediation timeline look like?
+      149 +
+      150 +**Why LLMs fail:** Enforcement pattern question requiring synt
+          +hesis of multiple penalty orders. No single circular answers t
+          +his — it's derived from RBI's enforcement behavior.
+      151 +
+      152 +---
+      153 +
+      154 +### 16. SEBI LODR Late Filing Penalty Calculation (Practical c
+          +ompliance)
+      155 +**Source:** [Lexology - SEBI Disclosure Enforcement Trends](ht
+          +tps://www.lexology.com/library/detail.aspx?g=178130cc-1ad9-45c
+          +6-ac8b-575031bcaede)
+      156 +
+      157 +> Our listed company filed the Q2 FY26 shareholding pattern 3 
+          +days late due to a system migration. Under SEBI's LODR Regulat
+          +ions, what's the penalty calculation? SEBI recently held that 
+          +interest on penalties runs from the adjudication order date, n
+          +ot the demand notice. If we contest the penalty at SAT, does i
+          +nterest still accrue during the appeal?
+      158 +
+      159 +**Why LLMs fail:** Requires knowledge of recent Supreme Court
+          +ruling on Section 28A SEBI Act interest calculation + SEBI's r
+          +outine LODR enforcement pattern.
+      160 +
+      161 +---
+      162 +
+      163 +### 17. Bank Acquisition Finance — New RBI Exposure Caps (Rece
+          +nt — 2026)
+      164 +**Source:** [IndiaCorpLaw - RBI Architecture for Bank-Financed
+          + Takeovers](https://indiacorplaw.in/2026/01/18/the-bankers-are
+          +-coming-rbis-architecture-for-bank-financed-takeovers/)
+      165 +
+      166 +> We're a bank considering financing an acquisition by a non-f
+          +inancial company. Under RBI's new draft directions on bank-fin
+          +anced takeovers (Oct 2025), the acquisition loan is capped at 
+          +10% of Tier-1 capital. Does this cap apply per-borrower or per
+          +-transaction? If the acquirer has existing credit facilities w
+          +ith us, does the acquisition finance count toward the Large Ex
+          +posure Framework limits?
+      167 +
+      168 +**Why LLMs fail:** Jan 2026 analysis of Oct 2025 draft directi
+          +ons. Interaction between new acquisition finance cap and exist
+          +ing LEF — not addressed in any single circular.
+      169 +
+      170 +---
+      171 +
+      172 +### 18. Insurance Distribution — DPDP + IRDAI Data Governance 
+          +(Cross-regulatory)
+      173 +**Source:** [Cyril Amarchand - Insurance Distribution Complian
+          +ce](https://corporate.cyrilamarchandblogs.com/2026/01/insuranc
+          +e-distribution-in-india-emerging-channels-compliance-and-data-
+          +governance/)
+      174 +
+      175 +> We're an insurtech distributing policies through a digital p
+          +latform. Under the new DPDP Rules 2025, we need explicit conse
+          +nt for customer data processing. But IRDAI's regulations requi
+          +re us to share customer data with the Insurance Information Bu
+          +reau (IIB) for portability. Can we rely on "compliance with la
+          +w" as a lawful basis under DPDP to share with IIB without sepa
+          +rate consent? How do IRDAI's data governance requirements inte
+          +ract with DPDP's Data Fiduciary obligations?
+      176 +
+      177 +**Why LLMs fail:** Three-way interaction: DPDP Act + IRDAI reg
+          +ulations + IIB data sharing requirements. Very recent (Jan 202
+          +6 analysis).
+      178 +
+      179 +---
+      180 +
+      181 +### 19. NBFC Project Finance Directions 2025 (Recent — Oct 202
+          +5 effective)
+      182 +**Source:** [Probe42 - RBI Project Finance](https://resources.
+          +probe42.in/regulatory-updates/rbi-circulars/rbi-project-financ
+          +e-directions/)
+      183 +
+      184 +> Our NBFC finances infrastructure projects. Under the new Pro
+          +ject Finance Directions 2025 (effective Oct 2025), what are th
+          +e enhanced provisioning requirements during the construction p
+          +hase? The old guidelines had standard asset provisioning at 0.
+          +4% — has this changed? Are there new requirements for independ
+          +ent monitoring of project milestones?
+      185 +
+      186 +**Why LLMs fail:** Oct 2025 directions replacing older framewo
+          +rk. Specific provisioning percentages during construction phas
+          +e.
+      187 +
+      188 +---
+      189 +
+      190 +### 20. SBR Review 2026 — Impact on Middle Layer NBFCs (Evolvi
+          +ng regulation)
+      191 +**Source:** [VisionIAS - RBI SBR Review](https://visionias.in/
+          +current-affairs/news-today/2025-12-30/economy/rbi-initiates-re
+          +view-of-scale-based-regulation-sbr-for-nbfcs)
+      192 +
+      193 +> RBI announced a review of the Scale-Based Regulation framewo
+          +rk in Dec 2025, citing increasing NBFC-bank interconnection. O
+          +ur NBFC is at the ₹950 crore threshold — just below the ₹1000 
+          +crore Middle Layer cutoff. Should we be preparing for the thre
+          +shold to be lowered? What are the likely additional requiremen
+          +ts if we move from Base to Middle Layer — CRAR increase to 15%
+          +, ALM reporting, risk committee, independent directors?
+      194 +
+      195 +**Why LLMs fail:** Forward-looking regulatory risk question. R
+          +equires understanding the SBR review context + current Base vs
+          + Middle Layer obligation differences.
+      196 +
+      197 +---
+      198 +
+      199  ## Sources for More Questions
+      200  - [IndiaCorpLaw](https://indiacorplaw.in) — Cross-regulator an
+           alysis, academic edge cases
+      201  - [Vinod Kothari Consultants](https://vinodkothari.com) — NBFC
+            practitioner interpretation
+      202  - [Probe42 Regulatory Updates](https://resources.probe42.in/re
+           gulatory-updates/) — AI-summarized circulars (also a competito
+           r)
+      203  - [ComplianceCalendar.in](https://www.compliancecalendar.in/le
+           arn/nbfc-rbi-compliance-calendar-for-2025-26) — Deadline/filin
+           g questions
+      204  - [RBI NBFC FAQs (Feb 2026)](https://www.rbi.org.in/commonman/
+           Upload/English/FAQs/PDFs/ALLNBFC23042025.pdf) — Official clari
+           fications
+      205 +- [K&S Partners - DPDP Cross-over](https://ksandk.com/data-pro
+          +tection-and-data-privacy/dpdp-sector-regulators-navigating-rbi
+          +-sebi-irdai-trai/) — Data protection vs sectoral regulators
+      206 +- [Chambers - RBI Penalty Wave](https://chambers.com/articles/
+          +when-compliance-fails-stories-behind-rbis-2024-penalty-wave) —
+          + Enforcement patterns
+      207 +- [Face of India - RBI Penalties Compilation (FY 24-25)](https
+          +://faceofindia.org/wp-content/uploads/2025/04/A-compliation-of
+          +-RBI-penal-and-enforcement-actions-in-FY-24-25_-released-on-11
+          +-Apr-2025.pdf) — Full penalty dataset
+      208  - RBI/SEBI enforcement orders — What companies actually got wr
+           ong
+      209  - Taxmann / CAClubIndia forums — Practitioner questions (more
+           tax-focused)
+      210 +- [Cyril Amarchand Blogs](https://corporate.cyrilamarchandblog
+          +s.com) — Law firm analysis of regulatory developments
+      211 +- [Mondaq India](https://www.mondaq.com/india/) — Multi-firm r
+          +egulatory commentary
+
+⏺ Done. The file now has 20 benchmark questions across all moat categories.
+  Here's the breakdown:
+
+  ┌──────────────────────────────────┬───────────┬──────────────────────────┐
+  │             Category             │ Questions │            #s            │
+  ├──────────────────────────────────┼───────────┼──────────────────────────┤
+  │ Cross-regulator conflict         │ 5         │ 1, 6, 11, 17, 18         │
+  ├──────────────────────────────────┼───────────┼──────────────────────────┤
+  │ Recent circulars (post-training) │ 8         │ 2, 3, 4, 5, 8, 9, 10, 19 │
+  ├──────────────────────────────────┼───────────┼──────────────────────────┤
+  │ Entity-specific applicability    │ 3         │ 13, 14, 20               │
+  ├──────────────────────────────────┼───────────┼──────────────────────────┤
+  │ Enforcement-derived              │ 2         │ 15, 16                   │
+  ├──────────────────────────────────┼───────────┼──────────────────────────┤
+  │ Horizontal law vs sectoral       │ 2         │ 11, 18                   │
+  └──────────────────────────────────┴───────────┴──────────────────────────┘
+
+  ★ Insight ─────────────────────────────────────
+  The strongest questions for proving your moat are 11, 14, and 18 — they sit at
+   intersections of multiple regulatory frameworks (DPDP + RBI, SBR +
+  agricultural norms, DPDP + IRDAI + IIB). Generic LLMs have near-zero chance on
+   these because they require synthesizing across regulators AND knowing recent
+  operational details. Questions like 15 (enforcement patterns) are also
+  powerful because the answer doesn't exist in any single document — it requires
+   aggregating across multiple penalty orders, which is exactly what your
+  crawler + obligation graph enables.
+  ─────────────────────────────────────────────────
+
+  The file is saved at questions.md in your project root. Want to refine any of
+  these or start testing them against the LLMs?
+
+✻ Crunched for 2m 29s

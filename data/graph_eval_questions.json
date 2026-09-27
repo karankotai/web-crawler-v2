@@ -1,0 +1,72 @@
+[
+  {
+    "category": "amendment_chain",
+    "question": "What is the history of RBI gold lending norms? Show me the amendment chain.",
+    "why_graph_helps": "Vector search cannot traverse supersession chains — returns all versions equally ranked"
+  },
+  {
+    "category": "amendment_chain",
+    "question": "How has the Order-to-Trade Ratio framework evolved over time?",
+    "why_graph_helps": "Graph walks SUPERSEDES edges to show full evolution timeline"
+  },
+  {
+    "category": "freshness",
+    "question": "What are the current KYC requirements for banks?",
+    "why_graph_helps": "Vector returns superseded circulars equally — graph flags outdated ones"
+  },
+  {
+    "category": "freshness",
+    "question": "What is the most recent circular on NPA classification?",
+    "why_graph_helps": "Graph knows which circular is_latest=true via supersession tracking"
+  },
+  {
+    "category": "freshness",
+    "question": "Are the RBI lending directions on gold still in force, or have they been updated?",
+    "why_graph_helps": "Graph can definitively answer whether a circular has been superseded"
+  },
+  {
+    "category": "impact",
+    "question": "Which entities are affected by the SEBI circular on green debt securities?",
+    "why_graph_helps": "Graph aggregates APPLIES_TO relationships for impact analysis"
+  },
+  {
+    "category": "impact",
+    "question": "Who must comply with the revised Merchant Bankers regulations?",
+    "why_graph_helps": "Graph returns all entity types from APPLIES_TO edges"
+  },
+  {
+    "category": "impact",
+    "question": "What is the blast radius of the IRDAI cyber incident preparedness circular?",
+    "why_graph_helps": "Graph combines entities and amended regulations for full impact view"
+  },
+  {
+    "category": "cross_reference",
+    "question": "Which regulations does the SEBI OTR framework circular amend?",
+    "why_graph_helps": "Graph follows AMENDS edges to find amended regulations"
+  },
+  {
+    "category": "cross_reference",
+    "question": "What other circulars are related to the SEBI Merchant Bankers regulation amendments?",
+    "why_graph_helps": "Graph finds related circulars via shared regulations, entities, or topics"
+  },
+  {
+    "category": "summary",
+    "question": "Give me an overview of all recent SEBI circulars.",
+    "why_graph_helps": "Graph provides source-level summary with topics and freshness status"
+  },
+  {
+    "category": "summary",
+    "question": "What RBI circulars have been issued recently?",
+    "why_graph_helps": "Graph aggregates all circulars by source with date ordering"
+  },
+  {
+    "category": "latest_version",
+    "question": "What is the latest version of the circular on bank finance for gold purchase?",
+    "why_graph_helps": "Graph follows SUPERSEDES chain to find the latest non-superseded version"
+  },
+  {
+    "category": "latest_version",
+    "question": "Is the IRDAI premium rate review circular for senior citizens still current?",
+    "why_graph_helps": "Graph checks is_latest flag and any incoming SUPERSEDES edges"
+  }
+]

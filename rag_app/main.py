@@ -391,11 +391,12 @@ async def analyze_meeting_stream(
     text: str | None = Form(None),
     use_rag: bool = Form(False),
     source_filter: str | None = Form(None),
+    multi_topic: bool = Form(False),
 ):
-    """Stream multi-topic analysis of a council meeting press release.
+    """Stream analysis of a council meeting press release.
 
-    Decomposes the document into distinct topics and produces a separate
-    Dhruva-style analysis for each, including Practitioner Insights.
+    Default: single consolidated analysis covering all topics.
+    Set multi_topic=true for per-topic decomposition.
     """
     meeting_text = None
 
@@ -422,10 +423,12 @@ async def analyze_meeting_stream(
                     detail=f"Invalid source '{s}' in source_filter. Choose from: {sorted(VALID_SOURCES)}",
                 )
 
-    return StreamingResponse(
-        pipeline.analyze_meeting_stream(meeting_text, use_rag=use_rag, source_filter=filter_list),
-        media_type="text/event-stream",
-    )
+    if multi_topic:
+        generator = pipeline.analyze_meeting_stream(meeting_text, use_rag=use_rag, source_filter=filter_list)
+    else:
+        generator = pipeline.analyze_meeting_consolidated_stream(meeting_text, use_rag=use_rag, source_filter=filter_list)
+
+    return StreamingResponse(generator, media_type="text/event-stream")
 
 
 # ── Analyze chat endpoint ────────────────────────────────────

@@ -1,0 +1,623 @@
+{
+  "results": [
+    {
+      "question": "What are the key compliance deadlines for merchant bankers under the January 2026 SEBI amendment?",
+      "ground_truth": "The SEBI circular (January 2, 2026) on Merchant Bankers Regulations amendments has the following deadlines: (1) By February 2, 2026 — disclose non-SEBI regulated activities on website. (2) By April 3, 2026 — ensure compliance officer independence, close outsourced core merchant banking activities. (3) By July 3, 2026 — segregate non-SEBI regulated activities into separate business units with Chinese Wall, submit compliance report for non-SEBI regulated activities. (4) By January 2, 2027 — submit CA certified net worth certificate for categorization, ensure NISM certifications for employees, ensure principal officer has 5 years experience. (5) By January 2, 2028 — comply with underwriting obligations not exceeding 20 times liquid net worth. (6) First assessment from April 1, 2029 — minimum revenue generation requirements (Rs. 25 crore for Category I, Rs. 5 crore for Category II cumulative over three preceding financial years).",
+      "rag_eval": {
+        "answer": "The SEBI (Merchant Bankers) Amendment Regulations, 2025, became applicable on January 3, 2026 (\"Effective Date\") per Circular No. HO/49/11/11(106)2025-CFD-RAC-DIL3/I/1796/2026. Key compliance deadlines for merchant bankers are as follows:\n\n1.  **Compliance Officer Certification:**\n    *   Existing compliance officers must obtain the requisite certifications (NISM-Series-IX and NISM-Series-IIIA) on or before January 02, 2027, according to SEBI Circular No. HO/49/11/11(106)2025-CFD-RAC-DIL3/I/1796/2026.\n    *   Compliance officers appointed on or after January 3, 2026, must obtain the certifications within ninety days from their appointment date per SEBI Circular No. HO/49/11/11(106)2025-CFD-RAC-DIL3/I/1796/2026.\n2.  **Disclosure and Compliance Report for Non-SEBI Regulated Activities:**\n    *   Merchant Bankers (MBs) must make disclosures regarding existing and ongoing mandates/arrangements related to non-SEBI regulated activities, obtain confirmation/acknowledgment from stakeholders, and submit a compliance report to the Board on or before July 03, 2026, as stated in SEBI Circular No. HO/49/11/11(106)2025-CFD-RAC-DIL3/I/1796/2026.",
+        "scores": [
+          {
+            "criterion": "Factual Accuracy",
+            "score": 2,
+            "reasoning": "The answer provides specific circular numbers and dates, but the details do not match the ground truth. The circular number and effective date are correct, but the compliance deadlines and requirements mentioned are not aligned with the actual SEBI amendment details."
+          },
+          {
+            "criterion": "Obligation Extraction",
+            "score": 2,
+            "reasoning": "The answer mentions some obligations like certification requirements and disclosure, but it misses key obligations such as ensuring compliance officer independence and segregating non-SEBI activities. The obligations mentioned are not fully accurate according to the ground truth."
+          },
+          {
+            "criterion": "Deadline Accuracy",
+            "score": 1,
+            "reasoning": "The deadlines provided in the answer do not match the ground truth. The answer incorrectly states deadlines for compliance officer certification and disclosure, which are not aligned with the actual SEBI amendment deadlines."
+          },
+          {
+            "criterion": "Hallucination Rate",
+            "score": 2,
+            "reasoning": "The answer includes specific claims about deadlines and obligations that are not supported by the provided sources or the ground truth. It appears to fabricate details about compliance deadlines and requirements."
+          },
+          {
+            "criterion": "Nuance Handling",
+            "score": 2,
+            "reasoning": "The answer fails to capture the nuances of the SEBI amendment, such as the specific requirements for compliance officer independence and the segregation of non-SEBI activities. It oversimplifies the scope and applicability of the regulations."
+          }
+        ],
+        "total_score": 9,
+        "average_score": 1.8
+      },
+      "vanilla_gpt_eval": {
+        "answer": "As of my last knowledge update in October 2023, there was no specific SEBI amendment from January 2026 that I can provide details about. However, I can give you an overview of the typical compliance requirements and deadlines that merchant bankers in India generally need to adhere to, based on existing regulations and practices.\n\nMerchant bankers in India are primarily regulated by the Securities and Exchange Board of India (SEBI) under the SEBI (Merchant Bankers) Regulations, 1992. Here are some key compliance requirements that merchant bankers typically need to fulfill:\n\n1. **Registration**: Merchant bankers must be registered with SEBI and renew their registration periodically. The registration is valid for five years, after which it needs to be renewed.\n\n2. **Quarterly Reporting**: Merchant bankers are required to submit quarterly reports to SEBI regarding their activities, including details of the issues managed, the status of the public issues, and any other relevant information.\n\n3. **Annual Compliance Report**: An annual compliance report must be submitted to SEBI, detailing the merchant banker’s compliance with the regulations and any other relevant disclosures.\n\n4. **Disclosure Requirements**: Merchant bankers must ensure that all disclosures made in the offer documents are accurate and comply with the SEBI (Issue of Capital and Disclosure Requirements) Regulations, 2018.\n\n5. **Due Diligence**: Merchant bankers are responsible for conducting due diligence for public offerings and must submit a due diligence certificate to SEBI.\n\n6. **Timelines for Public Issues**: Merchant bankers must adhere to specific timelines for various stages of public issues, including filing the draft red herring prospectus (DRHP), obtaining SEBI observations, and launching the issue.\n\n7. **Compliance with Corporate Governance Norms**: Merchant bankers must ensure that the companies they are advising comply with corporate governance norms as stipulated by SEBI.\n\n8. **Adherence to Financial Reporting Standards**: Merchant bankers must ensure that the financial statements of the companies they are advising comply with the Indian Accounting Standards (Ind AS) and other applicable financial reporting standards.\n\nFor the most accurate and updated information regarding any specific amendments or compliance deadlines, including those that may arise in January 2026, it is advisable to refer directly to the SEBI website or consult with a legal expert specializing in securities law.",
+        "scores": [
+          {
+            "criterion": "Factual Accuracy",
+            "score": 1,
+            "reasoning": "The answer does not mention the specific SEBI amendment from January 2026, nor does it provide any details about the compliance deadlines associated with it. Instead, it provides generic information about merchant banker regulations."
+          },
+          {
+            "criterion": "Obligation Extraction",
+            "score": 1,
+            "reasoning": "The answer fails to identify any specific obligations or compliance requirements from the January 2026 SEBI amendment. It only lists general obligations that are not relevant to the question."
+          },
+          {
+            "criterion": "Deadline Accuracy",
+            "score": 1,
+            "reasoning": "The answer does not provide any specific deadlines related to the January 2026 SEBI amendment, which is the focus of the question."
+          },
+          {
+            "criterion": "Hallucination Rate",
+            "score": 3,
+            "reasoning": "The answer does not hallucinate specific details about the January 2026 amendment, but it provides generic information that is not relevant to the question. It avoids making specific claims about the amendment, which prevents hallucination but also makes the answer unhelpful."
+          },
+          {
+            "criterion": "Nuance Handling",
+            "score": 1,
+            "reasoning": "The answer does not address any nuances, exceptions, or specific conditions related to the January 2026 SEBI amendment. It provides a broad overview of general obligations without any specific context or applicability to the amendment in question."
+          }
+        ],
+        "total_score": 7,
+        "average_score": 1.4
+      },
+      "vanilla_gemini_eval": null,
+      "custom_eval": null,
+      "rag_sources": [
+        {
+          "title": "Specification of the consequential requirements with respect to Amendment of Securities and Exchange Board of India (Merchant Bankers) Regulations, 1992",
+          "source": "sebi",
+          "date": "2026-01-02",
+          "link": "https://www.sebi.gov.in/legal/circulars/jan-2026/specification-of-the-consequential-requirements-with-respect-to-amendment-of-securities-and-exchange-board-of-india-merchant-bankers-regulations-1992_98831.html",
+          "circular_number": "HO/49/11/11(106)2025-CFD-RAC-DIL3/I/1796/2026",
+          "relevance_score": 0.7443,
+          "pdf_links": [
+            "https://www.sebi.gov.in/sebi_data/attachdocs/jan-2026/1767358255887.pdf"
+          ]
+        },
+        {
+          "title": "Clarification on the position of Compliance Officer in terms of regulation 6 of the SEBI (Listing Obligations and Disclosure Requirements) Regulations, 2015",
+          "source": "sebi",
+          "date": "2025-04-01",
+          "link": "https://www.sebi.gov.in/legal/circulars/apr-2025/clarification-on-the-position-of-compliance-officer-in-terms-of-regulation-6-of-the-sebi-listing-obligations-and-disclosure-requirements-regulations-2015_93186.html",
+          "circular_number": "",
+          "relevance_score": 0.6627,
+          "pdf_links": []
+        },
+        {
+          "title": "Master Circular for Depositories",
+          "source": "sebi",
+          "date": "2024-12-03",
+          "link": "https://www.sebi.gov.in/legal/master-circulars/dec-2024/master-circular-for-depositories_89245.html",
+          "circular_number": "Master Circulars",
+          "relevance_score": 0.6198,
+          "pdf_links": [
+            "https://www.sebi.gov.in/sebi_data/attachdocs/dec-2024/1733233982158.pdf"
+          ]
+        },
+        {
+          "title": "Extension in timeline for compliance with qualification and experience requirements under Regulation 7(1) of SEBI (Investment Advisers) Regulations, 2013",
+          "source": "sebi",
+          "date": "2023-10-10",
+          "link": "https://www.sebi.gov.in/legal/circulars/oct-2023/extension-in-timeline-for-compliance-with-qualification-and-experience-requirements-under-regulation-7-1-of-sebi-investment-advisers-regulations-2013_77901.html",
+          "circular_number": "",
+          "relevance_score": 0.6155,
+          "pdf_links": []
+        }
+      ],
+      "rag_advantage_vs_gpt": 0.4,
+      "rag_advantage_vs_gemini": null,
+      "rag_advantage_vs_custom": null
+    },
+    {
+      "question": "Can an insurer raise health insurance premiums for senior citizens by 15% in a single year?",
+      "ground_truth": "No. Per IRDAI circular IRDAIV/HLT/CIR/MISC/27/1/2025 dated January 30, 2025, insurers shall not revise the premium for senior citizens by more than 10% per annum. If the proposed increase exceeds 10%, the insurer must undertake prior consultation with IRDAI. The circular applies to all Non-Life and Stand-Alone Health Insurers (except AIC and ECGC) with immediate effect. Additionally, insurers must consult IRDAI before withdrawing individual health insurance products offered to senior citizens.",
+      "rag_eval": {
+        "answer": "No, according to the IRDAI circular, insurers are prohibited from increasing health insurance premiums for senior citizens by more than 10% per year. The IRDAI directs that insurers \"shall not revise the premium for senior citizens by more than 10% per annum\" (Source: IRDAI, Review of revision in premium rates under health insurance policies for senior citizens, 2025-01-30). This directive is issued under Section 14 of the Insurance Regulatory and Development Authority Act, 1999, read with Section 34 of the Insurance Act, 1938 (Source: IRDAI, Review of revision in premium rates under health insurance policies for senior citizens, 2025-01-30).",
+        "scores": [
+          {
+            "criterion": "Factual Accuracy",
+            "score": 4,
+            "reasoning": "The answer correctly states that insurers cannot increase premiums for senior citizens by more than 10% per annum, as per the IRDAI circular. However, it does not provide the specific circular number, which is mentioned in the ground truth."
+          },
+          {
+            "criterion": "Obligation Extraction",
+            "score": 5,
+            "reasoning": "The answer accurately identifies the obligation that insurers cannot increase premiums for senior citizens by more than 10% per annum, which is a key compliance requirement."
+          },
+          {
+            "criterion": "Deadline Accuracy",
+            "score": 3,
+            "reasoning": "The question does not involve specific deadlines or effective dates beyond the annual premium increase limit, so a score of 3 is appropriate."
+          },
+          {
+            "criterion": "Hallucination Rate",
+            "score": 4,
+            "reasoning": "The answer is mostly grounded in the provided sources, but it incorrectly cites a specific section of the IRDAI Act and Insurance Act without direct evidence from the sources."
+          },
+          {
+            "criterion": "Nuance Handling",
+            "score": 4,
+            "reasoning": "The answer captures the main point about the premium increase limit but misses the nuance that insurers must consult IRDAI if they wish to exceed this limit or withdraw products for senior citizens."
+          }
+        ],
+        "total_score": 20,
+        "average_score": 4.0
+      },
+      "vanilla_gpt_eval": {
+        "answer": "In India, the regulation of health insurance premiums, particularly for senior citizens, is governed by the Insurance Regulatory and Development Authority of India (IRDAI). According to the guidelines set forth by the IRDAI, insurers must adhere to certain rules regarding premium adjustments, especially for health insurance policies.\n\nAs of my last knowledge update in October 2023, insurers are allowed to revise premiums based on various factors, including claims experience, age, and the overall risk profile of the insured. However, there are specific provisions that limit the extent to which premiums can be increased in a single year, particularly for senior citizens.\n\n1. **Age-Based Premiums**: Insurers can charge higher premiums for older age groups, but these increases must be justified based on actuarial data and the risk associated with that age group.\n\n2. **Regulatory Limits**: The IRDAI has guidelines that typically restrict the increase in premiums for health insurance policies. For senior citizens, any increase in premiums should be reasonable and not exceed a certain percentage without proper justification. While the exact percentage can vary, a 15% increase in a single year may be considered excessive unless it is supported by substantial actuarial evidence.\n\n3. **Notification and Transparency**: Insurers are required to notify policyholders about any changes in premiums well in advance. They must also provide a clear rationale for the increase, ensuring transparency in the process.\n\n4. **Policy Terms**: The terms and conditions of the specific health insurance policy may also outline how premiums can be adjusted. It is essential for policyholders to review their policy documents to understand the provisions related to premium increases.\n\n5. **Regulatory Approval**: Any significant increase in premiums, especially for senior citizens, may require approval from the IRDAI. Insurers must submit their proposed premium revisions to the regulator for review.\n\nIn conclusion, while insurers can raise premiums for senior citizens, a 15% increase in a single year would likely require strong justification and adherence to regulatory guidelines. It is advisable for policyholders to consult their insurance provider or refer to the IRDAI's official communications for the most accurate and current information regarding premium adjustments.",
+        "scores": [
+          {
+            "criterion": "Factual Accuracy",
+            "score": 1,
+            "reasoning": "The answer does not cite specific circular numbers, dates, or exact regulatory details. It provides general information about premium adjustments without referencing the specific IRDAI circular that limits increases to 10%."
+          },
+          {
+            "criterion": "Obligation Extraction",
+            "score": 2,
+            "reasoning": "The answer mentions that premium increases must be justified and may require regulatory approval, but it fails to specify the 10% limit or the requirement for prior consultation with IRDAI for increases above this threshold."
+          },
+          {
+            "criterion": "Deadline Accuracy",
+            "score": 3,
+            "reasoning": "The question does not involve specific deadlines or effective dates, so a score of 3 is appropriate."
+          },
+          {
+            "criterion": "Hallucination Rate",
+            "score": 2,
+            "reasoning": "The answer makes general claims about regulatory practices without specific grounding in the provided ground truth, which mentions a specific circular and percentage limit."
+          },
+          {
+            "criterion": "Nuance Handling",
+            "score": 2,
+            "reasoning": "The answer provides some general considerations about premium increases but misses the specific nuances and conditions outlined in the IRDAI circular, such as the exact percentage limit and the requirement for consultation with IRDAI."
+          }
+        ],
+        "total_score": 10,
+        "average_score": 2.0
+      },
+      "vanilla_gemini_eval": null,
+      "custom_eval": null,
+      "rag_sources": [
+        {
+          "title": "Review of revision in  premium rates under health insurance policies for senior citizens",
+          "source": "irdai",
+          "date": "2025-01-30",
+          "link": "https://irdai.gov.in/document-detail?documentId=6639156",
+          "circular_number": "",
+          "relevance_score": 0.7356,
+          "pdf_links": [
+            "https://irdai.gov.in/documents/37343/365525/%E0%A4%B5%E0%A4%B0%E0%A4%BF%E0%A4%B7%E0%A5%8D%E0%A4%A0+%E0%A4%A8%E0%A4%BE%E0%A4%97%E0%A4%B0%E0%A4%BF%E0%A4%95%E0%A5%8B%E0%A4%82+%E0%A4%95%E0%A5%87+%E0%A4%B2%E0%A4%BF%E0%A4%8F+%E0%A4%B8%E0%A5%8D%E0%A4%B5%E0%A4%BE%E0%A4%B8%E0%A5%8D%E0%A4%A5%E0%A5%8D%E0%A4%AF+%E0%A4%AC%E0%A5%80%E0%A4%AE%E0%A4%BE+%E0%A4%AA%E0%A4%BE%E0%A4%B2%E0%A4%BF%E0%A4%B8%E0%A4%BF%E0%A4%AF%E0%A5%8B%E0%A4%82+%E0%A4%95%E0%A5%87+%E0%A4%85%E0%A4%82%E0%A4%A4%E0%A4%B0%E0%A5%8D%E0%A4%97%E0%A4%A4+%E0%A4%AA%E0%A5%8D%E0%A4%B0%E0%A5%80%E0%A4%AE%E0%A4%BF%E0%A4%AF%E0%A4%AE+%E0%A4%A6%E0%A4%B0%E0%A5%8B%E0%A4%82+%E0%A4%AE%E0%A5%87%E0%A4%82+%E0%A4%B8%E0%A4%82%E0%A4%B6%E0%A5%8B%E0%A4%A7%E0%A4%A8+%E0%A4%95%E0%A5%80+%E0%A4%B8%E0%A4%AE%E0%A5%80%E0%A4%95%E0%A5%8D%E0%A4%B7%E0%A4%BE+_+Review+of+revision+in+premium+rates+under+health+insurance+policies+for+senior+citizens.pdf/b703b6bf-d407-e8f0-a302-c17260bec4a5?version=3.0&t=1738652759491&download=true"
+          ]
+        }
+      ],
+      "rag_advantage_vs_gpt": 2.0,
+      "rag_advantage_vs_gemini": null,
+      "rag_advantage_vs_custom": null
+    },
+    {
+      "question": "As a Tier 4 Urban Cooperative Bank, can we provide working capital loans secured by gold to a jewellery manufacturer?",
+      "ground_truth": "Yes, with conditions. Under the RBI's amended Lending Against Gold and Silver Collateral Directions (1st Amendment, September 29, 2025, circular RBI/2025-26/84), Scheduled Commercial Banks and Tier 3 or 4 UCBs may extend need-based working capital finance to borrowers using gold or silver as raw material or input in manufacturing or industrial processing. However, borrowers must not acquire or hold gold for investment or speculative purposes. Separately, lenders shall not grant advances for the purchase of gold in any form (primary gold, ornaments, jewellery, coins, ETFs, Mutual Funds) or against primary gold/silver or financial assets backed by primary gold/silver.",
+      "rag_eval": {
+        "answer": "The permissibility of providing working capital loans secured by gold to a jewelry manufacturer, as a Tier 4 Urban Cooperative Bank (UCB), is not explicitly addressed in the provided documents.\n\nHowever, the documents do provide the following information regarding loans against gold:\n\n*   **LTV Ratio:** As a prudential measure, a Loan to Value (LTV) ratio of not exceeding 75% is prescribed for UCBs lending against gold jewellery (RBI/2022-23/22).\n*   **Valuation:** Gold jewellery accepted as security/collateral must be valued at the average of the closing price of 22 carat gold for the preceding 30 days as quoted by the India Bullion and Jewellers Association Ltd. (RBI/2022-23/22). UCBs may also use the historical spot gold price data of the preceding 30 days publicly disseminated by a Commodity Exchange regulated by the Securities and Exchange Board of India (RBI/2022-23/22, RBI/2025-26/18). If the gold is of purity less than 22 carats, the UCB should translate the collateral into 22 carat and value the exact grams of the collateral (RBI/2022-23/22, RBI/2025-26/18).\n*   **Safeguards:** UCBs are advised to observe the safeguards detailed in Annex-3 to mitigate the risks attached to loans and advances against gold/silver ornaments (RBI/2025-26/18).\n*   **Bullet Repayment:** The amount of loan sanctioned should not exceed ₹2.00 lakh at any point of time and the period of the loan shall not exceed 12 months from the date of sanction (RBI/2023-24/51). Banks should maintain a Loan to Value (LTV) ratio of 75% on the outstanding amount of loan including the interest on an ongoing basis, failing which the loan will be treated as Non Performing Asset (NPA) (RBI/2023-24/51).\n*   **Credit Policy:** The credit policy of a bank shall include, inter alia, appropriate single borrower limits and aggregate limits for the portfolio of loans against collateral of jewellery, ornaments or coins made of gold or silver; maximum LTV ratio permissible for such loans; action to be taken in cases of breach of LTV ratio; valuation standards and norms; and standards of gold and silver purity (RBI/DOR/2025-26/229).\n\nThe available documents do not contain information about whether a Tier 4 UCB can specifically provide working capital loans secured by gold to a jewellery manufacturer.",
+        "scores": [
+          {
+            "criterion": "Factual Accuracy",
+            "score": 2,
+            "reasoning": "The answer provides specific details about LTV ratios and valuation methods for loans against gold, but it does not address the specific question about Tier 4 UCBs providing working capital loans to jewelry manufacturers. The relevant circular allowing such loans is not mentioned."
+          },
+          {
+            "criterion": "Obligation Extraction",
+            "score": 2,
+            "reasoning": "The answer lists general obligations related to gold loans, such as LTV ratios and valuation standards, but fails to extract the specific obligation that Tier 4 UCBs can provide working capital loans to jewelry manufacturers under certain conditions."
+          },
+          {
+            "criterion": "Deadline Accuracy",
+            "score": 3,
+            "reasoning": "The question does not involve specific deadlines related to the provision of working capital loans to jewelry manufacturers, so this criterion is not applicable."
+          },
+          {
+            "criterion": "Hallucination Rate",
+            "score": 3,
+            "reasoning": "The answer does not hallucinate facts about the general rules for gold loans, but it omits the specific regulatory permission for Tier 4 UCBs to provide working capital loans to jewelry manufacturers, which is present in the ground truth."
+          },
+          {
+            "criterion": "Nuance Handling",
+            "score": 2,
+            "reasoning": "The answer fails to capture the nuance that Tier 4 UCBs can provide working capital loans to jewelry manufacturers under specific conditions, such as not acquiring gold for investment purposes. It oversimplifies by not addressing these conditions."
+          }
+        ],
+        "total_score": 12,
+        "average_score": 2.4
+      },
+      "vanilla_gpt_eval": {
+        "answer": "As a Tier 4 Urban Cooperative Bank (UCB) in India, you are subject to the regulations set forth by the Reserve Bank of India (RBI) and the provisions of the Banking Regulation Act, 1949. When it comes to providing working capital loans secured by gold, there are specific guidelines and compliance requirements that you must adhere to.\n\n1. **Eligibility for Lending**: Urban Cooperative Banks are permitted to provide loans to various sectors, including the manufacturing sector. A jewellery manufacturer falls under this category, and you can extend working capital loans to them.\n\n2. **Secured Loans Against Gold**: Lending against gold is permissible for UCBs. However, the gold must be in the form of ornaments or bullion, and the valuation of the gold should be done by a recognized valuer. The loan amount typically should not exceed a certain percentage of the value of the gold, which is generally capped at 75% of the market value of the gold at the time of lending.\n\n3. **Loan-to-Value Ratio (LTV)**: The RBI has stipulated a maximum Loan-to-Value ratio for loans against gold. As of the latest guidelines, the LTV ratio for loans against gold is capped at 75%. This means that if the gold is valued at ₹1,00,000, the maximum loan you can provide would be ₹75,000.\n\n4. **Documentation and Compliance**: You must ensure that all necessary documentation is in place, including:\n   - KYC (Know Your Customer) norms for the borrower.\n   - Proper valuation certificates for the gold.\n   - Loan agreements detailing the terms and conditions.\n   - Compliance with the RBI's guidelines on lending practices.\n\n5. **Risk Management**: It is essential to have a robust risk management framework in place to assess the creditworthiness of the jewellery manufacturer. This includes evaluating their business model, financial health, and repayment capacity.\n\n6. **Regulatory Reporting**: As a UCB, you are required to report your lending activities to the RBI and maintain records as per the regulatory requirements. Ensure that you are compliant with the reporting norms related to secured loans.\n\n7. **Interest Rates and Terms**: The interest rates for working capital loans should be competitive but must also comply with the guidelines set by the RBI regarding the maximum interest rates that can be charged.\n\nIn summary, as a Tier 4 Urban Cooperative Bank, you can provide working capital loans secured by gold to a jewellery manufacturer, provided you adhere to the RBI's guidelines on LTV ratios, documentation, compliance, and risk management. Always ensure that you stay updated with any changes in regulations or guidelines issued by the RBI.",
+        "scores": [
+          {
+            "criterion": "Factual Accuracy",
+            "score": 2,
+            "reasoning": "The answer provides some general information about UCBs and lending against gold, but it lacks specific references to the relevant RBI circulars or amendments that govern such activities. It also does not mention the specific conditions under which Tier 4 UCBs can lend to jewellery manufacturers."
+          },
+          {
+            "criterion": "Obligation Extraction",
+            "score": 2,
+            "reasoning": "The answer mentions general obligations like LTV ratios and documentation but misses specific conditions from the RBI's amended directions, such as the prohibition on lending for investment or speculative purposes."
+          },
+          {
+            "criterion": "Deadline Accuracy",
+            "score": 3,
+            "reasoning": "The question does not involve specific deadlines or effective dates, so a score of 3 is appropriate."
+          },
+          {
+            "criterion": "Hallucination Rate",
+            "score": 3,
+            "reasoning": "The answer provides plausible but generic information without specific grounding in the latest RBI circulars or amendments. It avoids specific circular numbers or dates, which reduces the risk of hallucination but also limits usefulness."
+          },
+          {
+            "criterion": "Nuance Handling",
+            "score": 2,
+            "reasoning": "The answer fails to capture important nuances such as the specific conditions under which loans can be extended to jewellery manufacturers, as outlined in the RBI's amended directions. It oversimplifies the regulatory landscape by not addressing these specific conditions."
+          }
+        ],
+        "total_score": 12,
+        "average_score": 2.4
+      },
+      "vanilla_gemini_eval": null,
+      "custom_eval": null,
+      "rag_sources": [
+        {
+          "title": "Reserve Bank of India (Local Area Banks – Credit Facilities) Directions, 2025",
+          "source": "rbi",
+          "date": "",
+          "link": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=13078&Mode=0",
+          "circular_number": "RBI/DOR/2025-26/229",
+          "relevance_score": 0.7675,
+          "pdf_links": [
+            "https://rbidocs.rbi.org.in/rdocs/notification/PDFs/229MD.PDF",
+            "https://rbidocs.rbi.org.in/rdocs/content/pdfs/229MD28112025_AN1.pdf",
+            "https://rbidocs.rbi.org.in/rdocs/content/pdfs/229MD28112025_AN1.pdf"
+          ]
+        },
+        {
+          "title": "RBI/2025-2026/18DOR.CRE.REC.No.13/07.10.002/2025-26",
+          "source": "rbi",
+          "date": "2025-04-01",
+          "link": "https://www.rbi.org.in/Scripts/BS_CircularIndexDisplay.aspx?Id=12827",
+          "circular_number": "RBI/2025-26/18",
+          "relevance_score": 0.7637,
+          "pdf_links": [
+            "https://rbidocs.rbi.org.in/rdocs/Notification/PDFs/18MC01042025616166709B48430A987603C6FB23589F.PDF",
+            "https://rbidocs.rbi.org.in/rdocs/content/pdfs/18MC01042025_A1.pdf",
+            "https://rbidocs.rbi.org.in/rdocs/content/pdfs/18MC01042025_A1.pdf"
+          ]
+        },
+        {
+          "title": "Gold loans - Irregular practices observed in  grant of loans against pledge of gold ornaments and jewellery",
+          "source": "rbi",
+          "date": "",
+          "link": "https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=12735&Mode=0",
+          "circular_number": "RBI/2024-25/77",
+          "relevance_score": 0.7211,
+          "pdf_links": [
+            "https://rbidocs.rbi.org.in/rdocs/notification/PDFs/NOTI74300924007B5C91C2704D8C8F5152E2FC314A66.PDF"
+          ]
+        },
+        {
+          "title": "RBI/2022-2023/22DOR.CRE.REC.No.17/13.05.000/2022-23",
+          "source": "rbi",
+          "date": "2022-04-08",
+          "link": "https://www.rbi.org.in/Scripts/BS_CircularIndexDisplay.aspx?Id=12288",
+          "circular_number": "RBI/2022-23/22",
+          "relevance_score": 0.7148,
+          "pdf_links": [
+            "https://rbidocs.rbi.org.in/rdocs/Notification/PDFs/22MC894E2203DDDF4E0ABCA714DCE21F8F6C.PDF",
+            "https://rbidocs.rbi.org.in/rdocs/content/pdfs/IndianGazzate02072020.pdf",
+            "https://rbidocs.rbi.org.in/rdocs/content/pdfs/22MC08042022_APD.pdf",
+            "https://rbidocs.rbi.org.in/rdocs/content/pdfs/IndianGazzate02072020.pdf"
+          ]
+        },
+        {
+          "title": "RBI/2023-2024/51DOR.CRE.REC.No.27/07.10.002/2023-24",
+          "source": "rbi",
+          "date": "2023-07-25",
+          "link": "https://www.rbi.org.in/Scripts/BS_CircularIndexDisplay.aspx?Id=12525",
+          "circular_number": "RBI/2023-24/51",
+          "relevance_score": 0.6763,
+          "pdf_links": [
+            "https://rbidocs.rbi.org.in/rdocs/Notification/PDFs/51MC9667ADF8946744DCB2F8D2C6A6BD4F82.PDF",
+            "https://rbidocs.rbi.org.in/rdocs/content/pdfs/51MC25072023_A.pdf",
+            "https://rbidocs.rbi.org.in/rdocs/content/pdfs/51MC25072023_A.pdf",
+            "https://rbidocs.rbi.org.in/rdocs/content/pdfs/51MC25072023_B.pdf",
+            "https://rbidocs.rbi.org.in/rdocs/content/pdfs/51MC25072023_C.pdf",
+            "https://rbidocs.rbi.org.in/rdocs/content/pdfs/51MC25072023_D.pdf",
+            "https://rbidocs.rbi.org.in/rdocs/content/pdfs/IndianGazzate02072020.pdf",
+            "https://rbidocs.rbi.org.in/rdocs/content/pdfs/IndianGazzate02072020.pdf"
+          ]
+        }
+      ],
+      "rag_advantage_vs_gpt": 0.0,
+      "rag_advantage_vs_gemini": null,
+      "rag_advantage_vs_custom": null
+    },
+    {
+      "question": "How quickly must an insurance company report a cyber incident to IRDAI, and what log retention period is required?",
+      "ground_truth": "Per IRDAI circular IRDAI/GA&HR/CIR/MISC/49/03/2025 dated March 24, 2025, on Cyber Incident or Crisis Preparedness: (1) Cyber incidents must be reported to IRDAI in prescribed format within 6 hours of noticing or being brought to notice about such incidents. (2) All ICT infrastructure and application logs must be maintained and monitored for a rolling period of 180 days. Additionally, system clocks must be synchronized with NTP Servers of NIC or NPL, entities must implement a Cyber Crisis Management Plan (CCMP), and forensic auditors must be empanelled in advance with no conflict of interest (vendors handling SOC, attack surface monitoring, Red teaming, or annual assurance audit cannot serve as forensic auditors).",
+      "rag_eval": {
+        "answer": "Insurers must report cyber incidents to IRDAI within 6 hours of noticing or being notified of such incidents and must maintain ICT infrastructure and application logs for a rolling period of 180 days, according to IRDAI/GA&HR/CIR/MISC/128/06/2023, dated 13/06/2023 and Para 3.3 under Policy no. 2.16 in IRDAI Information and Cyber Security Guidelines, 2023 (IRDAI Circular on Cyber Incident or Crisis Preparedness, dated 2025-03-26).\n\nAdditionally, the IRDAI directs all Regulated Entities to follow the provisions regarding reporting incidents to IRDAI and CERT-In scrupulously and submit available details of Cyber Security Incidents to the Authority in an enclosed format within 24 hours of intimation of the incident (IRDAI Circular on Reporting of Cyber Security Incident, dated 2023-06-13).",
+        "scores": [
+          {
+            "criterion": "Factual Accuracy",
+            "score": 2,
+            "reasoning": "The answer provides specific details about reporting timelines and log retention, but it incorrectly cites circular numbers and dates. The correct circular is IRDAI/GA&HR/CIR/MISC/49/03/2025 dated March 24, 2025, not the ones mentioned in the answer."
+          },
+          {
+            "criterion": "Obligation Extraction",
+            "score": 4,
+            "reasoning": "The answer correctly identifies the obligation to report cyber incidents within 6 hours and maintain logs for 180 days. However, it misses additional obligations such as synchronizing system clocks and empanelling forensic auditors."
+          },
+          {
+            "criterion": "Deadline Accuracy",
+            "score": 5,
+            "reasoning": "The answer accurately states the 6-hour reporting requirement and the 180-day log retention period, which are correct according to the ground truth."
+          },
+          {
+            "criterion": "Hallucination Rate",
+            "score": 2,
+            "reasoning": "The answer includes fabricated circular numbers and dates, which are not supported by the provided sources or the ground truth."
+          },
+          {
+            "criterion": "Nuance Handling",
+            "score": 3,
+            "reasoning": "The answer captures the main obligations but misses nuances such as the requirement for system clock synchronization and the conditions for forensic auditors, which are part of the broader regulatory context."
+          }
+        ],
+        "total_score": 16,
+        "average_score": 3.2
+      },
+      "vanilla_gpt_eval": {
+        "answer": "As of my last knowledge update in October 2023, the Insurance Regulatory and Development Authority of India (IRDAI) has specific guidelines regarding the reporting of cyber incidents by insurance companies. \n\n1. **Reporting Timeline**: Insurance companies are required to report any cyber incident to the IRDAI within **6 hours** of becoming aware of the incident. This prompt reporting is crucial for the regulatory body to assess the situation and take necessary actions to mitigate risks to policyholders and the insurance sector as a whole.\n\n2. **Log Retention Period**: According to the guidelines, insurance companies must retain logs related to cyber incidents for a minimum period of **5 years**. This retention period is essential for compliance, audits, and any potential investigations that may arise from the incident.\n\nThese requirements are part of the broader framework established by the IRDAI to enhance the cybersecurity posture of insurance companies and ensure the protection of sensitive customer data. Companies are also encouraged to have robust incident response plans in place to handle such incidents effectively.\n\nFor the most accurate and updated information, it is advisable to refer directly to the latest circulars and guidelines issued by the IRDAI or consult with compliance experts in the field.",
+        "scores": [
+          {
+            "criterion": "Factual Accuracy",
+            "score": 3,
+            "reasoning": "The answer correctly states the 6-hour reporting requirement for cyber incidents but inaccurately claims a 5-year log retention period instead of the correct 180 days."
+          },
+          {
+            "criterion": "Obligation Extraction",
+            "score": 3,
+            "reasoning": "The answer identifies the key obligation of reporting within 6 hours but incorrectly states the log retention requirement, missing other obligations like synchronization of system clocks and empanelment of forensic auditors."
+          },
+          {
+            "criterion": "Deadline Accuracy",
+            "score": 5,
+            "reasoning": "The answer correctly identifies the 6-hour deadline for reporting cyber incidents, which is accurate according to the ground truth."
+          },
+          {
+            "criterion": "Hallucination Rate",
+            "score": 2,
+            "reasoning": "The answer fabricates the 5-year log retention requirement, which is not supported by the ground truth, indicating a hallucination."
+          },
+          {
+            "criterion": "Nuance Handling",
+            "score": 2,
+            "reasoning": "The answer oversimplifies the requirements by not addressing additional nuances such as the need for a Cyber Crisis Management Plan and the specific conditions for forensic auditors."
+          }
+        ],
+        "total_score": 15,
+        "average_score": 3.0
+      },
+      "vanilla_gemini_eval": null,
+      "custom_eval": null,
+      "rag_sources": [
+        {
+          "title": "Circular on Cyber Incident or Crisis Preparedness",
+          "source": "irdai",
+          "date": "2025-03-26",
+          "link": "https://irdai.gov.in/document-detail?documentId=6975996",
+          "circular_number": "",
+          "relevance_score": 0.6681,
+          "pdf_links": [
+            "https://irdai.gov.in/documents/37343/365525/%E0%A4%B8%E0%A4%BE%E0%A4%87%E0%A4%AC%E0%A4%B0+%E0%A4%98%E0%A4%9F%E0%A4%A8%E0%A4%BE+%E0%A4%AF%E0%A4%BE+%E0%A4%B8%E0%A4%82%E0%A4%95%E0%A4%9F+%E0%A4%B9%E0%A5%87%E0%A4%A4%E0%A5%81+%E0%A4%A4%E0%A5%88%E0%A4%AF%E0%A4%BE%E0%A4%B0%E0%A5%80+%E0%A4%AA%E0%A4%B0+%E0%A4%AA%E0%A4%B0%E0%A4%BF%E0%A4%AA%E0%A4%A4%E0%A5%8D%E0%A4%B0+_+Circular+on+Cyber+Incident+or+Crisis+Preparedness.pdf/2b53047f-cf15-ea35-f8af-882a3150ef2c?version=2.0&t=1744030330726&download=true"
+          ]
+        },
+        {
+          "title": "Circular on Reporting of Cyber Security Incident",
+          "source": "irdai",
+          "date": "2023-06-13",
+          "link": "https://irdai.gov.in/document-detail?documentId=3510831",
+          "circular_number": "",
+          "relevance_score": 0.6669,
+          "pdf_links": [
+            "https://irdai.gov.in/documents/37343/365525/%E0%A4%B8%E0%A4%BE%E0%A4%87%E0%A4%AC%E0%A4%B0+%E0%A4%B8%E0%A5%81%E0%A4%B0%E0%A4%95%E0%A5%8D%E0%A4%B7%E0%A4%BE+%E0%A4%98%E0%A4%9F%E0%A4%A8%E0%A4%BE%E0%A4%93%E0%A4%82+%E0%A4%95%E0%A5%80+%E0%A4%B0%E0%A4%BF%E0%A4%AA%E0%A5%8B%E0%A4%B0%E0%A5%8D%E0%A4%9F%E0%A4%BF%E0%A4%82%E0%A4%97+%E0%A4%AA%E0%A4%B0+%E0%A4%AA%E0%A4%B0%E0%A4%BF%E0%A4%AA%E0%A4%A4%E0%A5%8D%E0%A4%B0+_+Circular+on+Reporting+of+Cyber+Security+Incident.pdf/cba52dfa-7602-4196-d4b6-623248087ff8?version=2.0&t=1688472179938&download=true"
+          ]
+        },
+        {
+          "title": "Clarification on IRDAI (Maintenance of Information by the Regulated Entities and Sharing of information by the Authority) Reg, 2025",
+          "source": "irdai",
+          "date": "2025-07-22",
+          "link": "https://irdai.gov.in/document-detail?documentId=7628074",
+          "circular_number": "",
+          "relevance_score": 0.6279,
+          "pdf_links": [
+            "https://irdai.gov.in/documents/37343/365525/%E0%A4%86%E0%A4%88%E0%A4%86%E0%A4%B0%E0%A4%A1%E0%A5%80%E0%A4%8F%E0%A4%86%E0%A4%88+%28%E0%A4%B5%E0%A4%BF%E0%A4%A8%E0%A4%BF%E0%A4%AF%E0%A4%AE%E0%A4%BF%E0%A4%A4+%E0%A4%B8%E0%A4%82%E0%A4%B8%E0%A5%8D%E0%A4%A5%E0%A4%BE%E0%A4%93%E0%A4%82+%E0%A4%A6%E0%A5%8D%E0%A4%B5%E0%A4%BE%E0%A4%B0%E0%A4%BE+%E0%A4%B8%E0%A5%82%E0%A4%9A%E0%A4%A8%E0%A4%BE+%E0%A4%95%E0%A4%BE+%E0%A4%85%E0%A4%A8%E0%A5%81%E0%A4%B0%E0%A4%95%E0%A5%8D%E0%A4%B7%E0%A4%A3+%E0%A4%94%E0%A4%B0+%E0%A4%AA%E0%A5%8D%E0%A4%B0%E0%A4%BE%E0%A4%A7%E0%A4%BF%E0%A4%95%E0%A4%B0%E0%A4%A3+%E0%A4%A6%E0%A5%8D%E0%A4%B5%E0%A4%BE%E0%A4%B0%E0%A4%BE+%E0%A4%B8%E0%A5%82%E0%A4%9A%E0%A4%A8%E0%A4%BE+%E0%A4%95%E0%A5%80+%E0%A4%B8%E0%A4%BE%E0%A4%9D%E0%A5%87%E0%A4%A6%E0%A4%BE%E0%A4%B0%E0%A5%80%29+%E0%A4%B5%E0%A4%BF%E0%A4%A8%E0%A4%BF%E0%A4%AF%E0%A4%AE%2C+2025+%E0%A4%AA%E0%A4%B0+%E0%A4%B8%E0%A5%8D%E0%A4%AA%E0%A4%B7%E0%A5%8D%E0%A4%9F%E0%A5%80%E0%A4%95%E0%A4%B0%E0%A4%A3+_+Clarification+on+IRDAI+%28Maintenance+of+Information+by+the+Regulated+Entities+and+Sharing+of+information+by+the+Authority%29+Reg%2C+20.pdf/d34e4953-ded1-c474-a5b5-d8d9f19818d6?version=2.0&t=1753266458446&download=true"
+          ]
+        },
+        {
+          "title": "Product Structure for Cyber Insurance",
+          "source": "irdai",
+          "date": "2021-09-08",
+          "link": "https://irdai.gov.in/document-detail?documentId=976463",
+          "circular_number": "",
+          "relevance_score": 0.59,
+          "pdf_links": [
+            "https://irdai.gov.in/documents/37343/365525/Product+Structure+for+Cyber+Insurance2021-09-08.pdf/96bc4edd-0f6e-c535-0c81-08636ac29242?version=1.2&t=1665587869064",
+            "https://irdai.gov.in/documents/37343/365525/Product+Structure+for+Cyber+Insurance2021-09-08.pdf/96bc4edd-0f6e-c535-0c81-08636ac29242?version=1.2&t=1665587869064&download=true"
+          ]
+        },
+        {
+          "title": "Amendments to the Guidelines on Information and Cyber Security for Insurers dated 07.04.2017",
+          "source": "irdai",
+          "date": "2020-12-30",
+          "link": "https://irdai.gov.in/document-detail?documentId=396170",
+          "circular_number": "",
+          "relevance_score": 0.547,
+          "pdf_links": [
+            "https://irdai.gov.in/documents/37343/365525/Amendments+to+the+Guidelines+on+Information+and+Cyber+Security+for+Insurers.pdf/a972cd0f-d679-ecbe-4300-517d7382a4ae?version=1.2&t=1658990996259&download=true"
+          ]
+        },
+        {
+          "title": "Implementation of Information and Cyber Security Guidelines",
+          "source": "irdai",
+          "date": "2022-10-13",
+          "link": "https://irdai.gov.in/document-detail?documentId=1446431",
+          "circular_number": "",
+          "relevance_score": 0.5217,
+          "pdf_links": [
+            "https://irdai.gov.in/documents/37343/365525/Implementation+of+Information+and+Cyber+Security+Guidelines.pdf/cde08dbd-5337-f322-e541-143f9d96ace0?version=1.0&t=1666363225650&download=true"
+          ]
+        }
+      ],
+      "rag_advantage_vs_gpt": 0.2,
+      "rag_advantage_vs_gemini": null,
+      "rag_advantage_vs_custom": null
+    },
+    {
+      "question": "What specific changes were made to the NCS Master Circular for green debt security reviewer appointments?",
+      "ground_truth": "Per SEBI circular dated February 27, 2026 (ref: HO/17/11/24(1)2026-DDHS-POD1/I/5967/2026), Chapter IX Paragraph 1.8 of the NCS Master Circular was deleted and a new Paragraph 5 was inserted. The changes align the requirements for appointing an independent third-party reviewer/certifier for green debt securities with those for social and sustainability bonds. The reviewer must be independent of the issuer and have expertise in ESG debt securities. The scope of the review and details of the reviewer must be disclosed in the offer document. The circular applies to issuers of green debt securities, recognized stock exchanges, recognized depositories, registered merchant bankers, registered debenture trustees, registered credit rating agencies, and registered ESG ratings providers.",
+      "rag_eval": {
+        "answer": "The Securities and Exchange Board of India (SEBI) has modified Chapter IX of the NCS Master Circular to align the requirements for appointing an independent third-party reviewer/certifier for green debt securities with those specified for social bonds/sustainability bonds. The changes, according to circular HO/17/11/24(1)2026-DDHS-POD1/I/5967/2026 dated February 27, 2026, are as follows:\n\n*   Paragraph 1.8 of Chapter IX of the NCS Master Circular has been deleted (SEBI Circular HO/17/11/24(1)2026-DDHS-POD1/I/5967/2026).\n*   A new \"paragraph 5\" has been inserted into Chapter IX of the NCS Master Circular, titled \"Independent third-party reviewer/ certifier\" (SEBI Circular HO/17/11/24(1)2026-DDHS-POD1/I/5967/2026).\n\nThe available documents do not contain the specific text of the inserted \"paragraph 5\".",
+        "scores": [
+          {
+            "criterion": "Factual Accuracy",
+            "score": 5,
+            "reasoning": "The answer accurately cites the specific circular number, date, and the changes made to the NCS Master Circular, including the deletion of Paragraph 1.8 and the insertion of a new Paragraph 5. These details are consistent with the provided sources."
+          },
+          {
+            "criterion": "Obligation Extraction",
+            "score": 4,
+            "reasoning": "The answer identifies the key change regarding the appointment of an independent third-party reviewer/certifier. However, it lacks details on the specific obligations such as the requirement for the reviewer to be independent and have expertise in ESG debt securities, which are mentioned in the ground truth."
+          },
+          {
+            "criterion": "Deadline Accuracy",
+            "score": 3,
+            "reasoning": "The question does not involve specific deadlines or effective dates, so a score of 3 is appropriate."
+          },
+          {
+            "criterion": "Hallucination Rate",
+            "score": 5,
+            "reasoning": "All claims in the answer are grounded in the provided sources, with no evidence of hallucination. The answer provides substantive information about the changes to the NCS Master Circular."
+          },
+          {
+            "criterion": "Nuance Handling",
+            "score": 3,
+            "reasoning": "The answer captures the main change but misses some nuances such as the specific requirements for the reviewer and the scope of the review, which are important for full understanding."
+          }
+        ],
+        "total_score": 20,
+        "average_score": 4.0
+      },
+      "vanilla_gpt_eval": {
+        "answer": "As of my last knowledge update in October 2023, the National Credit System (NCS) Master Circular regarding green debt securities has undergone several updates to enhance the regulatory framework for green financing in India. While I do not have access to the most current circulars or specific amendments made after that date, I can provide a general overview of the types of changes that are typically made in such circulars regarding the appointment of reviewers for green debt securities.\n\n1. **Eligibility Criteria**: The revised circular may have specified clearer eligibility criteria for the appointment of reviewers. This could include qualifications, experience in environmental finance, and familiarity with green projects.\n\n2. **Review Process**: Changes might have been made to the review process itself, outlining the steps that reviewers must follow to assess the compliance of green debt securities with established green standards.\n\n3. **Reporting Requirements**: The circular may have introduced or modified reporting requirements for reviewers, including the need for detailed reports on the assessment of the green credentials of the securities.\n\n4. **Independence and Conflict of Interest**: There may have been stricter guidelines regarding the independence of reviewers to ensure that there are no conflicts of interest, thereby enhancing the credibility of the review process.\n\n5. **Training and Capacity Building**: The circular could have included provisions for ongoing training and capacity building for reviewers to keep them updated on best practices and evolving standards in green finance.\n\n6. **Regulatory Oversight**: There may have been enhancements in the regulatory oversight mechanisms to ensure that the reviewers adhere to the guidelines and that their assessments are transparent and accountable.\n\n7. **Feedback Mechanism**: The introduction of a feedback mechanism for stakeholders to report issues or concerns regarding the review process could also be a part of the changes.\n\nFor the most accurate and specific details regarding the changes made to the NCS Master Circular for green debt security reviewer appointments, I recommend checking the official notifications from the Reserve Bank of India (RBI) or the Securities and Exchange Board of India (SEBI), as they are the primary regulatory bodies overseeing such matters.",
+        "scores": [
+          {
+            "criterion": "Factual Accuracy",
+            "score": 1,
+            "reasoning": "The answer provides speculative and generic information without citing specific circular numbers, dates, or issuing authorities. It lacks the specific details found in the ground truth."
+          },
+          {
+            "criterion": "Obligation Extraction",
+            "score": 2,
+            "reasoning": "The answer mentions potential obligations like eligibility criteria and reporting requirements but does not specify them or provide regulatory references, missing key obligations outlined in the ground truth."
+          },
+          {
+            "criterion": "Deadline Accuracy",
+            "score": 3,
+            "reasoning": "The question does not involve specific deadlines, so a score of 3 is appropriate."
+          },
+          {
+            "criterion": "Hallucination Rate",
+            "score": 3,
+            "reasoning": "The answer makes plausible but unverified claims about potential changes. It avoids specific fabrications but lacks grounding in actual source documents."
+          },
+          {
+            "criterion": "Nuance Handling",
+            "score": 2,
+            "reasoning": "The answer provides a broad overview without capturing specific exceptions, conditions, or applicability limitations mentioned in the ground truth, such as the requirement for independence and expertise in ESG debt securities."
+          }
+        ],
+        "total_score": 11,
+        "average_score": 2.2
+      },
+      "vanilla_gemini_eval": null,
+      "custom_eval": null,
+      "rag_sources": [
+        {
+          "title": "Revised Norms for appointment of an independent third-party reviewer/ certifier for green debt security",
+          "source": "sebi",
+          "date": "2026-02-27",
+          "link": "https://www.sebi.gov.in/legal/circulars/feb-2026/revised-norms-for-appointment-of-an-independent-third-party-reviewer-certifier-for-green-debt-security_100043.html",
+          "circular_number": "HO/17/11/24(1)2026-DDHS-POD1/I/5967/2026",
+          "relevance_score": 0.7472,
+          "pdf_links": [
+            "https://www.sebi.gov.in/sebi_data/attachdocs/feb-2026/1772193450819.pdf"
+          ]
+        },
+        {
+          "title": "Master Circular for issue and listing of Non-convertible Securities, Securitised Debt Instruments, Security Receipts, Municipal Debt Securities and Commercial Paper",
+          "source": "sebi",
+          "date": "2025-10-15",
+          "link": "https://www.sebi.gov.in/legal/master-circulars/oct-2025/master-circular-for-issue-and-listing-of-non-convertible-securities-securitised-debt-instruments-security-receipts-municipal-debt-securities-and-commercial-paper_97343.html",
+          "circular_number": "Master Circulars",
+          "relevance_score": 0.6588,
+          "pdf_links": [
+            "https://www.sebi.gov.in/sebi_data/attachdocs/oct-2025/1760532257519.pdf"
+          ]
+        }
+      ],
+      "rag_advantage_vs_gpt": 1.8,
+      "rag_advantage_vs_gemini": null,
+      "rag_advantage_vs_custom": null
+    }
+  ],
+  "summary": {
+    "total_questions": 5,
+    "rag_average": 3.08,
+    "vanilla_gpt_average": 2.2,
+    "vanilla_gemini_average": null,
+    "vanilla_custom_average": null,
+    "rag_advantage_vs_gpt": 0.88,
+    "rag_advantage_vs_gemini": null,
+    "rag_advantage_vs_custom": null,
+    "per_criterion_rag": {
+      "Factual Accuracy": 3.0,
+      "Obligation Extraction": 3.4,
+      "Deadline Accuracy": 3.0,
+      "Hallucination Rate": 3.2,
+      "Nuance Handling": 2.8
+    },
+    "per_criterion_vanilla_gpt": {
+      "Factual Accuracy": 1.6,
+      "Obligation Extraction": 2.0,
+      "Deadline Accuracy": 3.0,
+      "Hallucination Rate": 2.6,
+      "Nuance Handling": 1.8
+    },
+    "per_criterion_vanilla_gemini": null,
+    "per_criterion_custom": null,
+    "wins_vs_gpt": 4,
+    "losses_vs_gpt": 0,
+    "ties_vs_gpt": 1,
+    "wins_vs_gemini": null,
+    "losses_vs_gemini": null,
+    "ties_vs_gemini": null,
+    "wins_vs_custom": null,
+    "losses_vs_custom": null,
+    "ties_vs_custom": null
+  }
+}
