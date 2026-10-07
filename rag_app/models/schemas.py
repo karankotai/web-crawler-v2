@@ -20,6 +20,7 @@ class ChunkMetadata(BaseModel):
     topic: str = ""               # short subject label (e.g. "asset classification")
     section_index: int = 0        # which section (0-based) this chunk came from
     section_heading: str = ""     # raw heading text of the section
+    context_summary: str = ""     # LLM-generated context blurb for embedding enrichment
 
 
 class TextChunk(BaseModel):
@@ -83,12 +84,21 @@ class RetrievedChunk(BaseModel):
     topic: str = ""
 
 
+class GraphContext(BaseModel):
+    amendment_chain: list[str] = []
+    freshness_notes: dict[str, str] = {}
+    related_circulars: list[str] = []
+    impact_entities: list[str] = []
+    graph_intent: Optional[str] = None
+
+
 class AskResponse(BaseModel):
     answer: str
     sources: list[SourceReference]
     query_used: str
     chunks_retrieved: int
     retrieved_chunks: list[RetrievedChunk] = []
+    graph_context: Optional[GraphContext] = None
 
 
 # ── Eval schemas ──────────────────────────────────────────────

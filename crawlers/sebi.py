@@ -1,6 +1,7 @@
 """Crawler for SEBI (Securities and Exchange Board of India) circulars."""
 
 import gc
+import re
 from urllib.parse import urljoin
 
 import config
@@ -8,17 +9,25 @@ from crawlers.base import BaseCrawler
 
 
 class SEBICrawler(BaseCrawler):
-    """Crawls circulars from sebi.gov.in"""
+    """Crawls circulars from sebi.gov.in
+
+    SEBI uses AJAX POST pagination via /sebiweb/ajax/home/getnewslistinfo.jsp.
+    The initial GET sets up the JSESSIONID cookie, then subsequent pages are
+    fetched via POST with nextValue/doDirect parameters.
+    """
 
     name = "sebi_circulars"
     BASE_URL = "https://www.sebi.gov.in"
-    # ssid=7 = Circulars, ssid=6 = Master Circulars, ssid=5 = Guidelines
-    CIRCULARS_URL = f"{BASE_URL}/sebiweb/home/HomeAction.do?doListing=yes&sid=1&ssid=7&smid=0"
-    MASTER_CIRCULARS_URL = f"{BASE_URL}/sebiweb/home/HomeAction.do?doListing=yes&sid=1&ssid=6&smid=0"
+    AJAX_URL = f"{BASE_URL}/sebiweb/ajax/home/getnewslistinfo.jsp"
+    # ssid=7 = Circulars, ssid=6 = Master Circulars
+    SECTIONS = [
+        {"ssid": "7", "label": "circulars", "ssText": "Circulars"},
+        {"ssid": "6", "label": "master circulars", "ssText": "Master Circulars"},
+    ]
 
     def crawl(self):
-        self._crawl_listing_page(self.CIRCULARS_URL, "circulars")
-        self._crawl_listing_page(self.MASTER_CIRCULARS_URL, "master circulars")
+        for section in self.SECTIONS:
+            self._crawl_section(section)
 
     def parse_detail_page(self, soup, url):
         """Extract full content from a SEBI circular detail page.
@@ -69,82 +78,113 @@ class SEBICrawler(BaseCrawler):
 
         return detail
 
-    def _crawl_listing_page(self, base_url, label):
-        """Crawl a SEBI listing page with pagination."""
-        page_num = 1
+    def _crawl_section(self, section):
+        """Crawl a SEBI section using AJAX POST pagination."""
+        ssid = section["ssid"]
+        label = section["label"]
+
+        # Initial GET to establish JSESSIONID cookie
+        initial_url = f"{self.BASE_URL}/sebiweb/home/HomeAction.do?doListing=yes&sid=1&ssid={ssid}&smid=0"
+        print(f"  Fetching SEBI {label} page 1...")
+        self.session.headers["Referer"] = initial_url
+        resp = self.fetch(initial_url)
+        if not resp:
+            print(f"  [ERROR] Failed to load SEBI {label} initial page")
+            return
+
+        soup = self.parse_html(resp.text)
+        found = self._parse_listing(soup, label, 1)
+        if found == 0:
+            return
+
+        # AJAX pagination for subsequent pages
+        page_num = 2
+        consecutive_failures = 0
         while page_num <= config.MAX_PAGES:
-            url = f"{base_url}&pageNo={page_num}" if page_num > 1 else base_url
-            print(f"  Fetching SEBI {label} page {page_num}...")
-            resp = self.fetch(url)
-            if not resp:
+            if not self._has_next_page(soup, page_num - 1):
                 break
 
+            print(f"  Fetching SEBI {label} page {page_num}...")
+            post_data = {
+                "nextValue": str(page_num - 1),
+                "next": "n",
+                "search": "",
+                "fromDate": "",
+                "toDate": "",
+                "fromYear": "",
+                "toYear": "",
+                "deptId": "",
+                "sid": "1",
+                "ssid": ssid,
+                "smid": "0",
+                "ssidhidden": ssid,
+                "intmid": "-1",
+                "sText": "Legal",
+                "ssText": section["ssText"],
+                "smText": "",
+                "doDirect": str(page_num - 1),
+            }
+
+            resp = self.fetch(self.AJAX_URL, method="POST", data=post_data, timeout=30)
+            if not resp:
+                consecutive_failures += 1
+                print(f"  [ERROR] Failed to fetch SEBI {label} page {page_num} ({consecutive_failures} consecutive failures)")
+                if consecutive_failures >= 3:
+                    print(f"  [STOP] Too many consecutive failures, stopping {label}")
+                    break
+                page_num += 1
+                continue
+
+            consecutive_failures = 0
             soup = self.parse_html(resp.text)
-
-            before = len(self.results)
-            rows = soup.select("table tr")
-            for row in rows:
-                cells = row.find_all("td")
-                if len(cells) < 2:
-                    continue
-
-                link_tag = row.find("a", href=True)
-                link = ""
-                title = ""
-                if link_tag:
-                    link = link_tag.get("href", "")
-                    if link and not link.startswith("http"):
-                        link = f"{self.BASE_URL}{link}" if link.startswith("/") else f"{self.BASE_URL}/{link}"
-                    title = link_tag.get_text(strip=True)
-
-                texts = [c.get_text(strip=True) for c in cells]
-                date = texts[0] if texts else ""
-
-                if title and len(title) > 5:
-                    self.results.append({
-                        "source": "SEBI",
-                        "title": title,
-                        "date": date,
-                        "department": "",
-                        "link": link,
-                        "details": " | ".join(t for t in texts if t),
-                    })
-
-            found = len(self.results) - before
-            print(f"  SEBI {label} page {page_num}: {found} records")
-            self.save_progress()
-
+            found = self._parse_listing(soup, label, page_num)
             if found == 0:
                 break
 
-            if not self._has_next_page(soup, page_num):
-                break
             page_num += 1
 
+    def _parse_listing(self, soup, label, page_num):
+        """Parse records from a listing page. Returns count of new records."""
+        before = len(self.results)
+        rows = soup.select("table tr")
+        for row in rows:
+            cells = row.find_all("td")
+            if len(cells) < 2:
+                continue
+
+            link_tag = row.find("a", href=True)
+            link = ""
+            title = ""
+            if link_tag:
+                link = link_tag.get("href", "")
+                if link and not link.startswith("http"):
+                    link = f"{self.BASE_URL}{link}" if link.startswith("/") else f"{self.BASE_URL}/{link}"
+                title = link_tag.get_text(strip=True)
+
+            texts = [c.get_text(strip=True) for c in cells]
+            date = texts[0] if texts else ""
+
+            if title and len(title) > 5:
+                self.results.append({
+                    "source": "SEBI",
+                    "title": title,
+                    "date": date,
+                    "department": "",
+                    "link": link,
+                    "details": " | ".join(t for t in texts if t),
+                })
+
+        found = len(self.results) - before
+        print(f"  SEBI {label} page {page_num}: {found} records")
+        self.save_progress()
+        return found
+
     def _has_next_page(self, soup, current_page):
-        """Check if there's a next page link in the SEBI pagination."""
-        for a in soup.find_all("a", href=True):
-            text = a.get_text(strip=True).lower()
-            if text in ("next", "next >", ">>"):
-                return True
-            href = a.get("href", "")
-            if f"pageNo={current_page + 1}" in href:
-                return True
-
-        import re
-        for div in soup.select(".pagination_inner"):
-            m = re.search(r"(\d+)\s+to\s+(\d+)\s+of\s+(\d+)", div.get_text())
-            if m:
-                end_idx = int(m.group(2))
-                total = int(m.group(3))
-                if end_idx < total:
-                    return True
-
-        for a in soup.find_all("a", href=True):
-            href = a.get("href", "")
-            if "searchFormNewsList" in href:
-                text = a.get_text(strip=True).lower()
-                if text in ("next", "next >", ">>"):
-                    return True
-
+        """Check if there's a next page by parsing 'X to Y of Z records' text."""
+        page_text = soup.get_text()
+        m = re.search(r"(\d+)\s+to\s+(\d+)\s+of\s+(\d+)", page_text)
+        if m:
+            end_idx = int(m.group(2))
+            total = int(m.group(3))
+            return end_idx < total
         return False

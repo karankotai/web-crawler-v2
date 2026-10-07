@@ -79,8 +79,40 @@ When the GTA operates under Option 1 (5%, no ITC), the following recipients must
 4. **Not informing clients**: If GTA switches to forward charge, clients who were paying RCM must stop — double payment risk
 5. **E-way bill implications**: The GSTIN and tax rate on e-way bills must reflect the chosen option
 
+## Mid-Contract GST Rate Revision — Who Bears the Additional Tax?
+
+### Legal Position
+
+When the GST rate on GTA services is revised mid-contract:
+
+1. **Section 14 of the CGST Act** governs rate change on ongoing supplies — the new rate applies to supplies made on or after the effective date, regardless of when the contract was signed
+2. **The transporter (GTA) is legally liable** to charge the revised rate on all invoices issued post-revision
+3. The **contractual allocation** of the burden depends on the contract terms:
+   - If contract is "inclusive of GST" — the GTA absorbs the increase (unless contract has a change-in-law clause)
+   - If contract is "exclusive of GST" or "plus applicable taxes" — the recipient bears the additional GST
+
+### Force Majeure / Change-in-Law Clause Guidance
+
+A well-drafted GTA contract should include a **change-in-law clause** covering GST rate revisions:
+
+**Recommended clause elements**:
+1. **Trigger definition**: "Any change in applicable indirect tax rates (including GST, cess, or surcharge) by the Central or State Government"
+2. **Pass-through mechanism**: "Any increase or decrease in tax rates shall be passed through to the service recipient on a rupee-for-rupee basis"
+3. **Notice requirement**: "The GTA shall notify the recipient within 15 days of the rate change with revised invoicing details"
+4. **Adjustment mechanism**: "Invoices for the transition period shall reflect the applicable rate as per the date of supply (not date of contract or payment)"
+5. **Renegotiation trigger**: "If the tax rate change exceeds 2 percentage points, either party may request renegotiation of the base transport rate within 30 days"
+
+**Force majeure vs. change-in-law**: A GST rate change is NOT a force majeure event (it is a foreseeable regulatory action). It should be addressed through a specific change-in-law clause. Courts have held that tax rate changes do not constitute force majeure unless the contract explicitly includes them.
+
+**If the contract is silent** on rate changes:
+- The GTA must charge the new rate (legal requirement under GST law)
+- The recipient can refuse to pay the additional amount, leading to a commercial dispute
+- The Indian Contract Act Section 56 (frustration) does NOT apply to mere rate changes — the contract is not frustrated
+- **Practical resolution**: Negotiate a revised base price that accounts for the new rate, maintaining the same effective cost to the recipient
+
 ## Regulatory References
 
 - Notification No. 11/2017-Central Tax (Rate), S. No. 9 (GTA services)
 - Notification No. 13/2017-Central Tax (Rate), S. No. 1 (RCM for GTA)
 - Circular No. 212/6/2024-GST (clarification on GTA rate option)
+- Section 14 of CGST Act, 2017 (Change in rate of tax in respect of supply of goods or services)

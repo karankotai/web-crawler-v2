@@ -47,11 +47,42 @@ Table 8A of GSTR-9 auto-populates ITC from GSTR-2A (now GSTR-2B) for the entire 
 
 **Step 4**: Use the Excel offline tool to prepare reconciliation before online filing
 
+### Table 8C — ITC on Inward Supplies Received During the FY But Availed in Returns of the Next FY
+
+**Purpose**: Table 8C captures ITC that relates to the current financial year (invoice dated in the current FY) but was claimed in the GSTR-3B of the **next** financial year (up to the annual return filing date).
+
+**How to fill Table 8C**:
+
+1. Identify invoices where:
+   - Invoice date falls in the current FY (e.g., FY 2023-24)
+   - ITC was claimed in GSTR-3B of the **next FY** (April onwards of FY 2024-25)
+   - The claim was made before the due date of annual return filing
+2. Report the total ITC amount of such invoices in Table 8C
+3. This is **NOT** auto-populated — the taxpayer must manually calculate and enter
+
+**Relationship between Tables 8A, 8C, and 8D**:
+- **Table 8A**: Auto-populated total ITC from GSTR-2A/2B for the entire FY
+- **Table 8B**: ITC auto-populated for inward supplies from GSTR-2A (April to September of FY)
+- **Table 8C**: Manually entered — ITC from current FY invoices claimed in next FY returns
+- **Table 8D**: Difference between 8A and actual ITC claimed (8A minus claimed = difference explained here)
+- **Table 8F**: ITC not available in 8A (supplier didn't report, or reported in different FY), but claimed by taxpayer
+- **Net ITC** = Table 8A + 8C - 8D adjustments
+
+**Common mismatch reasons for Table 8A vs books**:
+1. Supplier filed GSTR-1 late → invoice appears in 8A of a different period
+2. Credit notes issued in a different period than original invoice
+3. Amendments by supplier in subsequent periods
+4. ITC claimed on provisional basis (later regularized)
+5. Reverse charge ITC not in 8A (separate reporting)
+6. Import IGST (Bill of Entry) timing differences
+7. GSTR-2A vs GSTR-2B computation differences
+
 ### Common Pitfalls
 
 1. **Don't blindly accept Table 8A figures** — they may include reversed credit notes, cancelled invoices
 2. **GSTR-2B vs 8A mismatch**: If you claimed ITC based on GSTR-2B but Table 8A shows GSTR-2A amounts, the difference needs explanation in Table 8D/8F
 3. **RCM ITC**: Reverse charge ITC is NOT part of Table 8A — it should be reported separately
+4. **Table 8C is manual**: Unlike 8A, Table 8C requires the taxpayer to compute and enter — failure to report leads to unexplained ITC difference
 
 ## GSTR-9C Late Fee
 

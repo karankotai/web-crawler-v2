@@ -1,0 +1,7 @@
+FROM python:3.12-slim
+WORKDIR /app
+RUN pip install --no-cache-dir streamlit openai psycopg2-binary python-dotenv
+COPY recent_circulars.py ui_components.py demo_obligations.json ./
+COPY scripts/extract_obligations.py scripts/extract_recent.py ./scripts/
+EXPOSE 8502
+CMD ["streamlit", "run", "recent_circulars.py", "--server.port=8502", "--server.address=0.0.0.0", "--server.headless=true"]

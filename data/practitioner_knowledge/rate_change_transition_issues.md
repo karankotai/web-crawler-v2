@@ -106,6 +106,70 @@ When GST rate is reduced OR ITC benefit is expanded, the supplier must pass the 
 - For services: Earlier of invoice date or receipt of payment or date of provision
 - **Special provision for rate change**: Section 14 overrides — the rate applicable is based on when the supply occurs, regardless of invoice/payment timing
 
+## Hotel Advance Booking — Which Rate Applies?
+
+### The Scenario
+
+A hotel collects an advance for a banquet/event booking when the GST rate is 18%. Before the event date, the rate is reduced to 12%. Which rate applies?
+
+### Legal Provision: Section 14 of CGST Act
+
+**Section 14** specifically addresses this situation — "Change in rate of tax in respect of supply of goods or services":
+
+- **Section 14(b)(ii)**: Where the payment has been received **before** the change in rate but the supply is made **after** the change in rate — the **new rate** (i.e., the rate at the time of supply) applies
+- The hotel must apply the **12% rate** (new/reduced rate) even though the advance was collected at 18%
+- The differential (6% excess collected) must be refunded to the customer or adjusted via credit note
+
+### Clarificatory Circulars
+
+- **CBIC Circular No. 1/1/2017-GST (Transition)** clarified that Section 14 overrides the normal time-of-supply rules in Sections 12/13
+- The rate at the **time of actual supply** (event date) determines the applicable rate, not the time of advance receipt
+- This applies to both rate increases and rate decreases
+
+### Practical Steps for Hotels
+
+1. Identify all advances received at the old rate for events scheduled after the rate change date
+2. Calculate the differential tax (old rate minus new rate) on each advance
+3. Issue a **credit note** to the customer for the excess tax collected
+4. Adjust the excess tax in the GSTR-3B return for the period of the event (not the advance period)
+5. If the rate increases instead: collect the additional tax from the customer via a supplementary invoice
+
+## MRP Obligations After Rate Change — Legal Framework
+
+### Which Law Governs MRP Revision?
+
+Three laws interact when GST rates change and MRP needs revision:
+
+### 1. Legal Metrology Act, 2009 (and Rules 2011)
+
+- **Rule 18 of Legal Metrology (Packaged Commodities) Rules, 2011**: MRP declared on the package is the maximum price including all taxes
+- When GST rate is **reduced**, the existing MRP already includes the old (higher) tax → the manufacturer is NOT legally required to re-label existing stock
+- However, **new stock** manufactured after the rate change must have the revised MRP reflecting the lower tax
+- The Legal Metrology Act does NOT mandate reprinting MRP on existing stock in warehouses
+
+### 2. GST Law — Anti-Profiteering (Section 171)
+
+- Section 171 requires that any reduction in rate of tax or benefit of ITC must be passed on to the consumer by way of commensurate reduction in prices
+- This is a GST-specific obligation that goes BEYOND what the Legal Metrology Act requires
+- Under Section 171, the manufacturer MUST reduce the effective selling price (even if MRP label is not changed)
+- Can sell below MRP (which is a maximum price) to comply with anti-profiteering
+
+### 3. Consumer Protection Act, 2019
+
+- Section 2(47) defines unfair trade practice — selling above MRP is an offence
+- But selling BELOW MRP after a rate reduction to pass benefit is perfectly legal
+- Consumer complaints about non-pass-through of GST reduction are handled under anti-profiteering framework, not directly under CPA
+
+### NAA/CCI Rulings
+
+- The **National Anti-Profiteering Authority (NAA)** (dissolved 01.12.2022, functions transferred to **CCI**) held in multiple cases:
+  - Manufacturers must reduce base price so that MRP reflects the reduced GST rate for new production
+  - For existing stock: Must sell at effective price reflecting new rate (even if MRP label shows old price)
+  - Penalty for non-compliance: Amount of profiteering + 10% penalty
+  - Key precedent: NAA ruled against HUL, Pyramid Infratech, etc. for not passing GST rate reduction benefit
+- **CCI** now handles anti-profiteering complaints through the Directorate General of Anti-Profiteering (DGAP)
+- State-level Screening Committees continue to receive and forward complaints to DGAP
+
 ## Checklist for CAs During Rate Change
 
 1. Identify all ongoing contracts with fixed prices — these may need re-negotiation
@@ -115,3 +179,4 @@ When GST rate is reduced OR ITC benefit is expanded, the supplier must pass the 
 5. File GSTR-1 carefully — ensure correct rate is applied to each invoice
 6. Monitor closing stock position for stranded credit assessment
 7. Check if any specific transition provisions have been notified
+8. For MRP products: Ensure new production has revised MRP; for existing stock, sell at effective reduced price

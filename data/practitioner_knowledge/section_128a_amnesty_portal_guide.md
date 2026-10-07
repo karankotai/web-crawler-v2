@@ -92,6 +92,60 @@ Rule 164 prescribes the procedure for availing the waiver under Section 128A:
 - Proper officer to verify within 60 days (or as prescribed)
 - Order in Form SPL-02 for acceptance, SPL-03 for rejection
 
+## SPL-02 Process (Settlement/Waiver Order)
+
+### What is SPL-02?
+
+SPL-02 is the order form issued by the proper officer granting the waiver of interest and penalty under Section 128A. The taxpayer does NOT file SPL-02 — it is issued by the officer after processing SPL-01.
+
+### SPL-02 Process Flow
+
+1. Taxpayer files SPL-01 with tax payment proof (DRC-03)
+2. Proper officer examines the application
+3. If application is in order:
+   - Officer issues **SPL-02** (Waiver Order) confirming interest and penalty waiver
+   - SPL-02 is available under: Services → User Services → View Additional Notices and Orders
+4. If application has deficiency:
+   - Officer issues notice for additional information/correction
+   - Taxpayer responds within the specified time
+5. If application is rejected:
+   - Officer issues **SPL-03** (Rejection Order) with reasons
+   - Taxpayer can rectify and re-apply if within the deadline
+
+### Partial Settlement of Demand
+
+For a demand order that was **partially confirmed and partially dropped**:
+- The taxpayer can settle only the **confirmed portion** under Section 128A
+- Pay the full tax of the confirmed portion via DRC-03
+- File SPL-01 referencing only the confirmed tax amount
+- The dropped portion does not require any action
+- In the SPL-01 form, enter the confirmed tax amount (not the original full demand)
+
+## Section 74 to Section 73 Rectification — Portal Workaround
+
+### The Problem
+
+When a demand order was originally issued under **Section 74** (fraud/suppression) and later **rectified to Section 73** (normal demand), the GST portal may show an error when filing SPL-01. This happens because the system still flags the order as a Section 74 order.
+
+### Official Workaround per CBIC Circular
+
+**CBIC Circular No. 238/32/2024-GST** provides the following guidance:
+
+1. If the original order was issued under Section 74 and later rectified/modified to Section 73, the taxpayer IS eligible for Section 128A benefit
+2. **Portal limitation**: The portal may not automatically update the section reference after rectification
+3. **Workaround**:
+   - File the application **manually** with the jurisdictional proper officer
+   - Attach the rectification order showing the change from Section 74 to Section 73
+   - The proper officer will process the application offline
+   - Alternatively, use **FORM GST SPL-05** or **SPL-06** as applicable and mention the rectification details in the remarks column (Column 19/20)
+4. The GSTN portal team has been instructed to enable system-level correction for such cases, but until then, manual filing is the accepted route
+
+### Important Clarifications
+
+- The date of the **original Section 74 order** does not matter — what matters is that the order is now under Section 73 post-rectification
+- If only a portion of the order was rectified from S74 to S73, only that portion qualifies for 128A
+- The taxpayer should retain a copy of both the original order and the rectification order as evidence
+
 ## Practical Tips for CAs
 
 1. **Maintain a tracker** of all Section 73 orders for FY 2017-18 to 2019-20
@@ -99,3 +153,4 @@ Rule 164 prescribes the procedure for availing the waiver under Section 128A:
 3. If the taxpayer has a strong case on merits, evaluate whether paying tax under 128A is worth it vs. winning the appeal and paying nothing
 4. **Deadline awareness**: The scheme has a limited window — track the notification date closely
 5. For composite demands (73 + 74), get a written communication from the officer about the split
+6. For Section 74→73 rectified orders, keep the rectification order handy and use the manual filing route if the portal shows errors

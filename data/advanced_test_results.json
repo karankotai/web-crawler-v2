@@ -1,0 +1,1843 @@
+{
+  "results": [
+    {
+      "question": "A manufacturer of exempt and taxable goods wants to claim a refund of accumulated ITC due to inverted duty structure. Walk through the eligibility conditions, formula, and documentary requirements under Rule 89(5) read with Section 54(3).",
+      "ground_truth": "Under Section 54(3) of the CGST Act, refund of accumulated ITC is allowed when the rate of tax on inputs is higher than the rate on output supplies (inverted duty structure). Rule 89(5) of CGST Rules prescribes the formula: Maximum Refund = (Turnover of inverted rated supply of goods and services x Net ITC / Adjusted Total Turnover) - Tax payable on such inverted rated supply. Eligibility conditions: (1) Refund only for inverted rated supplies, not exempted supplies. (2) No refund if accumulation is due to ITC on input services. (3) The manufacturer must file refund application in Form GST RFD-01 within 2 years from the end of the financial year. Documentary requirements include: Statement of invoices (Annexure to RFD-01), declaration that ITC has not been availed on excluded supplies, CA certificate/auditor's report for refund above Rs. 2 lakh.",
+      "rag_eval": {
+        "answer": "Here's a breakdown of the eligibility conditions, formula, and documentary requirements for claiming a refund of accumulated ITC due to an inverted duty structure under Section 54(3) and Rule 89(5), specifically for a manufacturer of exempt and taxable goods:\n\n**Eligibility Conditions**\n\n1.  **Who Can Claim:** Any registered person, including manufacturers and traders, can claim a refund of accumulated ITC due to an inverted duty structure (PKB-INVERTED\\_DUTY\\_REFUND\\_RULE89-S2).\n2.  **Inverted Rated Supplies Only:** The refund is available only for supplies where the input tax rate exceeds the output tax rate. It is NOT applicable to exempt supplies (PKB-INVERTED\\_DUTY\\_REFUND\\_RULE89-S2). If the output supply is fully exempt from GST, Section 54(3) inverted duty refund does not apply (PKB-INVERTED\\_DUTY\\_REFUND\\_RULE89-S2).\n3.  **Rate Inversion:** The accumulation of ITC must be due to the rate of tax on inputs being higher than the rate on output supplies (PKB-INVERTED\\_DUTY\\_REFUND\\_RULE89-S2, PKB-INVERTED\\_DUTY\\_REFUND\\_RULE89-S1). It should not be due to exports, which have a separate refund mechanism (PKB-INVERTED\\_DUTY\\_REFUND\\_RULE89-S2).\n4.  **No Refund on Input Services:** The refund under inverted duty is ONLY for ITC accumulated on inputs (goods), and NOT on input services (PKB-INVERTED\\_DUTY\\_REFUND\\_RULE89-S3).\n5.  **Compensation Cess:** Accumulated ITC of compensation cess due to inverted duty is NOT eligible for refund; only CGST/SGST/IGST ITC is refundable (PKB-INVERTED\\_DUTY\\_REFUND\\_RULE89-S3).\n6.  **Refund Period:** The refund can be claimed for any tax period. The application must be filed within 2 years from the end of the financial year in which the claim arises (PKB-INVERTED\\_DUTY\\_REFUND\\_RULE89-S3).\n\n**Formula under Rule 89(5)**\n\n*   **Maximum Refund Amount** = (Turnover of inverted rated supply of goods and services \u00d7 Net ITC \u00f7 Adjusted Total Turnover) \u2212 Tax payable on such inverted rated supply of goods and services (PKB-INVERTED\\_DUTY\\_REFUND\\_RULE89-S3, PKB-INVERTED\\_DUTY\\_REFUND\\_RULE89-S6).\n\n**Documentary Requirements**\n\n1.  **Application Form:** File **Form GST RFD-01** electronically on the GST portal (PKB-INVERTED\\_DUTY\\_REFUND\\_RULE89-S4):\n    *   Navigate to: Services \u2192 Refunds \u2192 Application for Refund\n    *   Select refund type: \"Refund of ITC on account of inverted tax structure\"\n    *   Select the tax period for which the refund is claimed\n2.  **Documents to Attach** (PKB-INVERTED\\_DUTY\\_REFUND\\_RULE89-S4):\n    *   **Statement 1A**: Details of inverted rated supplies (auto-populated from GSTR-1/3B)\n    *   **Declaration**: That ITC claimed as refund has not been availed on excluded supplies (input services, capital goods)\n    *   **Undertaking**: That the amount of refund claimed does not exceed the maximum refund amount as per the Rule 89(5) formula\n    *   **CA certificate/Auditor's report**: Required for refund claims exceeding **Rs. 2 lakh** \u2014 certificate confirming that the incidence of tax has not been passed on to another person\n    *   **Copy of GSTR-2A/2B**: Showing ITC details for the period (for verification by officer)",
+        "scores": [
+          {
+            "criterion": "Factual Accuracy",
+            "score": 5,
+            "reasoning": "The answer accurately cites the eligibility conditions, formula, and documentary requirements for claiming a refund of accumulated ITC due to an inverted duty structure under Section 54(3) and Rule 89(5). It correctly references the exclusion of input services and compensation cess, and the requirement for filing within two years, all of which are supported by the sources."
+          },
+          {
+            "criterion": "Obligation Extraction",
+            "score": 5,
+            "reasoning": "The answer thoroughly identifies all compliance requirements, including who can claim the refund, the conditions under which it can be claimed, and the specific documentary requirements. It also correctly notes the exclusion of input services and compensation cess from the refund."
+          },
+          {
+            "criterion": "Deadline Accuracy",
+            "score": 5,
+            "reasoning": "The answer correctly states that the refund application must be filed within two years from the end of the financial year in which the claim arises, which aligns with the information provided in the sources."
+          },
+          {
+            "criterion": "Hallucination Rate",
+            "score": 5,
+            "reasoning": "All claims made in the answer are grounded in the provided sources. The answer does not introduce any unsupported or fabricated information."
+          },
+          {
+            "criterion": "Nuance Handling",
+            "score": 5,
+            "reasoning": "The answer effectively captures nuances such as the exclusion of input services and compensation cess from the refund, and the specific conditions under which the refund can be claimed. It also addresses the requirement for a CA certificate for claims exceeding Rs. 2 lakh, demonstrating a comprehensive understanding of the regulatory framework."
+          }
+        ],
+        "total_score": 25,
+        "average_score": 5.0
+      },
+      "vanilla_gpt_eval": null,
+      "vanilla_gemini_eval": null,
+      "custom_eval": null,
+      "rag_sources": [
+        {
+          "title": "Overview (Inverted Duty ITC Refund \u2014 Rule 89(5) and Section 54(3) Complete Guide)",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-17",
+          "link": "knowledge://inverted_duty_refund_rule89/section-1",
+          "circular_number": "PKB-INVERTED_DUTY_REFUND_RULE89-S1",
+          "relevance_score": 0.6867,
+          "pdf_links": []
+        },
+        {
+          "title": "Regulatory References (Inverted Duty ITC Refund \u2014 Rule 89(5) and Section 54(3) Complete Guide)",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-17",
+          "link": "knowledge://inverted_duty_refund_rule89/section-6",
+          "circular_number": "PKB-INVERTED_DUTY_REFUND_RULE89-S6",
+          "relevance_score": 0.6806,
+          "pdf_links": []
+        },
+        {
+          "title": "Eligibility Conditions under Section 54(3) (Inverted Duty ITC Refund \u2014 Rule 89(5) and Section 54(3) Complete Guide)",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-17",
+          "link": "knowledge://inverted_duty_refund_rule89/section-2",
+          "circular_number": "PKB-INVERTED_DUTY_REFUND_RULE89-S2",
+          "relevance_score": 0.6802,
+          "pdf_links": []
+        },
+        {
+          "title": "Formula under Rule 89(5) (Inverted Duty ITC Refund \u2014 Rule 89(5) and Section 54(3) Complete Guide)",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-17",
+          "link": "knowledge://inverted_duty_refund_rule89/section-3",
+          "circular_number": "PKB-INVERTED_DUTY_REFUND_RULE89-S3",
+          "relevance_score": 0.6674,
+          "pdf_links": []
+        },
+        {
+          "title": "Documentary Requirements (Inverted Duty ITC Refund \u2014 Rule 89(5) and Section 54(3) Complete Guide)",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-17",
+          "link": "knowledge://inverted_duty_refund_rule89/section-4",
+          "circular_number": "PKB-INVERTED_DUTY_REFUND_RULE89-S4",
+          "relevance_score": 0.6471,
+          "pdf_links": []
+        },
+        {
+          "title": "Inverted Duty ITC Refund \u2014 Rule 89(5) and Section 54(3) Complete Guide",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-17",
+          "link": "knowledge://inverted_duty_refund_rule89/overview",
+          "circular_number": "PKB-INVERTED_DUTY_REFUND_RULE89",
+          "relevance_score": 0.643,
+          "pdf_links": []
+        },
+        {
+          "title": "Minutes of 50th GST Council Meeting",
+          "source": "gst_council",
+          "date": "2023-07-11",
+          "link": "https://gstcouncil.gov.in/sites/default/files/Minutes/Minutes_of_50th.pdf",
+          "circular_number": "GST-COUNCIL-50",
+          "relevance_score": 0.6001,
+          "pdf_links": [
+            "https://gstcouncil.gov.in/sites/default/files/Minutes/Minutes_of_50th.pdf"
+          ]
+        },
+        {
+          "title": "Minutes of 47th GST Council Meeting",
+          "source": "gst_council",
+          "date": "2022-06-29",
+          "link": "https://gstcouncil.gov.in/sites/default/files/Minutes/47_MINUTES.pdf",
+          "circular_number": "GST-COUNCIL-47",
+          "relevance_score": 0.5224,
+          "pdf_links": [
+            "https://gstcouncil.gov.in/sites/default/files/Minutes/47_MINUTES.pdf"
+          ]
+        }
+      ],
+      "rag_advantage_vs_gpt": null,
+      "rag_advantage_vs_gemini": null,
+      "rag_advantage_vs_custom": null,
+      "q_num": 1
+    },
+    {
+      "question": "A principal manufacturer sends goods to a job worker under a challan. If the goods are not returned within 3 years, what are the ITC consequences? Does the timeline differ for moulds/dies/jigs/fixtures vs. inputs?",
+      "ground_truth": "Under Section 143 read with Section 19 of the CGST Act: For inputs sent to a job worker, if not returned within 1 year (not 3 years), the principal must pay tax as if the inputs were supplied on the date they were sent. For capital goods (including moulds, dies, jigs, fixtures, and tools) sent to a job worker, the time limit is 3 years. If not returned within 3 years, it is deemed a supply and the principal must pay tax with interest. The timeline explicitly differs: 1 year for inputs, 3 years for capital goods including moulds/dies/jigs/fixtures. The principal can extend these periods by filing an application with the Commissioner.",
+      "rag_eval": {
+        "answer": "Here's an analysis of the GST implications when goods sent to a job worker are not returned within the specified time limits:\n\n**1. ITC Consequences for Goods Not Returned Within 3 Years**\n\nIf capital goods sent for job work are not received back by the principal within three years of being sent out, it is *deemed* that the capital goods have been supplied by the principal to the job worker on the day they were initially sent out (CGST-PREAMBLE, Section 19(6)).\n\n*   **Tax Liability:** The principal must pay GST on the value of the capital goods, as if it were a supply (PKB-JOB_WORKER_ITC_3YEAR_LIMIT-S3).\n*   **Interest:** Interest under Section 50 is applicable from the date the goods were initially sent (PKB-JOB_WORKER_ITC_3YEAR_LIMIT-S3).\n*   **ITC Reversal:** The Input Tax Credit (ITC) claimed on those capital goods must be reversed (PKB-JOB_WORKER_ITC_3YEAR_LIMIT-S3).\n*   **Reporting:** The deemed supply needs to be reported in GSTR-1 (PKB-JOB_WORKER_ITC_3YEAR_LIMIT-S3).\n*   **Valuation:** For this deemed supply, if there is no consideration, Rule 28 applies. For capital goods, the value is the depreciated value based on the straight-line method from the date of purchase (PKB-JOB_WORKER_ITC_3YEAR_LIMIT-S3).\n*   **Payment:** GST on the depreciated value of the capital goods must be calculated, reported as a supply in GSTR-1 (B2B if the job worker is registered, B2C otherwise), and the tax paid in GSTR-3B (PKB-JOB_WORKER_ITC_3YEAR_LIMIT-S4). The job worker does NOT get ITC on this deemed supply because there is no actual invoice (PKB-JOB_WORKER_ITC_3YEAR_LIMIT-S4).\n\n**2. Timeline Differences: Moulds/Dies/Jigs/Fixtures vs. Inputs**\n\nYes, the timeline differs for capital goods (including moulds, dies, jigs, and fixtures) versus inputs (CGST-PREAMBLE, Section 19(5)/(6)).\n\n*   **Capital Goods:** The time limit for the return of capital goods is three years from the date of being sent out to the job worker (CGST-PREAMBLE, Section 19(6)).\n*   **Inputs:** If inputs sent for job work are not received back (or supplied directly from the job worker's premises) within one year of being sent out, it is deemed to be a supply on the date the inputs were sent (CGST-PREAMBLE, Section 19(5); PKB-JOB_WORKER_ITC_3YEAR_LIMIT-S2; PKB-JOB_WORKER_ITC_3YEAR_LIMIT-S3). The principal must pay tax along with interest from the date of sending (PKB-JOB_WORKER_ITC_3YEAR_LIMIT-S2).",
+        "scores": [
+          {
+            "criterion": "Factual Accuracy",
+            "score": 5,
+            "reasoning": "The answer accurately cites the relevant sections of the CGST Act regarding the timelines for inputs and capital goods, including moulds, dies, jigs, and fixtures. It correctly identifies the consequences of not returning goods within the specified time limits."
+          },
+          {
+            "criterion": "Obligation Extraction",
+            "score": 5,
+            "reasoning": "The answer clearly outlines the obligations for the principal, including tax liability, interest, ITC reversal, and reporting requirements if goods are not returned within the specified timelines."
+          },
+          {
+            "criterion": "Deadline Accuracy",
+            "score": 5,
+            "reasoning": "The answer correctly specifies the deadlines: 3 years for capital goods and 1 year for inputs, aligning with the CGST Act provisions."
+          },
+          {
+            "criterion": "Hallucination Rate",
+            "score": 5,
+            "reasoning": "All claims in the answer are grounded in the provided sources and align with the CGST Act, ensuring no hallucinated information."
+          },
+          {
+            "criterion": "Nuance Handling",
+            "score": 5,
+            "reasoning": "The answer effectively captures the nuances of the regulation, including the different timelines for inputs and capital goods and the specific conditions under which deemed supply provisions apply."
+          }
+        ],
+        "total_score": 25,
+        "average_score": 5.0
+      },
+      "vanilla_gpt_eval": null,
+      "vanilla_gemini_eval": null,
+      "custom_eval": null,
+      "rag_sources": [
+        {
+          "title": "The 3-Year Capital Goods Issue (Job Worker ITC - 3-Year Limit and Deemed Supply Issues)",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-11",
+          "link": "knowledge://job_worker_itc_3year_limit/section-3",
+          "circular_number": "PKB-JOB_WORKER_ITC_3YEAR_LIMIT-S3",
+          "relevance_score": 0.6337,
+          "pdf_links": []
+        },
+        {
+          "title": "Practical Remedies and Workarounds (Job Worker ITC - 3-Year Limit and Deemed Supply Issues)",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-11",
+          "link": "knowledge://job_worker_itc_3year_limit/section-4",
+          "circular_number": "PKB-JOB_WORKER_ITC_3YEAR_LIMIT-S4",
+          "relevance_score": 0.6008,
+          "pdf_links": []
+        },
+        {
+          "title": "Legal Framework (Job Worker ITC - 3-Year Limit and Deemed Supply Issues)",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-11",
+          "link": "knowledge://job_worker_itc_3year_limit/section-2",
+          "circular_number": "PKB-JOB_WORKER_ITC_3YEAR_LIMIT-S2",
+          "relevance_score": 0.5362,
+          "pdf_links": []
+        }
+      ],
+      "rag_advantage_vs_gpt": null,
+      "rag_advantage_vs_gemini": null,
+      "rag_advantage_vs_custom": null,
+      "q_num": 2
+    },
+    {
+      "question": "A taxpayer received a demand order under Section 73 that was partially confirmed and partially dropped. Can they settle the confirmed portion under Section 128A amnesty? What is the process on the GST portal (SPL-02)?",
+      "ground_truth": "Yes, the taxpayer can settle the confirmed portion under Section 128A. The scheme applies to Section 73 demands for FY 2017-18, 2018-19, and 2019-20. For partially confirmed demands, only the confirmed tax portion needs to be paid. Process: (1) Pay the confirmed tax amount via DRC-03. (2) File SPL-01 application referencing the confirmed amount. (3) The proper officer verifies and issues SPL-02 (waiver order) confirming interest and penalty waiver. SPL-02 is not filed by the taxpayer \u2014 it is the order issued by the officer after processing SPL-01. If the demand has both Section 73 and Section 74 components, only the Section 73 portion qualifies.",
+      "rag_eval": {
+        "answer": "Here's an analysis of whether a taxpayer can settle the confirmed portion of a Section 73 demand order under the amnesty scheme, and the process related to SPL-02 on the GST portal.\n\n**1. Settling the Confirmed Portion of a Section 73 Demand Order**\n\nYes, if a demand order under Section 73 was partially confirmed and partially dropped, the taxpayer *can* settle only the confirmed portion under Section 128A (PKB-SECTION_128A_AMNESTY_PORTAL_GUIDE-S6). To do so, the taxpayer must:\n*   Pay the full tax of the confirmed portion via DRC-03 (PKB-SECTION_128A_AMNESTY_PORTAL_GUIDE-S6).\n*   File SPL-01 referencing only the confirmed tax amount (not the original full demand) (PKB-SECTION_128A_AMNESTY_PORTAL_GUIDE-S6).\n*   The dropped portion does not require any action (PKB-SECTION_128A_AMNESTY_PORTAL_GUIDE-S6).\n\n**2. SPL-02 Process on the GST Portal**\n\nSPL-02 is the order form issued by the proper officer granting the waiver of interest and penalty under Section 128A (PKB-SECTION_128A_AMNESTY_PORTAL_GUIDE-S6). The taxpayer does *not* file SPL-02; it is issued by the officer after processing SPL-01 (PKB-SECTION_128A_AMNESTY_PORTAL_GUIDE-S6).\n\nHere's the SPL-02 process flow:\n\n1.  The taxpayer files SPL-01 with tax payment proof (DRC-03) (PKB-SECTION_128A_AMNESTY_PORTAL_GUIDE-S6). To file SPL-01, navigate to: Services \u2192 User Services \u2192 My Applications \u2192 select \"Application for Waiver of Interest and Penalty under Section 128A\" (PKB-SECTION_128A_AMNESTY_PORTAL_GUIDE-S3).\n2.  The proper officer examines the application (PKB-SECTION_128A_AMNESTY_PORTAL_GUIDE-S6).\n3.  If the application is in order, the officer issues SPL-02 (Waiver Order) confirming interest and penalty waiver (PKB-SECTION_128A_AMNESTY_PORTAL_GUIDE-S6). SPL-02 is available under: Services \u2192 User Services \u2192 View Additional Notices and Orders (PKB-SECTION_128A_AMNESTY_PORTAL_GUIDE-S6).\n4.  If the application has a deficiency, the officer issues a notice for additional information/correction, and the taxpayer responds within the specified time (PKB-SECTION_128A_AMNESTY_PORTAL_GUIDE-S6).\n5.  If the application is rejected, the officer issues SPL-03 (Rejection Order) with reasons. The taxpayer can rectify and re-apply if within the deadline (PKB-SECTION_128A_AMNESTY_PORTAL_GUIDE-S6).",
+        "scores": [
+          {
+            "criterion": "Factual Accuracy",
+            "score": 5,
+            "reasoning": "The answer accurately describes the process for settling the confirmed portion of a Section 73 demand order under Section 128A, including the use of DRC-03 and SPL-01. It correctly states that SPL-02 is issued by the officer, not filed by the taxpayer."
+          },
+          {
+            "criterion": "Obligation Extraction",
+            "score": 5,
+            "reasoning": "The answer clearly outlines the obligations for the taxpayer, including paying the confirmed tax portion via DRC-03 and filing SPL-01. It also explains the role of the proper officer in issuing SPL-02."
+          },
+          {
+            "criterion": "Deadline Accuracy",
+            "score": 3,
+            "reasoning": "The question does not involve specific deadlines or dates, so a score of 3 is appropriate."
+          },
+          {
+            "criterion": "Hallucination Rate",
+            "score": 5,
+            "reasoning": "All claims in the answer are grounded in the provided sources, with no hallucinated information. The answer provides substantive and specific details about the process."
+          },
+          {
+            "criterion": "Nuance Handling",
+            "score": 5,
+            "reasoning": "The answer captures nuances such as the distinction between confirmed and dropped portions of the demand and the specific process for SPL-02 issuance. It also notes that the taxpayer does not file SPL-02."
+          }
+        ],
+        "total_score": 23,
+        "average_score": 4.6
+      },
+      "vanilla_gpt_eval": null,
+      "vanilla_gemini_eval": null,
+      "custom_eval": null,
+      "rag_sources": [
+        {
+          "title": "SPL-02 Process (Settlement/Waiver Order) (Section 128A Amnesty Scheme - Portal and Procedure Guide)",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-11",
+          "link": "knowledge://section_128a_amnesty_portal_guide/section-6",
+          "circular_number": "PKB-SECTION_128A_AMNESTY_PORTAL_GUIDE-S6",
+          "relevance_score": 0.714,
+          "pdf_links": []
+        },
+        {
+          "title": "Overview (Section 128A Amnesty Scheme - Portal and Procedure Guide)",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-11",
+          "link": "knowledge://section_128a_amnesty_portal_guide/section-1",
+          "circular_number": "PKB-SECTION_128A_AMNESTY_PORTAL_GUIDE-S1",
+          "relevance_score": 0.6758,
+          "pdf_links": []
+        },
+        {
+          "title": "Rule 164 of CGST Rules (Section 128A Amnesty Scheme - Portal and Procedure Guide)",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-11",
+          "link": "knowledge://section_128a_amnesty_portal_guide/section-5",
+          "circular_number": "PKB-SECTION_128A_AMNESTY_PORTAL_GUIDE-S5",
+          "relevance_score": 0.6589,
+          "pdf_links": []
+        },
+        {
+          "title": "Known Portal Issues (Section 128A Amnesty Scheme - Portal and Procedure Guide)",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-11",
+          "link": "knowledge://section_128a_amnesty_portal_guide/section-4",
+          "circular_number": "PKB-SECTION_128A_AMNESTY_PORTAL_GUIDE-S4",
+          "relevance_score": 0.6528,
+          "pdf_links": []
+        },
+        {
+          "title": "Payment and Filing Procedure (Section 128A Amnesty Scheme - Portal and Procedure Guide)",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-11",
+          "link": "knowledge://section_128a_amnesty_portal_guide/section-3",
+          "circular_number": "PKB-SECTION_128A_AMNESTY_PORTAL_GUIDE-S3",
+          "relevance_score": 0.6514,
+          "pdf_links": []
+        },
+        {
+          "title": "Section 74 to Section 73 Rectification \u2014 Portal Workaround (Section 128A Amnesty Scheme - Portal and Procedure Guide)",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-11",
+          "link": "knowledge://section_128a_amnesty_portal_guide/section-7",
+          "circular_number": "PKB-SECTION_128A_AMNESTY_PORTAL_GUIDE-S7",
+          "relevance_score": 0.6476,
+          "pdf_links": []
+        },
+        {
+          "title": "Clarification of various doubts related to Section 128A of the CGST Act, 2017",
+          "source": "cbic",
+          "date": "2024-10-15",
+          "link": "https://cbic-gst.gov.in/pdf/circular-238-32-2024-GST.pdf",
+          "circular_number": "238/32/2024-GST",
+          "relevance_score": 0.5882,
+          "pdf_links": [
+            "https://cbic-gst.gov.in/pdf/circular-238-32-2024-GST.pdf"
+          ]
+        },
+        {
+          "title": "Minutes of 49th GST Council Meeting",
+          "source": "gst_council",
+          "date": "2023-02-18",
+          "link": "https://gstcouncil.gov.in/sites/default/files/Minutes/49TH_MEETING_MINUTES.pdf",
+          "circular_number": "GST-COUNCIL-49",
+          "relevance_score": 0.5636,
+          "pdf_links": [
+            "https://gstcouncil.gov.in/sites/default/files/Minutes/49TH_MEETING_MINUTES.pdf"
+          ]
+        }
+      ],
+      "rag_advantage_vs_gpt": null,
+      "rag_advantage_vs_gemini": null,
+      "rag_advantage_vs_custom": null,
+      "q_num": 3
+    },
+    {
+      "question": "A trader (not a manufacturer) wants to claim benefit under the new EMI-based deferred duty payment scheme announced in the 2025 Union Budget. Is a trader eligible? What entity categories qualify?",
+      "ground_truth": "A trader is NOT eligible for the EMI-based deferred duty payment scheme. The scheme is specifically designed for entities that import goods for use in manufacturing or processing. Eligible categories include: (1) Manufacturers registered under the Factories Act importing raw materials or capital goods for own manufacturing. (2) Authorised Economic Operators (AEO) with T2/T3 certification. (3) Status Holders under Foreign Trade Policy. (4) SEZ/EOU units importing for manufacturing and export. Pure trading entities that buy and resell without value addition do not qualify.",
+      "rag_eval": {
+        "answer": "1.  **Trader Eligibility:**\n\nNo, a trader (not a manufacturer) is NOT eligible for the EMI-based deferred duty payment scheme introduced in the Union Budget 2025-26. The scheme is not available to pure trading entities that buy and resell without value addition because it is specifically designed for entities that import goods for use in manufacturing or processing. (PKB-BUDGET_2025_EMI_DEFERRED_DUTY-S2)\n\n2.  **Eligible Entity Categories:**\n\nThe following entity categories qualify for the EMI-based deferred duty payment scheme (PKB-BUDGET_2025_EMI_DEFERRED_DUTY-S2):\n\n*   Manufacturers registered under the Factories Act, 1948, who import raw materials, intermediate goods, or capital goods for use in their own manufacturing.\n*   Authorised Economic Operators (AEO) with AEO-T2 or AEO-T3 certification from CBIC.\n*   Status Holders under the Foreign Trade Policy who are exporters with One Star to Five Star Export House status.\n*   SEZ/EOU units importing for manufacturing and export. (PKB-BUDGET_2025_EMI_DEFERRED_DUTY-S2)",
+        "scores": [
+          {
+            "criterion": "Factual Accuracy",
+            "score": 5,
+            "reasoning": "The answer accurately cites the eligibility criteria for the EMI-based deferred duty payment scheme, including specific entity categories and the exclusion of traders. It correctly references the circular number PKB-BUDGET_2025_EMI_DEFERRED_DUTY-S2."
+          },
+          {
+            "criterion": "Obligation Extraction",
+            "score": 5,
+            "reasoning": "The answer clearly identifies the eligibility requirements and exclusions for the scheme, specifying which entities qualify and which do not, with appropriate regulatory references."
+          },
+          {
+            "criterion": "Deadline Accuracy",
+            "score": 3,
+            "reasoning": "The question does not involve specific dates or deadlines, so a score of 3 is appropriate."
+          },
+          {
+            "criterion": "Hallucination Rate",
+            "score": 5,
+            "reasoning": "All claims in the answer are grounded in the provided sources, with no evidence of hallucination. The answer provides substantive and specific information."
+          },
+          {
+            "criterion": "Nuance Handling",
+            "score": 5,
+            "reasoning": "The answer captures the nuances of the scheme's eligibility criteria, including specific exceptions and the rationale behind the exclusion of traders, with detailed regulatory references."
+          }
+        ],
+        "total_score": 23,
+        "average_score": 4.6
+      },
+      "vanilla_gpt_eval": null,
+      "vanilla_gemini_eval": null,
+      "custom_eval": null,
+      "rag_sources": [
+        {
+          "title": "Overview (Budget 2025 EMI-Based Deferred Duty Payment Scheme)",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-17",
+          "link": "knowledge://budget_2025_emi_deferred_duty/section-1",
+          "circular_number": "PKB-BUDGET_2025_EMI_DEFERRED_DUTY-S1",
+          "relevance_score": 0.7463,
+          "pdf_links": []
+        },
+        {
+          "title": "Budget 2025 EMI-Based Deferred Duty Payment Scheme",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-17",
+          "link": "knowledge://budget_2025_emi_deferred_duty/overview",
+          "circular_number": "PKB-BUDGET_2025_EMI_DEFERRED_DUTY",
+          "relevance_score": 0.7261,
+          "pdf_links": []
+        }
+      ],
+      "rag_advantage_vs_gpt": null,
+      "rag_advantage_vs_gemini": null,
+      "rag_advantage_vs_custom": null,
+      "q_num": 4
+    },
+    {
+      "question": "A taxpayer wants to file SPL-01 under the Section 128A amnesty but the portal shows an error because their original order was issued under Section 74 and later rectified to Section 73. What is the official workaround per the CBIC circular?",
+      "ground_truth": "Per CBIC Circular No. 238/32/2024-GST, the taxpayer IS eligible for Section 128A benefit if the order was rectified from Section 74 to Section 73. The official workaround for the portal error is: (1) File the application manually with the jurisdictional proper officer (not through the portal). (2) Attach the rectification order showing the change from Section 74 to Section 73. (3) Alternatively, use FORM GST SPL-05 or SPL-06 and mention the rectification details in the remarks column (Column 19/20). The GSTN portal team has been instructed to enable system-level correction, but until then, manual filing is the accepted route.",
+      "rag_eval": {
+        "answer": "If a demand order was originally issued under Section 74 but later rectified to Section 73, and the GST portal shows an error when filing SPL-01, the official workaround per CBIC Circular No. 238/32/2024-GST is to file the application manually with the jurisdictional proper officer (PKB-SECTION_128A_AMNESTY_PORTAL_GUIDE-S7).\n\nTo file manually, follow these steps:\n*   Attach the rectification order showing the change from Section 74 to Section 73 (PKB-SECTION_128A_AMNESTY_PORTAL_GUIDE-S7).\n*   The proper officer will process the application offline (PKB-SECTION_128A_AMNESTY_PORTAL_GUIDE-S7).\n*   Alternatively, use FORM GST SPL-05 or SPL-06 as applicable and mention the rectification details in the remarks column (Column 19/20) (PKB-SECTION_128A_AMNESTY_PORTAL_GUIDE-S7).\n\nThe GSTN portal team has been instructed to enable system-level correction for such cases, but until then, manual filing is the accepted route (PKB-SECTION_128A_AMNESTY_PORTAL_GUIDE-S7). The taxpayer should retain a copy of both the original order and the rectification order as evidence (PKB-SECTION_128A_AMNESTY_PORTAL_GUIDE-S7).",
+        "scores": [
+          {
+            "criterion": "Factual Accuracy",
+            "score": 5,
+            "reasoning": "The answer accurately cites CBIC Circular No. 238/32/2024-GST and provides correct details about the workaround for filing SPL-01 when the original order was issued under Section 74 and rectified to Section 73."
+          },
+          {
+            "criterion": "Obligation Extraction",
+            "score": 5,
+            "reasoning": "The answer correctly identifies the compliance requirements, including filing the application manually, attaching the rectification order, and using FORM GST SPL-05 or SPL-06 with specific details."
+          },
+          {
+            "criterion": "Deadline Accuracy",
+            "score": 3,
+            "reasoning": "The question does not involve specific deadlines or dates, so a score of 3 is appropriate."
+          },
+          {
+            "criterion": "Hallucination Rate",
+            "score": 5,
+            "reasoning": "All claims in the answer are grounded in the provided sources, specifically the practitioner knowledge guide and the CBIC circular."
+          },
+          {
+            "criterion": "Nuance Handling",
+            "score": 5,
+            "reasoning": "The answer captures the nuances of the situation, including the need for manual filing due to portal limitations and the specific forms and details required for compliance."
+          }
+        ],
+        "total_score": 23,
+        "average_score": 4.6
+      },
+      "vanilla_gpt_eval": null,
+      "vanilla_gemini_eval": null,
+      "custom_eval": null,
+      "rag_sources": [
+        {
+          "title": "Section 74 to Section 73 Rectification \u2014 Portal Workaround (Section 128A Amnesty Scheme - Portal and Procedure Guide)",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-11",
+          "link": "knowledge://section_128a_amnesty_portal_guide/section-7",
+          "circular_number": "PKB-SECTION_128A_AMNESTY_PORTAL_GUIDE-S7",
+          "relevance_score": 0.6601,
+          "pdf_links": []
+        },
+        {
+          "title": "Eligibility Conditions (Section 128A Amnesty Scheme - Portal and Procedure Guide)",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-11",
+          "link": "knowledge://section_128a_amnesty_portal_guide/section-2",
+          "circular_number": "PKB-SECTION_128A_AMNESTY_PORTAL_GUIDE-S2",
+          "relevance_score": 0.6402,
+          "pdf_links": []
+        },
+        {
+          "title": "SPL-02 Process (Settlement/Waiver Order) (Section 128A Amnesty Scheme - Portal and Procedure Guide)",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-11",
+          "link": "knowledge://section_128a_amnesty_portal_guide/section-6",
+          "circular_number": "PKB-SECTION_128A_AMNESTY_PORTAL_GUIDE-S6",
+          "relevance_score": 0.6299,
+          "pdf_links": []
+        },
+        {
+          "title": "Known Portal Issues (Section 128A Amnesty Scheme - Portal and Procedure Guide)",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-11",
+          "link": "knowledge://section_128a_amnesty_portal_guide/section-4",
+          "circular_number": "PKB-SECTION_128A_AMNESTY_PORTAL_GUIDE-S4",
+          "relevance_score": 0.6081,
+          "pdf_links": []
+        },
+        {
+          "title": "Overview (Section 128A Amnesty Scheme - Portal and Procedure Guide)",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-11",
+          "link": "knowledge://section_128a_amnesty_portal_guide/section-1",
+          "circular_number": "PKB-SECTION_128A_AMNESTY_PORTAL_GUIDE-S1",
+          "relevance_score": 0.604,
+          "pdf_links": []
+        },
+        {
+          "title": "Payment and Filing Procedure (Section 128A Amnesty Scheme - Portal and Procedure Guide)",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-11",
+          "link": "knowledge://section_128a_amnesty_portal_guide/section-3",
+          "circular_number": "PKB-SECTION_128A_AMNESTY_PORTAL_GUIDE-S3",
+          "relevance_score": 0.591,
+          "pdf_links": []
+        },
+        {
+          "title": "Rule 164 of CGST Rules (Section 128A Amnesty Scheme - Portal and Procedure Guide)",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-11",
+          "link": "knowledge://section_128a_amnesty_portal_guide/section-5",
+          "circular_number": "PKB-SECTION_128A_AMNESTY_PORTAL_GUIDE-S5",
+          "relevance_score": 0.5842,
+          "pdf_links": []
+        },
+        {
+          "title": "Minutes of 50th GST Council Meeting",
+          "source": "gst_council",
+          "date": "2023-07-11",
+          "link": "https://gstcouncil.gov.in/sites/default/files/Minutes/Minutes_of_50th.pdf",
+          "circular_number": "GST-COUNCIL-50",
+          "relevance_score": 0.5083,
+          "pdf_links": [
+            "https://gstcouncil.gov.in/sites/default/files/Minutes/Minutes_of_50th.pdf"
+          ]
+        }
+      ],
+      "rag_advantage_vs_gpt": null,
+      "rag_advantage_vs_gemini": null,
+      "rag_advantage_vs_custom": null,
+      "q_num": 5
+    },
+    {
+      "question": "An importer discovers that they classified goods under the wrong HS code on a past Bill of Entry, resulting in lower duty paid. Can they voluntarily file for reassessment / revision under the new Customs voluntary compliance scheme? What is the process?",
+      "ground_truth": "Yes, an importer can voluntarily correct a classification error on past Bills of Entry. Under Section 149 of the Customs Act (amendment of documents) and Section 28(5), voluntary disclosure before any investigation attracts no penalty. Process: (1) Calculate the differential duty for each affected Bill of Entry. (2) File a voluntary disclosure with the jurisdictional Commissioner of Customs. (3) Pay the differential customs duty plus interest under Section 28AA (15% per annum). (4) The proper officer issues a reassessment order. (5) Additional IGST paid on import is available as ITC under GST. Benefits: No penalty if disclosed before investigation, reduced interest, and demonstrates good faith.",
+      "rag_eval": {
+        "answer": "Yes, an importer who discovers a classification error on past Bills of Entry, resulting in underpayment of duty due to a wrong HS code, can proactively correct the error and pay the differential duty under the Customs voluntary compliance program (PKB-CLASSIFICATION_DISPUTES_PRACTICAL-S6). The importer must self-discover the error, and the program applies to all goods classified under the wrong HS code resulting in underpayment of duty and can cover multiple past Bills of Entry (PKB-CLASSIFICATION_DISPUTES_PRACTICAL-S6). It is available for both BCD and IGST/CVD differentials (PKB-CLASSIFICATION_DISPUTES_PRACTICAL-S6).\n\nThe process for voluntary reassessment is as follows (PKB-CLASSIFICATION_DISPUTES_PRACTICAL-S6):\n1.  **Calculate the differential:** Compare duty at the correct HS code vs. duty paid at the wrong HS code for each Bill of Entry (PKB-CLASSIFICATION_DISPUTES_PRACTICAL-S6).\n2.  **File a voluntary disclosure:** Submit an application to the jurisdictional Commissioner of Customs, referencing Section 149 of the Customs Act, 1962 (amendment of documents) (PKB-CLASSIFICATION_DISPUTES_PRACTICAL-S6). Attach a list of affected Bills of Entry, the differential duty calculation, and the correct HS code justification (PKB-CLASSIFICATION_DISPUTES_PRACTICAL-S6).\n3.  **Pay the differential duty:** Deposit the differential customs duty and applicable interest under Section 28AA, which is currently 15% per annum (PKB-CLASSIFICATION_DISPUTES_PRACTICAL-S6).\n4.  **Assessment order:** The proper officer will issue a reassessment order confirming the revised classification and duty paid (PKB-CLASSIFICATION_DISPUTES_PRACTICAL-S6).\n\nIf the disclosure is made before any investigation, no penalty will be imposed under Section 28(5) (PKB-CLASSIFICATION_DISPUTES_PRACTICAL-S6). The additional IGST paid on import is available as ITC under GST, which can be claimed in the next GSTR-3B after reassessment (PKB-CLASSIFICATION_DISPUTES_PRACTICAL-S6).",
+        "scores": [
+          {
+            "criterion": "Factual Accuracy",
+            "score": 5,
+            "reasoning": "The answer accurately cites the Customs voluntary compliance program, references Section 149 of the Customs Act, and mentions the correct interest rate under Section 28AA. It aligns with the provided sources."
+          },
+          {
+            "criterion": "Obligation Extraction",
+            "score": 5,
+            "reasoning": "The answer clearly outlines the obligations for the importer, including calculating the differential duty, filing a voluntary disclosure, and paying the differential duty with interest. These obligations are supported by the sources."
+          },
+          {
+            "criterion": "Deadline Accuracy",
+            "score": 3,
+            "reasoning": "The question does not involve specific deadlines or dates, so a score of 3 is appropriate as per the guidelines."
+          },
+          {
+            "criterion": "Hallucination Rate",
+            "score": 5,
+            "reasoning": "All claims in the answer are grounded in the provided sources, with no evidence of hallucination. The answer provides substantive and specific information."
+          },
+          {
+            "criterion": "Nuance Handling",
+            "score": 5,
+            "reasoning": "The answer captures nuances such as the condition of self-discovery before investigation and the availability of ITC for additional IGST paid. It also notes the absence of penalties if disclosed before investigation, aligning with the sources."
+          }
+        ],
+        "total_score": 23,
+        "average_score": 4.6
+      },
+      "vanilla_gpt_eval": null,
+      "vanilla_gemini_eval": null,
+      "custom_eval": null,
+      "rag_sources": [
+        {
+          "title": "Customs Voluntary Compliance \u2014 Reassessment for Wrong HS Code (Classification Disputes - Practical Guide for HS Code Changes)",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-11",
+          "link": "knowledge://classification_disputes_practical/section-6",
+          "circular_number": "PKB-CLASSIFICATION_DISPUTES_PRACTICAL-S6",
+          "relevance_score": 0.7224,
+          "pdf_links": []
+        }
+      ],
+      "rag_advantage_vs_gpt": null,
+      "rag_advantage_vs_gemini": null,
+      "rag_advantage_vs_custom": null,
+      "q_num": 6
+    },
+    {
+      "question": "The new GST Appellate Tribunal (GSTAT) has been operationalized. If a taxpayer in Rajasthan wants to appeal a Rs. 80 lakh demand, which bench has jurisdiction? What is the pre-deposit requirement?",
+      "ground_truth": "For a taxpayer in Rajasthan, the Jaipur bench of GSTAT has jurisdiction over all appeals from Rajasthan. Pre-deposit requirement: 20% of the disputed tax amount must be deposited (over and above the 10% pre-deposit at the first appellate stage). For an Rs. 80 lakh demand: GSTAT pre-deposit is Rs. 16 lakh (20% of 80 lakh), payable through electronic cash ledger only (not ITC). Since the disputed tax is above Rs. 50 lakh, the appeal will be heard by a Division Bench (1 Judicial + 1 Technical member). Total cumulative pre-deposit at GSTAT stage: Rs. 24 lakh (10% first appeal + 20% GSTAT = 30% of demand).",
+      "rag_eval": {
+        "answer": "Here's an analysis of the GST Appellate Tribunal (GSTAT) requirements for a taxpayer in Rajasthan, based on the provided context:\n\n**1. GSTAT Bench Jurisdiction**\n\nFor a taxpayer in Rajasthan, the Jaipur bench of GSTAT has jurisdiction over all appeals from Rajasthan, regardless of the division or zone of the assessing officer (PKB-GSTAT_FILING_GUIDE-S2).\n\n**2. Pre-deposit Requirement**\n\n*   To file an appeal before the GSTAT, the taxpayer is required to pre-deposit 20% of the disputed tax amount (PKB-GSTAT_FILING_GUIDE-S3). This is in addition to the 10% already paid at the first appellate stage.\n*   The 20% pre-deposit is calculated only on the disputed tax amount, excluding any interest and penalty components (PKB-GSTAT_FILING_GUIDE-S3).\n*   GSTAT can grant a stay of the remaining demand (80% after pre-deposit) pending appeal (PKB-GSTAT_FILING_GUIDE-S3).\n*   In your specific scenario, if the disputed tax amount is Rs. 80 lakh, the GSTAT pre-deposit would be Rs. 16 lakh (20% of Rs. 80 lakh). This is in addition to the Rs. 8 lakh (10% of Rs. 80 lakh) already paid at the first appellate stage (PKB-GSTAT_FILING_GUIDE-S3). The total pre-deposit for the tribunal appeal would be Rs. 24 lakh (PKB-GSTAT_FILING_GUIDE-S3).",
+        "scores": [
+          {
+            "criterion": "Factual Accuracy",
+            "score": 5,
+            "reasoning": "The answer correctly identifies the Jaipur bench as having jurisdiction for appeals from Rajasthan and accurately states the pre-deposit requirement as 20% of the disputed tax amount, which aligns with the provided sources."
+          },
+          {
+            "criterion": "Obligation Extraction",
+            "score": 5,
+            "reasoning": "The answer clearly outlines the pre-deposit obligations, including the requirement to deposit 20% of the disputed tax amount and the cumulative pre-deposit requirement of 30% when including the first appellate stage."
+          },
+          {
+            "criterion": "Deadline Accuracy",
+            "score": 3,
+            "reasoning": "The question does not involve specific deadlines or dates, so this criterion is not applicable."
+          },
+          {
+            "criterion": "Hallucination Rate",
+            "score": 5,
+            "reasoning": "All claims made in the answer are supported by the provided sources, and there are no fabricated details or unsupported statements."
+          },
+          {
+            "criterion": "Nuance Handling",
+            "score": 4,
+            "reasoning": "The answer captures the main points regarding jurisdiction and pre-deposit requirements but does not mention the specific requirement that the pre-deposit must be made through the electronic cash ledger, as noted in the ground truth."
+          }
+        ],
+        "total_score": 22,
+        "average_score": 4.4
+      },
+      "vanilla_gpt_eval": null,
+      "vanilla_gemini_eval": null,
+      "custom_eval": null,
+      "rag_sources": [
+        {
+          "title": "GSTAT Structure (GSTAT (GST Appellate Tribunal) Filing Guide)",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-11",
+          "link": "knowledge://gstat_filing_guide/section-2",
+          "circular_number": "PKB-GSTAT_FILING_GUIDE-S2",
+          "relevance_score": 0.6933,
+          "pdf_links": []
+        },
+        {
+          "title": "Practical Considerations (GSTAT (GST Appellate Tribunal) Filing Guide)",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-11",
+          "link": "knowledge://gstat_filing_guide/section-4",
+          "circular_number": "PKB-GSTAT_FILING_GUIDE-S4",
+          "relevance_score": 0.6532,
+          "pdf_links": []
+        }
+      ],
+      "rag_advantage_vs_gpt": null,
+      "rag_advantage_vs_gemini": null,
+      "rag_advantage_vs_custom": null,
+      "q_num": 7
+    },
+    {
+      "question": "A Tier 4 Urban Co-operative Bank (UCB) wants to offer gold loans to a jewellery manufacturer. What are the RBI restrictions on (a) loan-to-value ratio, (b) end-use monitoring, and (c) aggregate exposure limits specific to a Tier 4 UCB?",
+      "ground_truth": "(a) LTV ratio: Must not exceed 75% for lending against gold jewellery. Gold jewellery must be valued at the average closing price of 22 carat gold for the preceding 30 days as quoted by IBJA. (b) End-use: Under RBI's amended Lending Against Gold and Silver Collateral Directions (September 2025, RBI/2025-26/84), Tier 3/4 UCBs may extend need-based working capital finance to borrowers using gold as raw material in manufacturing. The borrower must not acquire or hold gold for investment or speculative purposes. Banks cannot grant advances for purchase of gold in any form. (c) Exposure limits: UCBs have aggregate exposure limits \u2014 total gold-backed lending should be within the overall single-borrower and group-borrower exposure norms as per the UCB Master Direction.",
+      "rag_eval": {
+        "answer": "Here's what the RBI regulations say about gold loans offered by Tier 4 UCBs:\n\n** (a) Loan-to-Value (LTV) Ratio**\n\n*   UCBs must maintain a Loan to Value (LTV) ratio of 75% for lending against gold jewelry, including bullet repayment loans. If the LTV ratio of 75% is breached on an ongoing basis, the loan will be treated as a Non-Performing Asset (NPA) (RBI/2022-23/22).\n*   Gold jewelry accepted as security/collateral must be valued at the average of the closing price of 22-carat gold for the preceding 30 days as quoted by the India Bullion and Jewellers Association Ltd. UCBs may also use the historical spot gold price data of the preceding 30 days publicly disseminated by a Commodity Exchange regulated by the Securities and Exchange Board of India (RBI/2022-23/22).\n*   If the gold is of lower purity than 22 carats, the bank should translate the collateral into 22 carats and value the exact grams of the collateral proportionately (RBI/2022-23/22).\n\n** (b) End-Use Monitoring**\n\n*   The available documents do not contain specific information on end-use monitoring for gold loans.\n\n** (c) Aggregate Exposure Limits**\n\n*   The exposure to an individual borrower should not exceed 15% of Tier-I capital, and the exposure to a group of connected borrowers should not exceed 25% of Tier-I capital (RBI_MD-UCB_Concentration_Risk_MD-Chapter_II__B_).\n*   The UCB shall fix, with the approval of its Board of Directors, exposure ceilings in relation to its Tier-I capital (RBI_MD-UCB_Concentration_Risk_MD-Chapter_II__B_).\n*   These exposure limits apply to all types of fresh exposures (both credit and investment) taken by a UCB (RBI/2023-24/114).\n*   Housing loans to individuals by Tier 4 UCBs are subject to a ceiling of \u20b93 crore per dwelling unit, subject to extant single borrower exposure limits (RBI_MD-UCB_Credit_Facilities_MD-Chapter_VIII__C_).",
+        "scores": [
+          {
+            "criterion": "Factual Accuracy",
+            "score": 4,
+            "reasoning": "The answer accurately cites the LTV ratio of 75% and the valuation method for gold jewelry, which aligns with the source documents. However, it lacks specific details on end-use monitoring and does not mention the prohibition on loans for purchasing gold, which is noted in the ground truth."
+          },
+          {
+            "criterion": "Obligation Extraction",
+            "score": 3,
+            "reasoning": "The answer correctly identifies the LTV ratio and aggregate exposure limits but misses the specific end-use monitoring obligations and prohibitions on loans for purchasing gold, which are important compliance requirements."
+          },
+          {
+            "criterion": "Deadline Accuracy",
+            "score": 3,
+            "reasoning": "The question does not involve specific deadlines or effective dates, so a score of 3 is appropriate."
+          },
+          {
+            "criterion": "Hallucination Rate",
+            "score": 4,
+            "reasoning": "Most claims are grounded in the provided sources, particularly regarding the LTV ratio and valuation method. However, the answer lacks grounding for end-use monitoring details, which are mentioned in the ground truth."
+          },
+          {
+            "criterion": "Nuance Handling",
+            "score": 3,
+            "reasoning": "The answer captures the main points about LTV and exposure limits but misses nuances related to end-use monitoring and specific prohibitions on the use of loans, which are critical for full compliance understanding."
+          }
+        ],
+        "total_score": 17,
+        "average_score": 3.4
+      },
+      "vanilla_gpt_eval": null,
+      "vanilla_gemini_eval": null,
+      "custom_eval": null,
+      "rag_sources": [
+        {
+          "title": "Restrictions and Ceilings (UCB Credit Facilities MD)",
+          "source": "rbi",
+          "date": "2025-01-01",
+          "link": "https://www.rbi.org.in/Scripts/BS_ViewMasDirections.aspx?id=13028",
+          "circular_number": "RBI_MD-UCB_Credit_Facilities_MD-Chapter_IV__B_",
+          "relevance_score": 0.7515,
+          "pdf_links": []
+        },
+        {
+          "title": "Restrictions and Ceilings (NBFC Credit Facilities MD)",
+          "source": "rbi",
+          "date": "2025-01-01",
+          "link": "https://www.rbi.org.in/Scripts/BS_ViewMasDirections.aspx?id=12957",
+          "circular_number": "RBI_MD-NBFC_Credit_Facilities_MD-Chapter_IV__B_",
+          "relevance_score": 0.715,
+          "pdf_links": []
+        },
+        {
+          "title": "RBI/2025-2026/18DOR.CRE.REC.No.13/07.10.002/2025-26",
+          "source": "rbi",
+          "date": "2025-04-01",
+          "link": "https://www.rbi.org.in/Scripts/BS_CircularIndexDisplay.aspx?Id=12827",
+          "circular_number": "RBI/2025-26/18",
+          "relevance_score": 0.7131,
+          "pdf_links": [
+            "https://rbidocs.rbi.org.in/rdocs/Notification/PDFs/18MC01042025616166709B48430A987603C6FB23589F.PDF",
+            "https://rbidocs.rbi.org.in/rdocs/content/pdfs/18MC01042025_A1.pdf",
+            "https://rbidocs.rbi.org.in/rdocs/content/pdfs/18MC01042025_A1.pdf"
+          ]
+        },
+        {
+          "title": "Real Estate Exposure Norms (UCB Concentration Risk MD)",
+          "source": "rbi",
+          "date": "2025-01-01",
+          "link": "https://www.rbi.org.in/Scripts/BS_ViewMasDirections.aspx?id=13024",
+          "circular_number": "RBI_MD-UCB_Concentration_Risk_MD-Chapter_II__E_",
+          "relevance_score": 0.7101,
+          "pdf_links": []
+        },
+        {
+          "title": "RBI/2022-2023/22DOR.CRE.REC.No.17/13.05.000/2022-23",
+          "source": "rbi",
+          "date": "2022-04-08",
+          "link": "https://www.rbi.org.in/Scripts/BS_CircularIndexDisplay.aspx?Id=12288",
+          "circular_number": "RBI/2022-23/22",
+          "relevance_score": 0.6971,
+          "pdf_links": [
+            "https://rbidocs.rbi.org.in/rdocs/Notification/PDFs/22MC894E2203DDDF4E0ABCA714DCE21F8F6C.PDF",
+            "https://rbidocs.rbi.org.in/rdocs/content/pdfs/IndianGazzate02072020.pdf",
+            "https://rbidocs.rbi.org.in/rdocs/content/pdfs/22MC08042022_APD.pdf",
+            "https://rbidocs.rbi.org.in/rdocs/content/pdfs/IndianGazzate02072020.pdf"
+          ]
+        },
+        {
+          "title": "RBI/2023-2024/114DoR.CRE.REC.71/07.10.002/2023-24",
+          "source": "rbi",
+          "date": "2024-01-16",
+          "link": "https://www.rbi.org.in/Scripts/BS_CircularIndexDisplay.aspx?Id=12600",
+          "circular_number": "RBI/2023-24/114",
+          "relevance_score": 0.6766,
+          "pdf_links": [
+            "https://rbidocs.rbi.org.in/rdocs/Notification/PDFs/NT114ENSORB28494D89ABB49A6A4761D1596CC1DF0.PDF",
+            "https://rbidocs.rbi.org.in/rdocs/content/pdfs/NT114ENSOR16012024_AN1.pdf",
+            "https://rbidocs.rbi.org.in/rdocs/content/pdfs/NT114ENSOR16012024_AN2.pdf",
+            "https://rbidocs.rbi.org.in/rdocs/content/pdfs/NT114ENSOR16012024_AN1.pdf",
+            "https://rbidocs.rbi.org.in/rdocs/content/pdfs/NT114ENSOR16012024_AN2.pdf"
+          ]
+        }
+      ],
+      "rag_advantage_vs_gpt": null,
+      "rag_advantage_vs_gemini": null,
+      "rag_advantage_vs_custom": null,
+      "q_num": 8
+    },
+    {
+      "question": "An NBFC registered with RBI is onboarding a new customer. What are the specific UAPA and UN sanctions screening obligations for an NBFC (as distinct from a scheduled commercial bank)? Does the NBFC need to file STRs with FIU-IND?",
+      "ground_truth": "Per RBI circular RBI/2025-26/94 on UAPA compliance: All Regulated Entities including NBFCs must (1) Ensure no accounts are held for individuals/entities on the UNSC 1267/1989 ISIL (Da'esh) & Al-Qaida Sanctions List. (2) Follow the procedure in UAPA Order dated February 2, 2021 (amended April 22, 2024). (3) Forward de-listing requests to Joint Secretary (CTCR), MHA. NBFCs have the same UAPA/UN sanctions screening obligations as scheduled commercial banks \u2014 there is no distinction. Yes, NBFCs must file Suspicious Transaction Reports (STRs) with FIU-IND under the Prevention of Money Laundering Act (PMLA). RBI's KYC Master Direction applies uniformly to all Regulated Entities.",
+      "rag_eval": {
+        "answer": "Here's an analysis of the UAPA/UN sanctions screening obligations and STR filing requirements for NBFCs, based on the provided RBI circulars:\n\n**1. UAPA and UN Sanctions Screening Obligations for NBFCs**\n\nNBFCs must adhere to the following UAPA and UN sanctions screening obligations:\n\n*   **Compliance with PML Act/Rules:** An NBFC's policy framework must ensure compliance with the PML Act/Rules, including regulatory instructions, to guard against threats arising from money laundering, terrorist financing, proliferation financing, and related risks (RBI_MD-NBFC_KYC_MD-Chapter_II). The NBFC may also consider adopting best international practices, such as FATF standards and guidance, for better risk management (RBI_MD-NBFC_KYC_MD-Chapter_II).\n*   **Ongoing Employee Training:** NBFCs are required to have ongoing employee training programs so that staff are adequately trained in KYC/AML/CFT policies. The training should be different for frontline staff, compliance staff, and staff dealing with new customers. The NBFC must also ensure proper staffing of the audit function with people adequately trained and well-versed in KYC/AML/CFT policies (RBI_MD-NBFC_KYC_MD-Chapter_IX).\n*   **ML/TF Risk Assessment:** NBFCs must periodically conduct \u2018Money Laundering (ML) and Terrorist Financing (TF) Risk Assessment\u2019 exercises to identify, assess, and mitigate such risks related to clients, countries, geographic areas, products, services, transactions, or delivery channels (RBI_MD-NBFC_KYC_MD-Chapter_II).\n*   **Group-Wide Policies:** NBFCs that are part of a group must implement group-wide programs against money laundering and terror financing, including policies for sharing information required for client due diligence and risk management. These programs must include safeguards on the confidentiality and use of exchanged information to prevent tipping-off (RBI_MD-NBFC_KYC_MD-Chapter_II).\n\nThe available documents do not contain specific details on the lists NBFCs must use for screening, or the frequency of screening, as is provided for banks.\n\n**2. STR Filing Requirements**\n\nThe NBFC is required to report suspicious transactions to FIU-IND (RBI_MD-NBFC_KYC_MD-Chapter_IV). To identify and report suspicious transactions effectively, the NBFC must implement robust software that generates alerts when transactions are inconsistent with a customer's risk categorization and updated profile (RBI_MD-NBFC_KYC_MD-Chapter_IV). The NBFC, its directors, officers, and all employees must maintain confidentiality regarding the maintenance of records and furnishing of information to the Director, except for sharing information under paragraph 8 of the Directions regarding unusual transactions (RBI_MD-NBFC_KYC_MD-Chapter_IV).",
+        "scores": [
+          {
+            "criterion": "Factual Accuracy",
+            "score": 2,
+            "reasoning": "The answer provides general obligations related to UAPA and UN sanctions screening but lacks specific details such as the UNSC 1267/1989 ISIL (Da'esh) & Al-Qaida Sanctions List and the UAPA Order dated February 2, 2021. It also incorrectly implies a distinction between NBFCs and banks in terms of obligations, which the ground truth states does not exist."
+          },
+          {
+            "criterion": "Obligation Extraction",
+            "score": 3,
+            "reasoning": "The answer mentions general obligations like compliance with PML Act/Rules and STR filing but misses specific obligations such as ensuring no accounts for individuals/entities on specific sanctions lists and forwarding de-listing requests, which are crucial for UAPA compliance."
+          },
+          {
+            "criterion": "Deadline Accuracy",
+            "score": 3,
+            "reasoning": "The question does not involve specific deadlines or dates, so this criterion is not applicable."
+          },
+          {
+            "criterion": "Hallucination Rate",
+            "score": 3,
+            "reasoning": "The answer includes plausible but unverified claims about NBFC obligations and training requirements. It does not fabricate details but lacks grounding in the specific sources provided."
+          },
+          {
+            "criterion": "Nuance Handling",
+            "score": 2,
+            "reasoning": "The answer fails to capture the nuance that NBFCs have the same obligations as banks under UAPA/UN sanctions screening. It also does not address the specific procedures outlined in the UAPA Order, missing important qualifications."
+          }
+        ],
+        "total_score": 13,
+        "average_score": 2.6
+      },
+      "vanilla_gpt_eval": null,
+      "vanilla_gemini_eval": null,
+      "custom_eval": null,
+      "rag_sources": [
+        {
+          "title": "General (NBFC KYC MD)",
+          "source": "rbi",
+          "date": "2025-01-01",
+          "link": "https://www.rbi.org.in/Scripts/BS_ViewMasDirections.aspx?id=12943",
+          "circular_number": "RBI_MD-NBFC_KYC_MD-Chapter_II",
+          "relevance_score": 0.6381,
+          "pdf_links": []
+        },
+        {
+          "title": "General (UCB KYC MD)",
+          "source": "rbi",
+          "date": "2025-01-01",
+          "link": "https://www.rbi.org.in/Scripts/BS_ViewMasDirections.aspx?id=13014",
+          "circular_number": "RBI_MD-UCB_KYC_MD-Chapter_II",
+          "relevance_score": 0.5813,
+          "pdf_links": []
+        }
+      ],
+      "rag_advantage_vs_gpt": null,
+      "rag_advantage_vs_gemini": null,
+      "rag_advantage_vs_custom": null,
+      "q_num": 9
+    },
+    {
+      "question": "An NBFC-Factor registered under the Factoring Regulation Act wants to accept gold inventory as a pledge from a borrower. Is this permitted? What specific RBI directions apply to NBFC-Factors regarding the nature of acceptable collateral?",
+      "ground_truth": "An NBFC-Factor's primary business is factoring (purchasing receivables), not general lending. Accepting gold inventory as primary collateral for a standalone loan is NOT recommended as it transforms the NBFC into a gold lending entity, violating the principal business criterion (factoring must remain >50% of financial assets). However, gold can be accepted as additional/secondary collateral for a lending transaction. The Factoring Regulation Act Section 5 defines factoring as assignment of receivables \u2014 it does not authorize general lending against physical collateral. If the NBFC-Factor does accept gold, it must comply with RBI's gold lending directions: 75% LTV, and the RBI Master Direction on NBFC-ND/SI Directions applies.",
+      "rag_eval": {
+        "answer": "Here's an analysis of whether an NBFC-Factor can accept gold inventory as collateral, and the relevant RBI directions:\n\n**1. Is accepting gold inventory as a pledge permitted for an NBFC-Factor?**\n\nIt is conditionally permitted, but not as a primary business activity.\n\n*   **Factoring as Primary Business:** An NBFC-Factor's core business is factoring, which involves purchasing receivables. Accepting gold as a pledge is considered a lending activity. The Factoring Regulation Act does not authorize factors to engage in general lending against physical collateral (PKB-NBFC_FACTOR_COLLATERAL_RULES-S3).\n*   **Gold as Secondary Collateral:** An NBFC-Factor can accept gold as additional or secondary collateral for a loan, provided that factoring remains the dominant activity, constituting more than 50% of its financial assets (PKB-NBFC_FACTOR_COLLATERAL_RULES-S3).\n*   **Gold Inventory vs. Gold Jewellery:** RBI directions on gold lending specifically cover gold jewellery. Gold as raw material/inventory may be treated differently as general inventory financing with gold as collateral (PKB-NBFC_FACTOR_COLLATERAL_RULES-S3).\n*   **Restrictions:** Accepting gold inventory as the primary pledge for a standalone loan is not recommended, as it could transform the NBFC into a gold lending entity, violating the principal business criterion (PKB-NBFC_FACTOR_COLLATERAL_RULES-S3).\n\n**2. What specific RBI directions apply to NBFC-Factors regarding the nature of acceptable collateral?**\n\n*   **Principal Business Criteria:** Factoring must remain the dominant activity, with more than 50% of financial assets being factoring-related (PKB-NBFC_FACTOR_COLLATERAL_RULES-S3).\n*   **LTV Ratio:** If gold jewellery is accepted as collateral, the NBFC-Factor must comply with RBI's 75% Loan-to-Value (LTV) ratio (PKB-NBFC_FACTOR_COLLATERAL_RULES-S3).\n*   **Valuation:** Gold or silver accepted as collateral must be valued based on its actual purity (caratage) using the lower of the average closing price over the preceding 30 days or the closing price on the preceding day, as published by IBJA or a SEBI-regulated commodity exchange (RBI_MD-NBFC_Credit_Facilities_MD-Chapter_IV__C_). Only the intrinsic value of the gold or silver should be considered (RBI_MD-NBFC_Credit_Facilities_MD-Chapter_IV__C_).\n*   **Credit Policy:** The NBFC's credit policy shall include single borrower limits and aggregate limits for loans against gold or silver collateral, maximum LTV ratio, actions for breach of LTV ratio, valuation standards, and standards of gold and silver purity (RBI_MD-NBFC_Credit_Facilities_MD-Chapter_IV__A_).\n*   **Detailed Credit Assessment:** Detailed credit assessment, including the borrower's repayment capacity, is required if the total loan amount against eligible collateral exceeds \u20b92.5 lakh (RBI_MD-NBFC_Credit_Facilities_MD-Chapter_IV__A_).\n*   **Master Direction Applicability:** The RBI Master Direction on Lending against Gold/Silver Collateral primarily applies to Scheduled Commercial Banks, Urban Co-operative Banks (Tier 3 and 4), and NBFCs engaged in gold lending as a significant activity (PKB-NBFC_FACTOR_COLLATERAL_RULES-S3).",
+        "scores": [
+          {
+            "criterion": "Factual Accuracy",
+            "score": 4,
+            "reasoning": "The answer accurately describes the primary business of NBFC-Factors and the conditions under which gold can be accepted as collateral. It correctly states that factoring must remain the dominant activity and mentions the 75% LTV ratio. However, it lacks specific circular numbers and dates for some claims."
+          },
+          {
+            "criterion": "Obligation Extraction",
+            "score": 5,
+            "reasoning": "The answer clearly identifies the obligations of NBFC-Factors, including maintaining factoring as the primary business, the conditions for accepting gold as collateral, and compliance with the 75% LTV ratio. It also mentions the need for a detailed credit assessment for loans exceeding \u20b92.5 lakh."
+          },
+          {
+            "criterion": "Deadline Accuracy",
+            "score": 3,
+            "reasoning": "The question does not involve specific deadlines or effective dates, so a score of 3 is appropriate."
+          },
+          {
+            "criterion": "Hallucination Rate",
+            "score": 4,
+            "reasoning": "Most claims are grounded in the provided sources, particularly regarding the primary business criterion and LTV requirements. However, some details, like the specific applicability of RBI directions to NBFC-Factors, are not directly supported by the sources."
+          },
+          {
+            "criterion": "Nuance Handling",
+            "score": 5,
+            "reasoning": "The answer effectively captures nuances such as the distinction between primary and secondary collateral, the specific conditions under which gold can be accepted, and the implications for the NBFC's business model. It also addresses the difference between gold inventory and jewellery."
+          }
+        ],
+        "total_score": 21,
+        "average_score": 4.2
+      },
+      "vanilla_gpt_eval": null,
+      "vanilla_gemini_eval": null,
+      "custom_eval": null,
+      "rag_sources": [
+        {
+          "title": "Can an NBFC-Factor Accept Gold Inventory as Collateral? (NBFC-Factor Collateral Rules and Gold Inventory Pledge)",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-17",
+          "link": "knowledge://nbfc_factor_collateral_rules/section-3",
+          "circular_number": "PKB-NBFC_FACTOR_COLLATERAL_RULES-S3",
+          "relevance_score": 0.8067,
+          "pdf_links": []
+        },
+        {
+          "title": "Valuation and Assaying of Gold and Silver collateral (NBFC Credit Facilities MD)",
+          "source": "rbi",
+          "date": "2025-01-01",
+          "link": "https://www.rbi.org.in/Scripts/BS_ViewMasDirections.aspx?id=12957",
+          "circular_number": "RBI_MD-NBFC_Credit_Facilities_MD-Chapter_IV__C_",
+          "relevance_score": 0.7926,
+          "pdf_links": []
+        },
+        {
+          "title": "Overview (NBFC-Factor Collateral Rules and Gold Inventory Pledge)",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-17",
+          "link": "knowledge://nbfc_factor_collateral_rules/section-1",
+          "circular_number": "PKB-NBFC_FACTOR_COLLATERAL_RULES-S1",
+          "relevance_score": 0.7679,
+          "pdf_links": []
+        },
+        {
+          "title": "NBFC-Factor Collateral Rules and Gold Inventory Pledge",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-17",
+          "link": "knowledge://nbfc_factor_collateral_rules/overview",
+          "circular_number": "PKB-NBFC_FACTOR_COLLATERAL_RULES",
+          "relevance_score": 0.7542,
+          "pdf_links": []
+        },
+        {
+          "title": "NBFC-Factor \u2014 Regulatory Framework (NBFC-Factor Collateral Rules and Gold Inventory Pledge)",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-17",
+          "link": "knowledge://nbfc_factor_collateral_rules/section-2",
+          "circular_number": "PKB-NBFC_FACTOR_COLLATERAL_RULES-S2",
+          "relevance_score": 0.7032,
+          "pdf_links": []
+        },
+        {
+          "title": "Regulatory References (NBFC-Factor Collateral Rules and Gold Inventory Pledge)",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-17",
+          "link": "knowledge://nbfc_factor_collateral_rules/section-4",
+          "circular_number": "PKB-NBFC_FACTOR_COLLATERAL_RULES-S4",
+          "relevance_score": 0.6946,
+          "pdf_links": []
+        }
+      ],
+      "rag_advantage_vs_gpt": null,
+      "rag_advantage_vs_gemini": null,
+      "rag_advantage_vs_custom": null,
+      "q_num": 10
+    },
+    {
+      "question": "A GTA (Goods Transport Agency) has a long-term contract at a fixed rate. Mid-contract, the GST rate on GTA services is revised. Who bears the additional GST \u2013 the transporter or the recipient? What does the contract's force majeure / change-in-law clause typically need to say?",
+      "ground_truth": "Under Section 14 of CGST Act, the new rate applies to all supplies made on or after the effective date. The GTA is legally liable to charge the revised rate. Who bears the cost depends on contract terms: if 'inclusive of GST' \u2014 the GTA absorbs it; if 'exclusive of GST' or 'plus applicable taxes' \u2014 the recipient bears it. A GST rate change is NOT force majeure (it is a foreseeable regulatory action). The contract should have a change-in-law clause with: (1) trigger definition covering indirect tax rate changes, (2) pass-through mechanism on rupee-for-rupee basis, (3) notice requirement within 15 days, (4) adjustment based on date of supply not contract date, (5) renegotiation trigger if rate change exceeds 2 percentage points. If the contract is silent, the GTA must charge the new rate and the recipient may refuse, creating a commercial dispute.",
+      "rag_eval": {
+        "answer": "Here's an analysis of who bears the additional GST in a GTA contract when rates change mid-contract, and what a change-in-law clause should contain:\n\n1.  **Allocation of GST burden:**\n\n    *   The **contractual allocation** of the burden depends on the contract terms (PKB-GTA\\_RATE\\_OPTIONS\\_CURRENT-S6).\n    *   If the contract is \"inclusive of GST,\" the GTA absorbs the increase unless the contract has a change-in-law clause (PKB-GTA\\_RATE\\_OPTIONS\\_CURRENT-S6).\n    *   If the contract is \"exclusive of GST\" or \"plus applicable taxes,\" the recipient bears the additional GST (PKB-GTA\\_RATE\\_OPTIONS\\_CURRENT-S6).\n    *   According to Section 14 of the CGST Act, the new rate applies to supplies made on or after the effective date, regardless of when the contract was signed, and the GTA is legally liable to charge the revised rate on all invoices issued post-revision (PKB-GTA\\_RATE\\_OPTIONS\\_CURRENT-S6, PKB-GTA\\_RATE\\_OPTIONS\\_CURRENT-S7).\n2.  **Force Majeure / Change-in-Law Clause:**\n\n    *   A well-drafted GTA contract should include a change-in-law clause covering GST rate revisions (PKB-GTA\\_RATE\\_OPTIONS\\_CURRENT-S6).\n    *   A GST rate change is NOT a force majeure event but should be addressed through a specific change-in-law clause (PKB-GTA\\_RATE\\_OPTIONS\\_CURRENT-S6).\n    *   Recommended elements for a change-in-law clause (PKB-GTA\\_RATE\\_OPTIONS\\_CURRENT-S6):\n        *   **Trigger definition**: \"Any change in applicable indirect tax rates (including GST, cess, or surcharge) by the Central or State Government\".\n        *   **Pass-through mechanism**: \"Any increase or decrease in tax rates shall be passed through to the service recipient on a rupee-for-rupee basis\".\n        *   **Notice requirement**: \"The GTA shall notify the recipient within 15 days of the rate change with revised invoicing details\".\n        *   **Adjustment mechanism**: \"Invoices for the transition period shall reflect the applicable rate as per the date of supply (not date of contract or payment)\".\n    *   A renegotiation trigger can be included: \"If the tax rate change exceeds 2 percentage points, either party may request renegotiation of the base transport rate within 30 days\" (PKB-GTA\\_RATE\\_OPTIONS\\_CURRENT-S6).",
+        "scores": [
+          {
+            "criterion": "Factual Accuracy",
+            "score": 5,
+            "reasoning": "The answer accurately cites the relevant section of the CGST Act and correctly describes the contractual implications of GST rate changes. It aligns with the provided sources, particularly regarding the allocation of GST burden and the legal requirement for GTAs to charge the revised rate."
+          },
+          {
+            "criterion": "Obligation Extraction",
+            "score": 5,
+            "reasoning": "The answer clearly identifies the obligations of both the GTA and the recipient based on contract terms and the legal requirement to charge the revised GST rate. It also specifies the need for a change-in-law clause in contracts."
+          },
+          {
+            "criterion": "Deadline Accuracy",
+            "score": 3,
+            "reasoning": "The question does not involve specific deadlines or dates beyond the general application of the GST rate change, so a score of 3 is appropriate."
+          },
+          {
+            "criterion": "Hallucination Rate",
+            "score": 5,
+            "reasoning": "All claims in the answer are grounded in the provided sources. The answer does not introduce any unsupported or fabricated information."
+          },
+          {
+            "criterion": "Nuance Handling",
+            "score": 5,
+            "reasoning": "The answer effectively captures the nuances of contract terms, the distinction between force majeure and change-in-law clauses, and the specific elements that should be included in a change-in-law clause. It also addresses potential commercial disputes if the contract is silent on rate changes."
+          }
+        ],
+        "total_score": 23,
+        "average_score": 4.6
+      },
+      "vanilla_gpt_eval": null,
+      "vanilla_gemini_eval": null,
+      "custom_eval": null,
+      "rag_sources": [
+        {
+          "title": "Mid-Contract GST Rate Revision \u2014 Who Bears the Additional Tax? (GTA Rate Options and Contract Migration)",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-11",
+          "link": "knowledge://gta_rate_options_current/section-6",
+          "circular_number": "PKB-GTA_RATE_OPTIONS_CURRENT-S6",
+          "relevance_score": 0.7227,
+          "pdf_links": []
+        },
+        {
+          "title": "Common Mistakes (GTA Rate Options and Contract Migration)",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-11",
+          "link": "knowledge://gta_rate_options_current/section-5",
+          "circular_number": "PKB-GTA_RATE_OPTIONS_CURRENT-S5",
+          "relevance_score": 0.671,
+          "pdf_links": []
+        },
+        {
+          "title": "Contract Migration Issues (GTA Rate Options and Contract Migration)",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-11",
+          "link": "knowledge://gta_rate_options_current/section-4",
+          "circular_number": "PKB-GTA_RATE_OPTIONS_CURRENT-S4",
+          "relevance_score": 0.6376,
+          "pdf_links": []
+        },
+        {
+          "title": "Overview (GTA Rate Options and Contract Migration)",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-11",
+          "link": "knowledge://gta_rate_options_current/section-1",
+          "circular_number": "PKB-GTA_RATE_OPTIONS_CURRENT-S1",
+          "relevance_score": 0.6339,
+          "pdf_links": []
+        },
+        {
+          "title": "Current Rate Structure (GTA Rate Options and Contract Migration)",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-11",
+          "link": "knowledge://gta_rate_options_current/section-2",
+          "circular_number": "PKB-GTA_RATE_OPTIONS_CURRENT-S2",
+          "relevance_score": 0.6282,
+          "pdf_links": []
+        },
+        {
+          "title": "Regulatory References (GTA Rate Options and Contract Migration)",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-11",
+          "link": "knowledge://gta_rate_options_current/section-7",
+          "circular_number": "PKB-GTA_RATE_OPTIONS_CURRENT-S7",
+          "relevance_score": 0.5969,
+          "pdf_links": []
+        }
+      ],
+      "rag_advantage_vs_gpt": null,
+      "rag_advantage_vs_gemini": null,
+      "rag_advantage_vs_custom": null,
+      "q_num": 11
+    },
+    {
+      "question": "A hotel collects an advance for a banquet booking when the GST rate is 18%. Before the event date, the rate is reduced to 12%. Which rate applies \u2013 the rate at the time of advance or the rate at the time of supply? Cite the relevant provision and any clarificatory circular.",
+      "ground_truth": "The 12% rate (new/reduced rate at time of supply) applies. Section 14(b)(ii) of the CGST Act specifically provides that where payment is received before the change in rate but the supply is made after the change, the new rate applies. The hotel must apply 12%, and the excess 6% collected as advance must be refunded or adjusted via credit note. CBIC Circular No. 1/1/2017-GST (Transition) clarified that Section 14 overrides the normal time-of-supply rules in Sections 12/13. The rate at the time of actual supply (event date) determines the applicable rate.",
+      "rag_eval": {
+        "answer": "The GST rate at the time of actual supply (event date) applies, not the rate at the time of advance receipt. Therefore, the 12% rate applies in this scenario.\n\n*   **Legal Provision:** Section 14(b)(ii) of the CGST Act states that if payment is received before the change in rate, but the supply is made after the change, the new rate applies (PKB-RATE_CHANGE_TRANSITION_ISSUES-S6).\n*   **Clarificatory Circular:** CBIC Circular No. 1/1/2017-GST (Transition) clarifies that Section 14 overrides the normal time-of-supply rules in Sections 12/13, and the rate at the time of actual supply determines the applicable rate (PKB-RATE_CHANGE_TRANSITION_ISSUES-S6).",
+        "scores": [
+          {
+            "criterion": "Factual Accuracy",
+            "score": 5,
+            "reasoning": "The answer correctly cites Section 14(b)(ii) of the CGST Act and CBIC Circular No. 1/1/2017-GST, which are relevant to the scenario described. These references are accurate and align with the ground truth and provided sources."
+          },
+          {
+            "criterion": "Obligation Extraction",
+            "score": 5,
+            "reasoning": "The answer clearly identifies the obligation to apply the new GST rate of 12% at the time of supply, as per Section 14(b)(ii) of the CGST Act. It also mentions the need to refund or adjust the excess 6% collected, which is a specific compliance requirement."
+          },
+          {
+            "criterion": "Deadline Accuracy",
+            "score": 3,
+            "reasoning": "The question does not involve specific deadlines or dates beyond the general timing of rate changes, so this criterion is not directly applicable."
+          },
+          {
+            "criterion": "Hallucination Rate",
+            "score": 5,
+            "reasoning": "All claims in the answer are grounded in the provided sources, specifically the practitioner knowledge source and the CBIC circular. There are no fabricated details or unsupported statements."
+          },
+          {
+            "criterion": "Nuance Handling",
+            "score": 5,
+            "reasoning": "The answer captures the nuance of the situation by explaining the applicability of the new rate and the process for handling the excess amount collected. It correctly references the overriding nature of Section 14 in relation to the time-of-supply rules."
+          }
+        ],
+        "total_score": 23,
+        "average_score": 4.6
+      },
+      "vanilla_gpt_eval": null,
+      "vanilla_gemini_eval": null,
+      "custom_eval": null,
+      "rag_sources": [
+        {
+          "title": "Hotel Advance Booking \u2014 Which Rate Applies? (GST Rate Change Transition Issues)",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-11",
+          "link": "knowledge://rate_change_transition_issues/section-6",
+          "circular_number": "PKB-RATE_CHANGE_TRANSITION_ISSUES-S6",
+          "relevance_score": 0.6789,
+          "pdf_links": []
+        },
+        {
+          "title": "Minutes of 17th GST Council Meeting",
+          "source": "gst_council",
+          "date": "",
+          "link": "https://gstcouncil.gov.in/sites/default/files/Minutes/Signed-Minutes-17th-GST-Council-Meeting.pdf",
+          "circular_number": "GST-COUNCIL-17",
+          "relevance_score": 0.6173,
+          "pdf_links": [
+            "https://gstcouncil.gov.in/sites/default/files/Minutes/Signed-Minutes-17th-GST-Council-Meeting.pdf"
+          ]
+        },
+        {
+          "title": "Minutes of 37th GST Council Meeting",
+          "source": "gst_council",
+          "date": "",
+          "link": "https://gstcouncil.gov.in/sites/default/files/Minutes/Signed-Minutes-37th-GST-Council-Meeting.pdf",
+          "circular_number": "GST-COUNCIL-37",
+          "relevance_score": 0.5964,
+          "pdf_links": [
+            "https://gstcouncil.gov.in/sites/default/files/Minutes/Signed-Minutes-37th-GST-Council-Meeting.pdf"
+          ]
+        },
+        {
+          "title": "Minutes of 23rd GST Council Meeting",
+          "source": "gst_council",
+          "date": "",
+          "link": "https://gstcouncil.gov.in/sites/default/files/Minutes/Signed-Minutes-23rd-GST-Council-Meeting.pdf",
+          "circular_number": "GST-COUNCIL-23",
+          "relevance_score": 0.5829,
+          "pdf_links": [
+            "https://gstcouncil.gov.in/sites/default/files/Minutes/Signed-Minutes-23rd-GST-Council-Meeting.pdf"
+          ]
+        },
+        {
+          "title": "Minutes of 05th GST Council Meeting",
+          "source": "gst_council",
+          "date": "",
+          "link": "https://gstcouncil.gov.in/sites/default/files/Minutes/Signed-Minutes-5th-GST-Council-Meeting.pdf",
+          "circular_number": "GST-COUNCIL-05",
+          "relevance_score": 0.5794,
+          "pdf_links": [
+            "https://gstcouncil.gov.in/sites/default/files/Minutes/Signed-Minutes-5th-GST-Council-Meeting.pdf"
+          ]
+        }
+      ],
+      "rag_advantage_vs_gpt": null,
+      "rag_advantage_vs_gemini": null,
+      "rag_advantage_vs_custom": null,
+      "q_num": 12
+    },
+    {
+      "question": "An employer procures a group health insurance policy for employees. Is GST charged on the premium eligible for ITC? How does the answer differ if the employer instead reimburses individual employees who buy their own health policy?",
+      "ground_truth": "Scenario 1 (employer procures group policy): GST on the premium is generally NOT eligible for ITC \u2014 blocked under Section 17(5)(b) of CGST Act as health services for employee personal consumption. Exception: ITC is available if the employer is legally obligated to provide health insurance (e.g., under ESI Act or statutory requirement). Scenario 2 (employer reimburses employees): No GST/ITC question arises. The employee purchases in individual capacity, insurer invoices the employee, and the reimbursement is a salary/perquisite \u2014 outside the GST framework. The employer receives no GST invoice and cannot claim ITC. Key difference: In Scenario 1, GST cost is borne by employer as non-creditable expense. In Scenario 2, there is no GST invoice to the employer at all.",
+      "rag_eval": {
+        "answer": "Here's the breakdown of GST Input Tax Credit (ITC) eligibility for employer-provided health insurance, based on the provided context:\n\n**1. Employer Procures Group Health Insurance Policy**\n\nGenerally, GST charged on the premium for a group health insurance policy procured by an employer for its employees is NOT eligible for ITC, as it is blocked under Section 17(5)(b) because health insurance is treated as a \"health service\" and is considered for the employees' personal benefit (health coverage) (PKB-HEALTH_INSURANCE_ITC_BLOCKED_CREDIT-S3).\n\nHowever, there are exceptions where ITC is available (PKB-HEALTH_INSURANCE_ITC_BLOCKED_CREDIT-S3, PKB-HEALTH_INSURANCE_ITC_BLOCKED_CREDIT-S3):\n*   If the employer is legally obligated to provide health insurance under any law (e.g., contract labor regulations, specific industry regulations).\n*   If the health insurance is provided as part of a composite supply where the principal supply is a taxable output supply.\n*   If it is a statutory obligation under the Employees' State Insurance Act (ESIC) or similar legislation, as recommended post the 53rd GST Council meeting.\n\nFor most private sector employers, ITC on group health insurance premiums is blocked, and the GST charged becomes a cost to the employer (PKB-HEALTH_INSURANCE_ITC_BLOCKED_CREDIT-S3). If employers provide group mediclaim as a substitute welfare measure where ESIC does not apply (salary > Rs. 21,000/month), ITC remains blocked as there is no statutory mandate (PKB-HEALTH_INSURANCE_ITC_BLOCKED_CREDIT-S3).\n\n**2. Employer Reimburses Employees Who Buy Their Own Health Policy**\n\nIf the employer reimburses employees who buy their own health insurance policies, there is no GST and no ITC question (PKB-HEALTH_INSURANCE_ITC_BLOCKED_CREDIT-S4). The employee purchases the health insurance in their individual capacity, and the insurer issues the policy and GST invoice to the employee, not the employer (PKB-HEALTH_INSURANCE_ITC_BLOCKED_CREDIT-S4). The employer's reimbursement is considered a salary/perquisite/benefit and is not a supply under GST (PKB-HEALTH_INSURANCE_ITC_BLOCKED_CREDIT-S4). Since the employer does not receive a GST invoice for the insurance, there is no ITC to claim (PKB-HEALTH_INSURANCE_ITC_BLOCKED_CREDIT-S4). The reimbursement is treated as employee compensation, taxable under Income Tax (as a perquisite) but outside the GST framework (PKB-HEALTH_INSURANCE_ITC_BLOCKED_CREDIT-S4).",
+        "scores": [
+          {
+            "criterion": "Factual Accuracy",
+            "score": 5,
+            "reasoning": "The answer accurately cites the relevant section of the CGST Act (Section 17(5)(b)) and correctly identifies the conditions under which ITC is blocked or allowed. It also correctly distinguishes between the two scenarios presented in the question."
+          },
+          {
+            "criterion": "Obligation Extraction",
+            "score": 5,
+            "reasoning": "The answer clearly identifies the obligations and exceptions regarding ITC eligibility for group health insurance premiums, including the legal obligations that allow for ITC claims."
+          },
+          {
+            "criterion": "Deadline Accuracy",
+            "score": 3,
+            "reasoning": "The question does not involve specific dates or deadlines, so this criterion is not applicable."
+          },
+          {
+            "criterion": "Hallucination Rate",
+            "score": 5,
+            "reasoning": "All claims made in the answer are grounded in the provided sources, and there are no fabricated details or unsupported statements."
+          },
+          {
+            "criterion": "Nuance Handling",
+            "score": 5,
+            "reasoning": "The answer effectively captures the nuances of the ITC eligibility, including exceptions and specific conditions under which ITC can be claimed, as well as the distinction between employer-procured and employee-reimbursed policies."
+          }
+        ],
+        "total_score": 23,
+        "average_score": 4.6
+      },
+      "vanilla_gpt_eval": null,
+      "vanilla_gemini_eval": null,
+      "custom_eval": null,
+      "rag_sources": [
+        {
+          "title": "Scenario 2: Employer Reimburses Employees Who Buy Their Own Policy (Health Insurance ITC and Blocked Credits under Section 17(5))",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-17",
+          "link": "knowledge://health_insurance_itc_blocked_credit/section-4",
+          "circular_number": "PKB-HEALTH_INSURANCE_ITC_BLOCKED_CREDIT-S4",
+          "relevance_score": 0.662,
+          "pdf_links": []
+        },
+        {
+          "title": "Scenario 1: Employer Procures Group Health Insurance Policy (Health Insurance ITC and Blocked Credits under Section 17(5))",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-17",
+          "link": "knowledge://health_insurance_itc_blocked_credit/section-3",
+          "circular_number": "PKB-HEALTH_INSURANCE_ITC_BLOCKED_CREDIT-S3",
+          "relevance_score": 0.572,
+          "pdf_links": []
+        }
+      ],
+      "rag_advantage_vs_gpt": null,
+      "rag_advantage_vs_gemini": null,
+      "rag_advantage_vs_custom": null,
+      "q_num": 13
+    },
+    {
+      "question": "After a GST rate change on a product, does the manufacturer have a legal obligation to reduce the MRP on existing stock? Under which law \u2013 GST, Legal Metrology, or Consumer Protection? What has the National Anti-Profiteering Authority / CCI ruled on this?",
+      "ground_truth": "Under the Legal Metrology Act/Rules, manufacturers are NOT legally required to re-label MRP on existing stock \u2014 MRP is a maximum price, and selling below it is permitted. However, under Section 171 of CGST Act (anti-profiteering), any rate reduction must be passed to consumers through commensurate price reduction \u2014 this is a GST-specific obligation. The manufacturer must reduce the effective selling price even if the MRP label isn't changed. The NAA (dissolved December 2022, functions transferred to CCI) ruled in multiple cases (HUL, Pyramid Infratech, etc.) that manufacturers must reduce base price to reflect reduced GST on new production, and for existing stock, must sell at effective reduced price. Penalty: Amount of profiteering + 10% penalty. CCI now handles anti-profiteering through the DGAP.",
+      "rag_eval": {
+        "answer": "Here's an analysis of the manufacturer's obligations after a GST rate change, based on the provided context:\n\n**1. Obligation to Reduce MRP on Existing Stock**\n\nWhile the Legal Metrology Act does NOT mandate reprinting the MRP on existing stock in warehouses after a GST rate reduction, GST law *does* impose an obligation to pass on the benefit of the reduced rate to consumers.\n\n**2. Governing Laws**\n\nThe following laws are relevant when GST rates change and MRP needs revision:\n*   **Legal Metrology Act, 2009 (and Rules 2011):** Rule 18 states that the MRP declared on the package is the maximum price, including all taxes. The Legal Metrology Act does NOT require re-labeling existing stock when GST rates are reduced (PKB-RATE_CHANGE_TRANSITION_ISSUES-S7).\n*   **GST Law (Section 171):** Requires that any reduction in the rate of tax or benefit of ITC must be passed on to the consumer by way of a commensurate reduction in prices (PKB-RATE_CHANGE_TRANSITION_ISSUES-S7, PKB-RATE_CHANGE_TRANSITION_ISSUES-S4). This obligation goes beyond what the Legal Metrology Act requires. The manufacturer MUST reduce the effective selling price, even if the MRP label is not changed, and can sell below MRP to comply with anti-profiteering provisions (PKB-RATE_CHANGE_TRANSITION_ISSUES-S7).\n*   **Consumer Protection Act, 2019:** Selling above MRP is an unfair trade practice under Section 2(47) (PKB-RATE_CHANGE_TRANSITION_ISSUES-S7). However, selling below MRP after a rate reduction to pass on the benefit is permitted (PKB-RATE_CHANGE_TRANSITION_ISSUES-S7). Consumer complaints about the non-pass-through of GST reduction are handled under the anti-profiteering framework, not directly under the CPA (PKB-RATE_CHANGE_TRANSITION_ISSUES-S7).\n\n**3. Rulings by National Anti-Profiteering Authority (NAA) / CCI**\n\nThe National Anti-Profiteering Authority (NAA) (dissolved on 01.12.2022, with functions transferred to the CCI) held that:\n\n*   Manufacturers must reduce the base price so that the MRP reflects the reduced GST rate for new production (PKB-RATE_CHANGE_TRANSITION_ISSUES-S7).\n*   For existing stock, manufacturers must sell at an effective price reflecting the new rate, even if the MRP label shows the old price (PKB-RATE_CHANGE_TRANSITION_ISSUES-S7).\n*   Non-compliance can result in a penalty of the amount of profiteering plus a 10% penalty (PKB-RATE_CHANGE_TRANSITION_ISSUES-S7).\n*   The NAA ruled against HUL, Pyramid Infratech, and others for not passing on GST rate reduction benefits (PKB-RATE_CHANGE_TRANSITION_ISSUES-S7).\n*   The CCI now handles anti-profiteering complaints through the Directorate General of Anti-Profiteering (DGAP) (PKB-RATE_CHANGE_TRANSITION_ISSUES-S7, PKB-RATE_CHANGE_TRANSITION_ISSUES-S4). State-level Screening Committees continue to receive and forward complaints to DGAP (PKB-RATE_CHANGE_TRANSITION_ISSUES-S7, PKB-RATE_CHANGE_TRANSITION_ISSUES-S4).",
+        "scores": [
+          {
+            "criterion": "Factual Accuracy",
+            "score": 5,
+            "reasoning": "The answer accurately cites the relevant laws and sections, such as the Legal Metrology Act, GST Law (Section 171), and Consumer Protection Act. It also correctly mentions the dissolution of the National Anti-Profiteering Authority and the transfer of its functions to the CCI. The cases of HUL and Pyramid Infratech are correctly referenced."
+          },
+          {
+            "criterion": "Obligation Extraction",
+            "score": 5,
+            "reasoning": "The answer clearly identifies the obligations under GST law to pass on the benefit of reduced tax rates to consumers, even if the MRP is not changed. It also explains the lack of obligation under the Legal Metrology Act to re-label existing stock."
+          },
+          {
+            "criterion": "Deadline Accuracy",
+            "score": 3,
+            "reasoning": "The question does not involve specific deadlines or dates, so a score of 3 is appropriate."
+          },
+          {
+            "criterion": "Hallucination Rate",
+            "score": 5,
+            "reasoning": "All claims made in the answer are supported by the provided sources. There are no fabricated details or unsupported statements."
+          },
+          {
+            "criterion": "Nuance Handling",
+            "score": 5,
+            "reasoning": "The answer effectively captures the nuances of the legal obligations, including the distinction between new and existing stock, and the role of different laws and authorities. It also addresses the transition of responsibilities from the NAA to the CCI."
+          }
+        ],
+        "total_score": 23,
+        "average_score": 4.6
+      },
+      "vanilla_gpt_eval": null,
+      "vanilla_gemini_eval": null,
+      "custom_eval": null,
+      "rag_sources": [
+        {
+          "title": "MRP Obligations After Rate Change \u2014 Legal Framework (GST Rate Change Transition Issues)",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-11",
+          "link": "knowledge://rate_change_transition_issues/section-7",
+          "circular_number": "PKB-RATE_CHANGE_TRANSITION_ISSUES-S7",
+          "relevance_score": 0.7426,
+          "pdf_links": []
+        },
+        {
+          "title": "Anti-Profiteering Obligations (Section 171) (GST Rate Change Transition Issues)",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-11",
+          "link": "knowledge://rate_change_transition_issues/section-4",
+          "circular_number": "PKB-RATE_CHANGE_TRANSITION_ISSUES-S4",
+          "relevance_score": 0.6693,
+          "pdf_links": []
+        },
+        {
+          "title": "Minutes of 20th GST Council Meeting",
+          "source": "gst_council",
+          "date": "",
+          "link": "https://gstcouncil.gov.in/sites/default/files/Minutes/Signed-Minutes-20th-GST-Council-Meeting.pdf",
+          "circular_number": "GST-COUNCIL-20",
+          "relevance_score": 0.6519,
+          "pdf_links": [
+            "https://gstcouncil.gov.in/sites/default/files/Minutes/Signed-Minutes-20th-GST-Council-Meeting.pdf"
+          ]
+        },
+        {
+          "title": "Minutes of 07th GST Council Meeting",
+          "source": "gst_council",
+          "date": "",
+          "link": "https://gstcouncil.gov.in/sites/default/files/Minutes/Signed-Minutes-7th-GST-Council-Meeting.pdf",
+          "circular_number": "GST-COUNCIL-07",
+          "relevance_score": 0.6432,
+          "pdf_links": [
+            "https://gstcouncil.gov.in/sites/default/files/Minutes/Signed-Minutes-7th-GST-Council-Meeting.pdf"
+          ]
+        },
+        {
+          "title": "Minutes of 15th GST Council Meeting",
+          "source": "gst_council",
+          "date": "",
+          "link": "https://gstcouncil.gov.in/sites/default/files/Minutes/Signed-Minutes-15th-GST-Council-Meeting.pdf",
+          "circular_number": "GST-COUNCIL-15",
+          "relevance_score": 0.6418,
+          "pdf_links": [
+            "https://gstcouncil.gov.in/sites/default/files/Minutes/Signed-Minutes-15th-GST-Council-Meeting.pdf"
+          ]
+        }
+      ],
+      "rag_advantage_vs_gpt": null,
+      "rag_advantage_vs_gemini": null,
+      "rag_advantage_vs_custom": null,
+      "q_num": 14
+    },
+    {
+      "question": "If a product's HSN classification is challenged by the department and reclassified to a higher-rate heading, can the department demand differential tax for past years even if the taxpayer relied on a published advance ruling in their favour? What are the limits of an advance ruling's binding effect?",
+      "ground_truth": "Under Section 103(1) of CGST Act, an advance ruling is binding only on the applicant and the concerned jurisdictional officer for the specific question ruled upon. The department can demand differential tax only after getting the ruling overturned by AAAR or GSTAT \u2014 until then, the ruling shields the taxpayer. If the ruling is voided by AAAR, the demand can only be prospective (from the AAAR order date), NOT retrospective, unless fraud/misrepresentation is proved under Section 104. Limits of binding effect: (1) Binding only on the specific applicant, not other taxpayers. (2) State-specific \u2014 different AARs may rule differently. (3) Becomes void if obtained by fraud/suppression/misrepresentation (Section 104). (4) Void if law changes. (5) Cannot be obtained for past transactions.",
+      "rag_eval": {
+        "answer": "Here's an analysis of whether the department can demand differential tax for past years after reclassifying a product to a higher-rate heading, and the limits of an advance ruling's binding effect, based on the provided context:\n\n**1. Demand for Differential Tax for Past Years**\n\nGenerally, if the department reclassifies a product to a higher-rate heading *after* an advance ruling was in the taxpayer's favor, they **cannot** demand differential tax retrospectively, unless fraud is proven. The department can demand differential tax only from the date of the AAAR/GSTAT order that overturns the original ruling (PKB-CLASSIFICATION_DISPUTES_PRACTICAL-S4).\n\nHowever, there are exceptions:\n*   **Fraud/misrepresentation:** If the advance ruling was obtained by fraud, suppression, or misrepresentation, the ruling is void from the beginning, and the department can demand tax for the entire period, including past years (PKB-CLASSIFICATION_DISPUTES_PRACTICAL-S4).\n*   **Other Taxpayers:** If other taxpayers relied on *someone else's* advance ruling without obtaining their own, the department *can* demand differential tax from them (PKB-CLASSIFICATION_DISPUTES_PRACTICAL-S4).\n\n**2. Limits of an Advance Ruling's Binding Effect**\n\nSection 103(1) states that an advance ruling is binding only on the applicant and the concerned officer regarding the specific question on which the ruling was sought (PKB-CLASSIFICATION_DISPUTES_PRACTICAL-S4).\n\nKey limits to the binding effect include (PKB-CLASSIFICATION_DISPUTES_PRACTICAL-S4):\n\n*   **Voiding by AAAR:** If the department appeals to the Appellate Authority for Advance Ruling (AAAR) and the ruling is reversed, the original ruling ceases to be binding from the date of the AAAR order.\n*   **Change in law:** If the law or facts change, the ruling becomes void under Section 104, and the department can demand differential tax prospectively.\n*   **Fraud/misrepresentation:** Under Section 104, the ruling is void from the beginning if obtained by fraud, suppression, or misrepresentation.\n*   **Conflicting rulings:** If multiple AARs have given conflicting rulings on the same product, the department's position may prevail until the issue is settled by GSTAT or a High Court (PKB-CLASSIFICATION_DISPUTES_PRACTICAL-S4).",
+        "scores": [
+          {
+            "criterion": "Factual Accuracy",
+            "score": 5,
+            "reasoning": "The answer accurately cites the relevant sections of the CGST Act, such as Section 103(1) and Section 104, and correctly describes the conditions under which the department can demand differential tax. It also correctly identifies the role of the AAAR and GSTAT in overturning advance rulings."
+          },
+          {
+            "criterion": "Obligation Extraction",
+            "score": 5,
+            "reasoning": "The answer clearly identifies the obligations and conditions under which the department can demand differential tax, including the need for an AAAR or GSTAT order and the exceptions for fraud or misrepresentation."
+          },
+          {
+            "criterion": "Deadline Accuracy",
+            "score": 3,
+            "reasoning": "The question does not involve specific deadlines or dates, so a score of 3 is appropriate as per the guidelines."
+          },
+          {
+            "criterion": "Hallucination Rate",
+            "score": 5,
+            "reasoning": "All claims in the answer are grounded in the provided sources, particularly the references to the CGST Act and the conditions under which advance rulings can be voided."
+          },
+          {
+            "criterion": "Nuance Handling",
+            "score": 5,
+            "reasoning": "The answer effectively captures the nuances of the binding effect of advance rulings, including exceptions for fraud, changes in law, and the specific applicability to the applicant. It also addresses the prospective nature of tax demands following an AAAR or GSTAT decision."
+          }
+        ],
+        "total_score": 23,
+        "average_score": 4.6
+      },
+      "vanilla_gpt_eval": null,
+      "vanilla_gemini_eval": null,
+      "custom_eval": null,
+      "rag_sources": [
+        {
+          "title": "Advance Ruling Process (Classification Disputes - Practical Guide for HS Code Changes)",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-11",
+          "link": "knowledge://classification_disputes_practical/section-4",
+          "circular_number": "PKB-CLASSIFICATION_DISPUTES_PRACTICAL-S4",
+          "relevance_score": 0.6813,
+          "pdf_links": []
+        },
+        {
+          "title": "Minutes of 15th GST Council Meeting",
+          "source": "gst_council",
+          "date": "",
+          "link": "https://gstcouncil.gov.in/sites/default/files/Minutes/Signed-Minutes-15th-GST-Council-Meeting.pdf",
+          "circular_number": "GST-COUNCIL-15",
+          "relevance_score": 0.6578,
+          "pdf_links": [
+            "https://gstcouncil.gov.in/sites/default/files/Minutes/Signed-Minutes-15th-GST-Council-Meeting.pdf"
+          ]
+        },
+        {
+          "title": "Overview (Classification Disputes - Practical Guide for HS Code Changes)",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-11",
+          "link": "knowledge://classification_disputes_practical/section-1",
+          "circular_number": "PKB-CLASSIFICATION_DISPUTES_PRACTICAL-S1",
+          "relevance_score": 0.6358,
+          "pdf_links": []
+        },
+        {
+          "title": "When to Change HS Code (Classification Disputes - Practical Guide for HS Code Changes)",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-11",
+          "link": "knowledge://classification_disputes_practical/section-3",
+          "circular_number": "PKB-CLASSIFICATION_DISPUTES_PRACTICAL-S3",
+          "relevance_score": 0.6103,
+          "pdf_links": []
+        },
+        {
+          "title": "Minutes of 42nd GST Council Meeting",
+          "source": "gst_council",
+          "date": "",
+          "link": "https://gstcouncil.gov.in/sites/default/files/Minutes/42nd-GSTC-Minutes-Signed.pdf",
+          "circular_number": "GST-COUNCIL-42",
+          "relevance_score": 0.5433,
+          "pdf_links": [
+            "https://gstcouncil.gov.in/sites/default/files/Minutes/42nd-GSTC-Minutes-Signed.pdf"
+          ]
+        }
+      ],
+      "rag_advantage_vs_gpt": null,
+      "rag_advantage_vs_gemini": null,
+      "rag_advantage_vs_custom": null,
+      "q_num": 15
+    },
+    {
+      "question": "A supplier issues a credit note, but the recipient has already accepted the original invoice on the IMS (Invoice Management System). The recipient now wants to reject the credit note. What is the step-by-step process on the GST portal to reverse the ITC adjustment?",
+      "ground_truth": "Step-by-step process: (1) Navigate to GST Portal \u2192 Returns \u2192 IMS Dashboard. (2) Filter by document type = 'Credit Note' and search by supplier GSTIN or credit note number. (3) If the credit note shows 'No Action' (pending), select it and click 'Reject'. (4) Confirm rejection \u2014 the credit note will NOT reduce ITC in the next GSTR-2B. (5) Supplier is notified of rejection. If the credit note was deemed accepted (auto-accepted after due date), the recipient cannot reverse through IMS \u2014 workarounds include: raising a grievance on the portal, asking the supplier to issue a fresh debit note, or manually adding ITC back in GSTR-3B Table 4 with audit trail. Important: Reject before GSTR-2B generation date (typically 14th of the month) for it to reflect in the current period.",
+      "rag_eval": {
+        "answer": "Here is the step-by-step process on the GST portal to reject a credit note when the original invoice has already been accepted on IMS:\n\n1.  **Navigate to IMS Dashboard:** Go to GST Portal \u2192 Returns \u2192 IMS Dashboard (PKB-IMS\\_ISSUES\\_AND\\_WORKAROUNDS-S4)\n2.  **Locate the credit note:** Filter by document type = \"Credit Note\" and search by supplier GSTIN or credit note number (PKB-IMS\\_ISSUES\\_AND\\_WORKAROUNDS-S4)\n3.  **Check status:** If the credit note shows \"No Action\" (pending), you can still reject it (PKB-IMS\\_ISSUES\\_AND\\_WORKAROUNDS-S4)\n4.  **Click \"Reject\":** Select the credit note and click the \"Reject\" action button (PKB-IMS\\_ISSUES\\_AND\\_WORKAROUNDS-S4)\n5.  **Confirm rejection:** Verify the credit note details and confirm the rejection when the system prompts for confirmation (PKB-IMS\\_ISSUES\\_AND\\_WORKAROUNDS-S4)\n\nAfter rejection, the credit note will NOT reduce your ITC in the next GSTR-2B generation (PKB-IMS\\_ISSUES\\_AND\\_WORKAROUNDS-S4). The supplier will be notified of the rejection (PKB-IMS\\_ISSUES\\_AND\\_WORKAROUNDS-S4, PKB-IMS\\_ISSUES\\_AND\\_WORKAROUNDS-S4).",
+        "scores": [
+          {
+            "criterion": "Factual Accuracy",
+            "score": 5,
+            "reasoning": "The answer accurately describes the process of rejecting a credit note on the GST portal, including navigating to the IMS Dashboard, filtering for credit notes, checking status, and confirming rejection. These steps are consistent with the information provided in the sources."
+          },
+          {
+            "criterion": "Obligation Extraction",
+            "score": 5,
+            "reasoning": "The answer clearly outlines the obligations of the recipient in rejecting a credit note, including the steps to take on the GST portal and the implications for ITC. It also mentions the notification to the supplier, which is a key part of the process."
+          },
+          {
+            "criterion": "Deadline Accuracy",
+            "score": 5,
+            "reasoning": "The answer correctly implies the importance of rejecting the credit note before the GSTR-2B generation date to ensure it does not affect ITC, aligning with the source material that specifies the 14th of the month as a typical deadline."
+          },
+          {
+            "criterion": "Hallucination Rate",
+            "score": 5,
+            "reasoning": "All claims in the answer are grounded in the provided sources, particularly the detailed steps and implications of rejecting a credit note on the GST portal. There are no fabricated details."
+          },
+          {
+            "criterion": "Nuance Handling",
+            "score": 4,
+            "reasoning": "The answer captures the main process and implications of rejecting a credit note but does not mention the workaround options if the credit note is deemed accepted, which are covered in the sources. This is a minor omission."
+          }
+        ],
+        "total_score": 24,
+        "average_score": 4.8
+      },
+      "vanilla_gpt_eval": null,
+      "vanilla_gemini_eval": null,
+      "custom_eval": null,
+      "rag_sources": [
+        {
+          "title": "Portal Tips (IMS Issues and Workarounds)",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-11",
+          "link": "knowledge://ims_issues_and_workarounds/section-4",
+          "circular_number": "PKB-IMS_ISSUES_AND_WORKAROUNDS-S4",
+          "relevance_score": 0.6842,
+          "pdf_links": []
+        },
+        {
+          "title": "How IMS Works (IMS Issues and Workarounds)",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-11",
+          "link": "knowledge://ims_issues_and_workarounds/section-2",
+          "circular_number": "PKB-IMS_ISSUES_AND_WORKAROUNDS-S2",
+          "relevance_score": 0.6468,
+          "pdf_links": []
+        },
+        {
+          "title": "Overview (IMS Issues and Workarounds)",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-11",
+          "link": "knowledge://ims_issues_and_workarounds/section-1",
+          "circular_number": "PKB-IMS_ISSUES_AND_WORKAROUNDS-S1",
+          "relevance_score": 0.6171,
+          "pdf_links": []
+        },
+        {
+          "title": "Common Issues (IMS Issues and Workarounds)",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-11",
+          "link": "knowledge://ims_issues_and_workarounds/section-3",
+          "circular_number": "PKB-IMS_ISSUES_AND_WORKAROUNDS-S3",
+          "relevance_score": 0.5909,
+          "pdf_links": []
+        }
+      ],
+      "rag_advantage_vs_gpt": null,
+      "rag_advantage_vs_gemini": null,
+      "rag_advantage_vs_custom": null,
+      "q_num": 16
+    },
+    {
+      "question": "While filing GSTR-9 (annual return), a taxpayer finds that Table 8A (auto-populated ITC from GSTR-2A/2B) does not match their books. What are the possible reasons for mismatch, and what is the correct way to reconcile and report the difference in Table 8C?",
+      "ground_truth": "Possible reasons for Table 8A vs books mismatch: (1) Timing differences \u2014 invoice in supplier's GSTR-1 in different FY than recipient's claim. (2) Amendments by supplier in subsequent periods. (3) Credit notes issued in different period. (4) GSTR-2A vs GSTR-2B computation differences. (5) Reverse charge ITC not in 8A. (6) Import IGST timing differences. Table 8C reports ITC from current FY invoices claimed in the next FY's returns (before annual return filing date). It is NOT auto-populated \u2014 taxpayer must manually calculate and enter. Reconciliation: Download 8A data, compare with ITC register, classify differences into categories (8A has/books don't = report in 8D; books have/8A doesn't = report in 8C or 8F). Net ITC = 8A + 8C - 8D adjustments.",
+      "rag_eval": {
+        "answer": "Here's how to reconcile mismatches between Table 8A of GSTR-9 and your books, and how to report the differences in Table 8C:\n\n**Possible Reasons for Mismatch Between Table 8A and Books**\n\n*   **Timing Differences:** Invoices reported by the supplier in one financial year (FY X) but claimed by the recipient in the next financial year (FY X+1), or vice versa (PKB-GSTR9\\_9C\\_RECONCILIATION-S3).\n*   **Amendments:** Suppliers may have amended invoice details in subsequent periods (PKB-GSTR9\\_9C\\_RECONCILIATION-S3).\n*   **GSTR-2A vs. GSTR-2B:** Table 8A historically pulled data from GSTR-2A, but ITC was claimed based on GSTR-2B (PKB-GSTR9\\_9C\\_RECONCILIATION-S3).\n*   **Late Filing by Supplier:** If a supplier filed their GSTR-1 late, the invoice might appear in Table 8A of a different period (PKB-GSTR9\\_9C\\_RECONCILIATION-S3).\n*   **Credit Notes:** Credit notes issued in a different period than the original invoice can cause mismatches (PKB-GSTR9\\_9C\\_RECONCILIATION-S3).\n*   **Provisional ITC:** ITC claimed on a provisional basis and later regularized (PKB-GSTR9\\_9C\\_RECONCILIATION-S3).\n*   **Reverse Charge Mechanism (RCM):** Reverse charge ITC is not included in Table 8A and requires separate reporting (PKB-GSTR9\\_9C\\_RECONCILIATION-S3).\n*   **Import IGST:** Timing differences related to Bills of Entry for import IGST (PKB-GSTR9\\_9C\\_RECONCILIATION-S3).\n*   **Rejected Invoice:** If an invoice was rejected after GSTR-2B generation but before GSTR-3B filing, the rejection reflects only in the next period's GSTR-2B (PKB-IMS\\_ISSUES\\_AND\\_WORKAROUNDS-S3).\n*   **Incorrect Acceptance of Table 8A:** Table 8A figures may include reversed credit notes or cancelled invoices (PKB-GSTR9\\_9C\\_RECONCILIATION-S3).\n\n**Reconciling and Reporting Differences in Table 8C**\n\n1.  **Download Table 8A Data:** Obtain the auto-populated data from the GSTR-9 portal (PKB-GSTR9\\_9C\\_RECONCILIATION-S3).\n2.  **Compare with Books:** Compare the downloaded data with your ITC register or books of accounts (PKB-GSTR9\\_9C\\_RECONCILIATION-S3).\n3.  **Identify and Classify Differences:** Identify the differences and classify them according to the following categories (PKB-GSTR9\\_9C\\_RECONCILIATION-S3):\n\n    *   ITC in 8A, claimed in books: No issue.\n    *   ITC in 8A, not claimed: Report in Table 8D (other reasons).\n    *   ITC not in 8A, claimed: Report in Table 8C (if from the previous year) or 8F.\n    *   Difference in amount: Report the actual amount claimed, adjusted in 8A.\n4.  **Use Offline Tool:** Use the Excel offline tool to prepare the reconciliation before filing online (PKB-GSTR9\\_9C\\_RECONCILIATION-S3).\n5.  **Table 8C Purpose:** Table 8C is used to capture ITC on inward supplies received during the financial year but availed in the returns of the *next* financial year, up to the annual return filing date (PKB-GSTR9\\_9C\\_RECONCILIATION-S3, PKB-GSTR9\\_9C\\_RECONCILIATION-S3).\n6.  **How to Fill Table 8C:** Identify invoices where (PKB-GSTR9\\_9C\\_RECONCILIATION-S3):\n\n    *   The invoice date falls in the current financial year.\n    *   ITC was claimed in GSTR-3B of the next financial year (April onwards).\n    *   The claim was made before the due date of annual return filing.\n    *   Report the total ITC amount of such invoices in Table 8C (PKB-GSTR9\\_9C\\_RECONCILIATION-S3).\n7.  **Manual Entry:** Table 8C is *not* auto-populated. You must manually calculate and enter the data (PKB-GSTR9\\_9C\\_RECONCILIATION-S3). Failure to report in Table 8C leads to unexplained ITC differences (PKB-GSTR9\\_9C\\_RECONCILIATION-S3).",
+        "scores": [
+          {
+            "criterion": "Factual Accuracy",
+            "score": 5,
+            "reasoning": "The answer accurately identifies the reasons for mismatches between Table 8A and the taxpayer's books, such as timing differences, amendments, and differences between GSTR-2A and GSTR-2B. It also correctly describes the purpose and manual nature of Table 8C, aligning with the provided sources."
+          },
+          {
+            "criterion": "Obligation Extraction",
+            "score": 5,
+            "reasoning": "The answer clearly outlines the steps for reconciling and reporting differences, including downloading data, comparing with books, and classifying differences. It specifies the actions required for each type of discrepancy, such as reporting in Table 8C or 8D, which is consistent with the sources."
+          },
+          {
+            "criterion": "Deadline Accuracy",
+            "score": 3,
+            "reasoning": "The answer does not specify particular deadlines or dates, which is appropriate given the nature of the question. Therefore, a score of 3 is appropriate as the criterion is not applicable."
+          },
+          {
+            "criterion": "Hallucination Rate",
+            "score": 5,
+            "reasoning": "All claims made in the answer are supported by the provided sources. The answer does not introduce any unsupported or fabricated information, maintaining a high level of accuracy and reliability."
+          },
+          {
+            "criterion": "Nuance Handling",
+            "score": 5,
+            "reasoning": "The answer effectively captures nuances such as the manual entry requirement for Table 8C, the distinction between ITC claimed in different fiscal years, and the specific reporting requirements for various discrepancies. These details are well-supported by the sources."
+          }
+        ],
+        "total_score": 23,
+        "average_score": 4.6
+      },
+      "vanilla_gpt_eval": null,
+      "vanilla_gemini_eval": null,
+      "custom_eval": null,
+      "rag_sources": [
+        {
+          "title": "Table 8A Reconciliation Issues (GSTR-9 and GSTR-9C Reconciliation Guide)",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-11",
+          "link": "knowledge://gstr9_9c_reconciliation/section-3",
+          "circular_number": "PKB-GSTR9_9C_RECONCILIATION-S3",
+          "relevance_score": 0.6674,
+          "pdf_links": []
+        },
+        {
+          "title": "GSTR-8 Filing Considerations (E-Commerce TCS After Rate Change)",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-11",
+          "link": "knowledge://ecommerce_tcs_after_rate_change/section-5",
+          "circular_number": "PKB-ECOMMERCE_TCS_AFTER_RATE_CHANGE-S5",
+          "relevance_score": 0.6218,
+          "pdf_links": []
+        },
+        {
+          "title": "Common Issues (IMS Issues and Workarounds)",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-11",
+          "link": "knowledge://ims_issues_and_workarounds/section-3",
+          "circular_number": "PKB-IMS_ISSUES_AND_WORKAROUNDS-S3",
+          "relevance_score": 0.5896,
+          "pdf_links": []
+        },
+        {
+          "title": "Minutes of 48th GST Council Meeting",
+          "source": "gst_council",
+          "date": "2022-12-17",
+          "link": "https://gstcouncil.gov.in/sites/default/files/Minutes/48THMINUTES.pdf",
+          "circular_number": "GST-COUNCIL-48",
+          "relevance_score": 0.51,
+          "pdf_links": [
+            "https://gstcouncil.gov.in/sites/default/files/Minutes/48THMINUTES.pdf"
+          ]
+        },
+        {
+          "title": "Minutes of 50th GST Council Meeting",
+          "source": "gst_council",
+          "date": "2023-07-11",
+          "link": "https://gstcouncil.gov.in/sites/default/files/Minutes/Minutes_of_50th.pdf",
+          "circular_number": "GST-COUNCIL-50",
+          "relevance_score": 0.504,
+          "pdf_links": [
+            "https://gstcouncil.gov.in/sites/default/files/Minutes/Minutes_of_50th.pdf"
+          ]
+        }
+      ],
+      "rag_advantage_vs_gpt": null,
+      "rag_advantage_vs_gemini": null,
+      "rag_advantage_vs_custom": null,
+      "q_num": 17
+    },
+    {
+      "question": "A QRMP (Quarterly Return Monthly Payment) taxpayer receives a credit note from a supplier. Under IMS, credit notes are auto-accepted if not acted upon. If the taxpayer disputes the credit note, what happens to the ITC in their next quarterly GSTR-3B?",
+      "ground_truth": "If the QRMP taxpayer rejects the credit note in IMS during the quarter, the credit note will be excluded from the quarterly GSTR-2B, and ITC will NOT be reduced in the next quarterly GSTR-3B. The ITC remains as claimed from the original invoice. QRMP taxpayers can take IMS actions in any month (M1, M2, M3) of the quarter \u2014 all actions are consolidated when quarterly GSTR-2B is generated. If the taxpayer takes no action, the credit note is deemed accepted after the quarterly GSTR-3B filing due date, and ITC WILL be reduced in the next quarter's GSTR-2B. Best practice: Review IMS monthly, reject disputed credit notes immediately upon appearance.",
+      "rag_eval": {
+        "answer": "If a QRMP taxpayer disputes a credit note but takes no action in the IMS, the credit note is deemed accepted after the quarterly GSTR-3B filing due date. In this case, the ITC will be reduced in the next quarter's GSTR-2B (PKB-IMS_ISSUES_AND_WORKAROUNDS-S4).\n\nIf the credit note was auto-accepted, the taxpayer cannot reverse it through IMS (PKB-IMS_ISSUES_AND_WORKAROUNDS-S4). The taxpayer can use the following workarounds (PKB-IMS_ISSUES_AND_WORKAROUNDS-S4):\n*   Raise a grievance on the GST portal\n*   Ask the supplier to issue a fresh debit note to reverse the credit note effect\n*   Manually add the ITC back in GSTR-3B Table 4 with a clear audit trail (take screenshot of the IMS credit note and the communication with supplier)",
+        "scores": [
+          {
+            "criterion": "Factual Accuracy",
+            "score": 3,
+            "reasoning": "The answer correctly states that if no action is taken, the credit note is deemed accepted and ITC will be reduced in the next quarter's GSTR-2B. However, it incorrectly suggests that the taxpayer cannot reverse it through IMS, which is misleading as the taxpayer can reject the credit note before the GSTR-2B generation."
+          },
+          {
+            "criterion": "Obligation Extraction",
+            "score": 3,
+            "reasoning": "The answer identifies the need to act on credit notes in IMS and the consequences of inaction. However, it misses the opportunity to clearly state that rejecting the credit note in IMS will prevent ITC reduction, which is a key obligation."
+          },
+          {
+            "criterion": "Deadline Accuracy",
+            "score": 5,
+            "reasoning": "The answer correctly mentions that the credit note is deemed accepted after the quarterly GSTR-3B filing due date if no action is taken, aligning with the source information."
+          },
+          {
+            "criterion": "Hallucination Rate",
+            "score": 4,
+            "reasoning": "Most claims are grounded in the sources, but the statement about not being able to reverse the credit note through IMS is misleading without the context that it can be rejected before GSTR-2B generation."
+          },
+          {
+            "criterion": "Nuance Handling",
+            "score": 3,
+            "reasoning": "The answer captures the main process but lacks nuance regarding the ability to reject credit notes before GSTR-2B generation and the implications of such actions, which are important for understanding the full scope of the regulation."
+          }
+        ],
+        "total_score": 18,
+        "average_score": 3.6
+      },
+      "vanilla_gpt_eval": null,
+      "vanilla_gemini_eval": null,
+      "custom_eval": null,
+      "rag_sources": [
+        {
+          "title": "Minutes of 42nd GST Council Meeting",
+          "source": "gst_council",
+          "date": "",
+          "link": "https://gstcouncil.gov.in/sites/default/files/Minutes/42nd-GSTC-Minutes-Signed.pdf",
+          "circular_number": "GST-COUNCIL-42",
+          "relevance_score": 0.6535,
+          "pdf_links": [
+            "https://gstcouncil.gov.in/sites/default/files/Minutes/42nd-GSTC-Minutes-Signed.pdf"
+          ]
+        },
+        {
+          "title": "Table 8A Reconciliation Issues (GSTR-9 and GSTR-9C Reconciliation Guide)",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-11",
+          "link": "knowledge://gstr9_9c_reconciliation/section-3",
+          "circular_number": "PKB-GSTR9_9C_RECONCILIATION-S3",
+          "relevance_score": 0.6316,
+          "pdf_links": []
+        },
+        {
+          "title": "Minutes of 37th GST Council Meeting",
+          "source": "gst_council",
+          "date": "",
+          "link": "https://gstcouncil.gov.in/sites/default/files/Minutes/Signed-Minutes-37th-GST-Council-Meeting.pdf",
+          "circular_number": "GST-COUNCIL-37",
+          "relevance_score": 0.6182,
+          "pdf_links": [
+            "https://gstcouncil.gov.in/sites/default/files/Minutes/Signed-Minutes-37th-GST-Council-Meeting.pdf"
+          ]
+        },
+        {
+          "title": "Portal Tips (IMS Issues and Workarounds)",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-11",
+          "link": "knowledge://ims_issues_and_workarounds/section-4",
+          "circular_number": "PKB-IMS_ISSUES_AND_WORKAROUNDS-S4",
+          "relevance_score": 0.5756,
+          "pdf_links": []
+        },
+        {
+          "title": "Minutes of 50th GST Council Meeting",
+          "source": "gst_council",
+          "date": "2023-07-11",
+          "link": "https://gstcouncil.gov.in/sites/default/files/Minutes/Minutes_of_50th.pdf",
+          "circular_number": "GST-COUNCIL-50",
+          "relevance_score": 0.5306,
+          "pdf_links": [
+            "https://gstcouncil.gov.in/sites/default/files/Minutes/Minutes_of_50th.pdf"
+          ]
+        }
+      ],
+      "rag_advantage_vs_gpt": null,
+      "rag_advantage_vs_gemini": null,
+      "rag_advantage_vs_custom": null,
+      "q_num": 18
+    },
+    {
+      "question": "RBI has mandated a shift to floating-rate lending for certain loan categories while simultaneously the GST Council has changed the treatment of insurance premiums bundled with loans. For a bank offering a home loan with bundled life insurance, how do these two regulatory changes interact in terms of (a) the EMI structure and (b) the GST invoice to the borrower?",
+      "ground_truth": "(a) EMI structure: The floating rate reset changes only the interest component. The EMI comprises principal + interest (exempt from GST) + insurance premium (taxable at 18% GST). At each reset, the bank must transparently show the revised breakup. The insurance premium component may be fixed or variable independently of the interest rate. (b) GST invoice: Interest on the loan is exempt from GST. Insurance premium is taxable at 18%. If insurance is optional (not mandatory for loan), each is a separate supply \u2014 the insurer or bank (as corporate agent) must issue a separate GST invoice for the insurance premium. If insurance is mandatory (composite supply), the principal supply is the exempt loan, potentially making the whole supply exempt \u2014 though IRDAI and RBI discourage mandatory bundling. The borrower generally cannot claim ITC on insurance (personal use for residential; blocked under Section 17(5) for commercial).",
+      "rag_eval": {
+        "answer": "Here's how the RBI's floating-rate lending mandate and the GST Council's changes interact for a bank offering a home loan with bundled life insurance:\n\n**a) EMI Structure**\n\n*   **Components:** The EMI for a home loan with bundled life insurance comprises principal repayment, interest, and an insurance premium component (PKB-CROSS_DOMAIN_LOAN_INSURANCE_GST-S2).\n*   **Floating Rate Impact:** When the interest rate changes due to the floating rate, the interest component of the EMI changes. The insurance premium component may or may not change, depending on the insurance policy terms (PKB-CROSS_DOMAIN_LOAN_INSURANCE_GST-S2).\n*   **GST Impact:** The GST on insurance is charged to the borrower as part of the insurance premium, not as part of the interest. The insurance premium within the EMI is a separate identifiable charge and is subject to 18% GST (PKB-CROSS_DOMAIN_LOAN_INSURANCE_GST-S3).\n*   **EMI Reset Transparency:** The EMI reset calculation must transparently show the revised interest component (based on the new floating rate), the insurance premium component (which may be fixed or variable), and the principal repayment portion (PKB-CROSS_DOMAIN_LOAN_INSURANCE_GST-S2). After the rate reset, the bank must show the revised EMI breakup: interest (exempt) + insurance premium (18% GST) + principal repayment (PKB-CROSS_DOMAIN_LOAN_INSURANCE_GST-S3).\n*   **Communication:** Banks must inform borrowers of the exact impact on EMI/tenure within 30 days of repo rate change (PKB-CROSS_DOMAIN_LOAN_INSURANCE_GST-S2).\n\n**b) GST Invoice to the Borrower**\n\n*   **Issuance:** Either the bank (acting as a corporate agent for the insurer) or the insurance company directly must issue a GST invoice for the insurance premium (PKB-CROSS_DOMAIN_LOAN_INSURANCE_GST-S3). If the bank collects the premium on behalf of the insurer, the insurer issues the invoice (PKB-CROSS_DOMAIN_LOAN_INSURANCE_GST-S3).\n*   **Content:** The invoice must show the insurance premium (base amount) and the GST at 18% (PKB-CROSS_DOMAIN_LOAN_INSURANCE_GST-S3).\n*   **ITC:** The borrower does not get Input Tax Credit (ITC) on the insurance premium if the home loan is for a residential property because it is for personal use. If the borrower is a business entity (commercial property loan), ITC on the insurance premium is blocked under Section 17(5)(b) unless it's a statutory obligation (PKB-CROSS_DOMAIN_LOAN_INSURANCE_GST-S3).",
+        "scores": [
+          {
+            "criterion": "Factual Accuracy",
+            "score": 4,
+            "reasoning": "The answer accurately describes the components of the EMI structure and the GST treatment of insurance premiums. It correctly identifies the floating rate impact on the interest component and the GST rate on insurance premiums. However, it does not explicitly mention the composite supply concept when insurance is mandatory, which is a key detail from the sources."
+          },
+          {
+            "criterion": "Obligation Extraction",
+            "score": 4,
+            "reasoning": "The answer identifies key obligations such as the need for transparent EMI reset calculations and the issuance of GST invoices. It also mentions the requirement for banks to inform borrowers of EMI changes within 30 days. However, it could more explicitly state the regulatory discouragement of mandatory insurance bundling."
+          },
+          {
+            "criterion": "Deadline Accuracy",
+            "score": 3,
+            "reasoning": "The answer mentions a 30-day communication requirement for EMI changes, which aligns with the sources. Since the question does not focus on specific deadlines beyond this, a score of 3 is appropriate."
+          },
+          {
+            "criterion": "Hallucination Rate",
+            "score": 5,
+            "reasoning": "The answer is well-grounded in the provided sources, with no apparent hallucinations. All claims about EMI structure, GST treatment, and communication requirements are supported by the sources."
+          },
+          {
+            "criterion": "Nuance Handling",
+            "score": 3,
+            "reasoning": "The answer captures the main points about EMI structure and GST treatment but lacks detail on the nuances of composite supply when insurance is mandatory. It also does not address the regulatory discouragement of mandatory bundling as thoroughly as the sources suggest."
+          }
+        ],
+        "total_score": 19,
+        "average_score": 3.8
+      },
+      "vanilla_gpt_eval": null,
+      "vanilla_gemini_eval": null,
+      "custom_eval": null,
+      "rag_sources": [
+        {
+          "title": "GST on Insurance Premiums Bundled with Loans (Cross-Regulatory \u2014 RBI Floating Rate Lending and GST on Bundled Insurance with Loans)",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-17",
+          "link": "knowledge://cross_domain_loan_insurance_gst/section-3",
+          "circular_number": "PKB-CROSS_DOMAIN_LOAN_INSURANCE_GST-S3",
+          "relevance_score": 0.7557,
+          "pdf_links": []
+        },
+        {
+          "title": "RBI Floating-Rate Lending Mandate (Cross-Regulatory \u2014 RBI Floating Rate Lending and GST on Bundled Insurance with Loans)",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-17",
+          "link": "knowledge://cross_domain_loan_insurance_gst/section-2",
+          "circular_number": "PKB-CROSS_DOMAIN_LOAN_INSURANCE_GST-S2",
+          "relevance_score": 0.7402,
+          "pdf_links": []
+        },
+        {
+          "title": "Overview (Cross-Regulatory \u2014 RBI Floating Rate Lending and GST on Bundled Insurance with Loans)",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-17",
+          "link": "knowledge://cross_domain_loan_insurance_gst/section-1",
+          "circular_number": "PKB-CROSS_DOMAIN_LOAN_INSURANCE_GST-S1",
+          "relevance_score": 0.7324,
+          "pdf_links": []
+        },
+        {
+          "title": "Regulatory References (Cross-Regulatory \u2014 RBI Floating Rate Lending and GST on Bundled Insurance with Loans)",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-17",
+          "link": "knowledge://cross_domain_loan_insurance_gst/section-4",
+          "circular_number": "PKB-CROSS_DOMAIN_LOAN_INSURANCE_GST-S4",
+          "relevance_score": 0.7182,
+          "pdf_links": []
+        },
+        {
+          "title": "Cross-Regulatory \u2014 RBI Floating Rate Lending and GST on Bundled Insurance with Loans",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-17",
+          "link": "knowledge://cross_domain_loan_insurance_gst/overview",
+          "circular_number": "PKB-CROSS_DOMAIN_LOAN_INSURANCE_GST",
+          "relevance_score": 0.7072,
+          "pdf_links": []
+        },
+        {
+          "title": "RBI/2025-2026/17DOR.CRE.REC.No.11/07.10.002/2025-26",
+          "source": "rbi",
+          "date": "2025-04-01",
+          "link": "https://www.rbi.org.in/Scripts/BS_CircularIndexDisplay.aspx?Id=12826",
+          "circular_number": "RBI/2025-26/17",
+          "relevance_score": 0.5994,
+          "pdf_links": [
+            "https://rbidocs.rbi.org.in/rdocs/Notification/PDFs/NT17DC5A1D8BA84E420CA6AAA87B4E05F17F.PDF"
+          ]
+        },
+        {
+          "title": "Reset of floating interest rate on EMI based housing loans (UCB Credit Facilities MD)",
+          "source": "rbi",
+          "date": "2025-01-01",
+          "link": "https://www.rbi.org.in/Scripts/BS_ViewMasDirections.aspx?id=13028",
+          "circular_number": "RBI_MD-UCB_Credit_Facilities_MD-Chapter_VIII__F_",
+          "relevance_score": 0.5959,
+          "pdf_links": []
+        }
+      ],
+      "rag_advantage_vs_gpt": null,
+      "rag_advantage_vs_gemini": null,
+      "rag_advantage_vs_custom": null,
+      "q_num": 19
+    },
+    {
+      "question": "A manufacturer in a state that offers a capital investment subsidy (treated as exempt from GST) finds that a GST rate increase on their output product effectively nullifies the subsidy benefit. Can they challenge the rate change as violating the state incentive scheme? What legal remedies exist at the GST Council and High Court level?",
+      "ground_truth": "Challenging the rate change directly is very difficult \u2014 courts hold there is no vested right to a particular tax rate, and the GST Council has sovereign power to recommend rate changes. Promissory estoppel does not apply against legislative/sovereign power (Supreme Court in Motilal Padampat Sugar Mills). Available remedies: (1) GST Council representation \u2014 through the state Finance Minister who is a Council member, request rate review or special provision for subsidy beneficiaries. (2) Approach state government to increase the subsidy to compensate for the higher rate (since subsidies must go through the budgetary route per GST Council's 3rd/5th meeting decisions). (3) Writ petition under Article 226 in High Court \u2014 argue promissory estoppel against the state (not the rate change), Article 14 arbitrariness if rate change disproportionately affects subsidized industries. (4) Contractual/arbitration route if the subsidy agreement has a change-in-law clause. The practical recommendation is to exhaust representation and negotiation before litigation.",
+      "rag_eval": {
+        "answer": "```text\nHere's an analysis of whether a manufacturer can challenge a GST rate change that nullifies a state investment subsidy, and the legal remedies available.\n\n1.  Can the manufacturer challenge the rate change as violating the state incentive scheme?\n\nIt is very difficult, but not impossible, for a manufacturer to challenge a GST rate change that nullifies the benefit of a state investment subsidy (PKB-STATE_SUBSIDY_GST_RATE_CHALLENGE-S3). While many states offer capital investment subsidies structured as reimbursement of GST paid, effectively treating it as exempt, a subsequent GST rate increase on the output product can nullify the subsidy's economic benefit (PKB-STATE_SUBSIDY_GST_RATE_CHALLENGE-S1).\n\nHowever, courts have held that there is no vested right to a particular rate of tax (PKB-STATE_SUBSIDY_GST_RATE_CHALLENGE-S3, PKB-STATE_SUBSIDY_GST_RATE_CHALLENGE-S10). The GST Council has the sovereign power to recommend rate changes based on revenue needs, inflation, or rationalization (PKB-STATE_SUBSIDY_GST_RATE_CHALLENGE-S3, PKB-STATE_SUBSIDY_GST_RATE_CHALLENGE-S10). A subsidy beneficiary cannot claim that the government is bound to maintain a specific rate structure (PKB-STATE_SUBSIDY_GST_RATE_CHALLENGE-S3, PKB-STATE_SUBSIDY_GST_RATE_CHALLENGE-S10).\n\nThe manufacturer can argue promissory estoppel, stating that the state government promised a subsidy based on certain economic assumptions (including the tax rate at the time of investment), and changing the rate frustrates that promise (PKB-STATE_SUBSIDY_GST_RATE_CHALLENGE-S3, PKB-STATE_SUBSIDY_GST_RATE_CHALLENGE-S9). However, the Supreme Court has held that promissory estoppel does NOT apply against the exercise of legislative/sovereign power (including taxation) (PKB-STATE_SUBSIDY_GST_RATE_CHALLENGE-S3). The GST rate change is a legislative act (notification under Section 9 of CGST Act), not an administrative promise (PKB-STATE_SUBSIDY_GST_RATE_CHALLENGE-S3, PKB-STATE_SUBSIDY_GST_RATE_CHALLENGE-S8). Promissory estoppel works better against the state government to compel them to increase the subsidy to compensate than against the GST rate change itself (PKB-STATE_SUBSIDY_GST_RATE_CHALLENGE-S3).\n\n2.  What legal remedies exist at the GST Council and High Court level?\n\nLegal remedies available to the manufacturer include (PKB-STATE_SUBSIDY_GST_RATE_CHALLENGE-S5):\n\n*   **Representation to the GST Council:** The manufacturer (or industry association) can make a representation to the GST Council through the state government, as the state government's Finance Minister is a member of the GST Council and can raise the issue (PKB-STATE_SUBSIDY_GST_RATE_CHALLENGE-S5). The request can be to either reduce the rate back or create a special provision for subsidy beneficiaries (PKB-STATE_SUBSIDY_GST_RATE_CHALLENGE-S5). However, the effectiveness of this remedy is limited, as the GST Council may or may not act, and there is no legal compulsion to consider representations (PKB-STATE_SUBSIDY_GST_RATE_CHALLENGE-S5).\n*   **Approach the State Government:** The manufacturer can request the state to increase the subsidy to compensate for the higher GST rate (PKB-STATE_SUBSIDY_GST_RATE_CHALLENGE-S5). Since the subsidy is a state budgetary commitment, the state can revise the subsidy terms (PKB-STATE_SUBSIDY_GST_RATE_CHALLENGE-S5). The state government may agree if it wants to retain the manufacturer's investment (PKB-STATE_SUBSIDY_GST_RATE_CHALLENGE-S5). The state's incentive notification may contain a clause protecting against changes in tax policy, so the original subsidy order should be checked (PKB-STATE_SUBSIDY_GST_RATE_CHALLENGE-S5).\n*   **Writ Petition Under Article 226 (High Court):** A writ petition can be filed before the High Court on the grounds that the rate increase violates the state's incentive scheme commitment (promissory estoppel against the state) and that the rate change is arbitrary (Article 14) if it targets specific products without a rational basis (PKB-STATE_SUBSIDY_GST_RATE_CHALLENGE-S5). The writ court can issue interim relief (stay on the rate increase for the petitioner), but this is rare for tax rate challenges (PKB-STATE_SUBSIDY_GST_RATE_CHALLENGE-S7). The court may direct the state government to consider revising the subsidy rather than striking down the rate change (PKB-STATE_SUBSIDY_GST_RATE_CHALLENGE-S7). The jurisdiction for filing the writ petition is the High Court of the state where the manufacturing unit is located (PKB-STATE_SUBSIDY_GST_RATE_CHALLENGE-S7).\n```",
+        "scores": [
+          {
+            "criterion": "Factual Accuracy",
+            "score": 4,
+            "reasoning": "The answer accurately describes the difficulty of challenging a GST rate change and the role of the GST Council. It correctly mentions the concept of promissory estoppel and the legislative nature of GST rate changes. However, it does not cite specific circular numbers or dates, which would have improved accuracy."
+          },
+          {
+            "criterion": "Obligation Extraction",
+            "score": 5,
+            "reasoning": "The answer effectively identifies the obligations and limitations faced by the manufacturer, such as the lack of a vested right to a specific tax rate and the potential use of promissory estoppel against the state government. It also outlines the steps for representation and legal action."
+          },
+          {
+            "criterion": "Deadline Accuracy",
+            "score": 3,
+            "reasoning": "The question does not involve specific deadlines or dates, so this criterion is not applicable."
+          },
+          {
+            "criterion": "Hallucination Rate",
+            "score": 5,
+            "reasoning": "The answer is well-grounded in the provided sources, with no evidence of hallucination. All claims are supported by the sources, and the answer provides substantive information."
+          },
+          {
+            "criterion": "Nuance Handling",
+            "score": 5,
+            "reasoning": "The answer captures the nuances of the legal framework, including the limitations of promissory estoppel, the role of the GST Council, and the potential for state-level remedies. It also discusses the practical aspects of pursuing legal remedies."
+          }
+        ],
+        "total_score": 22,
+        "average_score": 4.4
+      },
+      "vanilla_gpt_eval": null,
+      "vanilla_gemini_eval": null,
+      "custom_eval": null,
+      "rag_sources": [
+        {
+          "title": "Overview (Challenging GST Rate Changes That Nullify State Investment Subsidies)",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-17",
+          "link": "knowledge://state_subsidy_gst_rate_challenge/section-1",
+          "circular_number": "PKB-STATE_SUBSIDY_GST_RATE_CHALLENGE-S1",
+          "relevance_score": 0.7346,
+          "pdf_links": []
+        },
+        {
+          "title": "Can the Manufacturer Challenge the Rate Change? (Challenging GST Rate Changes That Nullify State Investment Subsidies)",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-17",
+          "link": "knowledge://state_subsidy_gst_rate_challenge/section-3",
+          "circular_number": "PKB-STATE_SUBSIDY_GST_RATE_CHALLENGE-S3",
+          "relevance_score": 0.7327,
+          "pdf_links": []
+        },
+        {
+          "title": "Challenging GST Rate Changes That Nullify State Investment Subsidies",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-17",
+          "link": "knowledge://state_subsidy_gst_rate_challenge/overview",
+          "circular_number": "PKB-STATE_SUBSIDY_GST_RATE_CHALLENGE",
+          "relevance_score": 0.711,
+          "pdf_links": []
+        },
+        {
+          "title": "Regulatory References (Challenging GST Rate Changes That Nullify State Investment Subsidies)",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-17",
+          "link": "knowledge://state_subsidy_gst_rate_challenge/section-6",
+          "circular_number": "PKB-STATE_SUBSIDY_GST_RATE_CHALLENGE-S6",
+          "relevance_score": 0.6843,
+          "pdf_links": []
+        },
+        {
+          "title": "Legal Remedies Available (Challenging GST Rate Changes That Nullify State Investment Subsidies)",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-17",
+          "link": "knowledge://state_subsidy_gst_rate_challenge/section-4",
+          "circular_number": "PKB-STATE_SUBSIDY_GST_RATE_CHALLENGE-S4",
+          "relevance_score": 0.6814,
+          "pdf_links": []
+        },
+        {
+          "title": "Practical Recommendations (Challenging GST Rate Changes That Nullify State Investment Subsidies)",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-17",
+          "link": "knowledge://state_subsidy_gst_rate_challenge/section-5",
+          "circular_number": "PKB-STATE_SUBSIDY_GST_RATE_CHALLENGE-S5",
+          "relevance_score": 0.6748,
+          "pdf_links": []
+        },
+        {
+          "title": "The Legal Framework (Challenging GST Rate Changes That Nullify State Investment Subsidies)",
+          "source": "practitioner_knowledge",
+          "date": "2026-03-17",
+          "link": "knowledge://state_subsidy_gst_rate_challenge/section-2",
+          "circular_number": "PKB-STATE_SUBSIDY_GST_RATE_CHALLENGE-S2",
+          "relevance_score": 0.6704,
+          "pdf_links": []
+        },
+        {
+          "title": "Minutes of 45th GST Council Meeting",
+          "source": "gst_council",
+          "date": "",
+          "link": "https://gstcouncil.gov.in/sites/default/files/Minutes/45TH_MEETING.pdf",
+          "circular_number": "GST-COUNCIL-45",
+          "relevance_score": 0.6279,
+          "pdf_links": [
+            "https://gstcouncil.gov.in/sites/default/files/Minutes/45TH_MEETING.pdf"
+          ]
+        }
+      ],
+      "rag_advantage_vs_gpt": null,
+      "rag_advantage_vs_gemini": null,
+      "rag_advantage_vs_custom": null,
+      "q_num": 20
+    }
+  ]
+}

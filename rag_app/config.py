@@ -15,7 +15,8 @@ class Settings(BaseSettings):
     EMBEDDING_DIMENSION: int = 1536
     GENERATION_MODEL: str = "gpt-4o-mini"  # Used for vanilla GPT baseline
     EVAL_JUDGE_MODEL: str = "gpt-4o"
-    GEMINI_MODEL: str = "gemini-2.5-pro"  # Used for vanilla Gemini baseline
+    GEMINI_MODEL: str = "gemini-2.0-flash"  # Used for analysis and eval baselines
+    GEMINI_FAST_MODEL: str = "gemini-2.0-flash"  # Used for /ask, query rewrite, multi-query expansion
     LLM_PROVIDER: str = "gemini"  # "gemini" or "openai"
     OPENAI_GENERATION_MODEL: str = "gpt-4o-mini"
 
@@ -40,6 +41,17 @@ class Settings(BaseSettings):
     CHUNK_MIN_TOKENS: int = 400
     CHUNK_MAX_TOKENS: int = 700
     CHUNK_OVERLAP_TOKENS: int = 50
+
+    # Neo4j
+    NEO4J_URI: str = ""
+    NEO4J_USER: str = "neo4j"
+    NEO4J_USERNAME: str = ""  # alias — some Aura instances use this
+    NEO4J_PASSWORD: str = ""
+    GRAPH_ENABLED: bool = False
+
+    @property
+    def neo4j_user(self) -> str:
+        return self.NEO4J_USERNAME or self.NEO4J_USER
 
     # Retrieval
     TOP_K: int = 12

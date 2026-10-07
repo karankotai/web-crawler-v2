@@ -1,0 +1,146 @@
+{
+  "Regulated Entity": {
+    "children": ["Bank", "NBFC", "Insurance Company", "Stock Exchange", "Depository", "Payment System Operator", "Credit Information Company", "Housing Finance Company"],
+    "aliases": ["Regulated Entities", "Regulated Entities (REs)", "REs", "All Regulated Entities", "Supervised Entities"]
+  },
+  "Bank": {
+    "children": ["Scheduled Commercial Bank", "Urban Cooperative Bank", "Regional Rural Bank", "Small Finance Bank", "Payments Bank", "Local Area Bank"],
+    "aliases": ["Banks", "Banking Company", "Banking Companies", "All Banks"]
+  },
+  "Scheduled Commercial Bank": {
+    "children": ["Public Sector Bank", "Private Sector Bank", "Foreign Bank"],
+    "aliases": ["Scheduled Commercial Banks", "SCBs", "SCB", "Commercial Banks"]
+  },
+  "Public Sector Bank": {
+    "children": [],
+    "aliases": ["Public Sector Banks", "PSBs", "PSB", "Nationalised Banks", "Nationalized Banks"]
+  },
+  "Private Sector Bank": {
+    "children": [],
+    "aliases": ["Private Sector Banks", "Private Banks"]
+  },
+  "Foreign Bank": {
+    "children": [],
+    "aliases": ["Foreign Banks", "Foreign Bank Branches"]
+  },
+  "Urban Cooperative Bank": {
+    "children": ["Tier 1 UCB", "Tier 2 UCB", "Tier 3 UCB", "Tier 4 UCB"],
+    "aliases": ["UCBs", "UCB", "Urban Co-operative Banks", "Urban Co-operative Bank", "Primary Urban Cooperative Banks", "Primary (Urban) Co-operative Banks"]
+  },
+  "Regional Rural Bank": {
+    "children": [],
+    "aliases": ["Regional Rural Banks", "RRBs", "RRB"]
+  },
+  "Small Finance Bank": {
+    "children": [],
+    "aliases": ["Small Finance Banks", "SFBs", "SFB"]
+  },
+  "Payments Bank": {
+    "children": [],
+    "aliases": ["Payments Banks", "PBs"]
+  },
+  "NBFC": {
+    "children": ["NBFC-ICC", "NBFC-MFI", "NBFC-Factor", "NBFC-P2P", "NBFC-AA", "Infrastructure Finance Company", "Core Investment Company", "NBFC-UL", "NBFC-ML", "NBFC-BL"],
+    "aliases": ["NBFCs", "Non-Banking Financial Company", "Non-Banking Financial Companies", "Non Banking Financial Company"]
+  },
+  "NBFC-UL": {
+    "children": [],
+    "aliases": ["Upper Layer NBFCs", "Upper Layer NBFC"]
+  },
+  "NBFC-ML": {
+    "children": [],
+    "aliases": ["Middle Layer NBFCs", "Middle Layer NBFC"]
+  },
+  "NBFC-BL": {
+    "children": [],
+    "aliases": ["Base Layer NBFCs", "Base Layer NBFC"]
+  },
+  "NBFC-ICC": {
+    "children": [],
+    "aliases": ["NBFC-Investment and Credit Companies"]
+  },
+  "NBFC-MFI": {
+    "children": [],
+    "aliases": ["NBFC-Micro Finance Institution", "Microfinance NBFCs"]
+  },
+  "Infrastructure Finance Company": {
+    "children": [],
+    "aliases": ["Infrastructure Finance Companies", "IFC", "NBFC-IFC"]
+  },
+  "Core Investment Company": {
+    "children": [],
+    "aliases": ["Core Investment Companies", "CIC", "CICs", "NBFC-CIC"]
+  },
+  "Insurance Company": {
+    "children": ["Life Insurance Company", "General Insurance Company", "Health Insurance Company", "Reinsurance Company"],
+    "aliases": ["Insurance Companies", "Insurers", "Insurer"]
+  },
+  "Life Insurance Company": {
+    "children": [],
+    "aliases": ["Life Insurers", "Life Insurance Companies"]
+  },
+  "General Insurance Company": {
+    "children": [],
+    "aliases": ["General Insurers", "General Insurance Companies"]
+  },
+  "Health Insurance Company": {
+    "children": [],
+    "aliases": ["Health Insurers", "Stand Alone Health Insurers"]
+  },
+  "Housing Finance Company": {
+    "children": [],
+    "aliases": ["Housing Finance Companies", "HFCs", "HFC"]
+  },
+  "Stock Exchange": {
+    "children": [],
+    "aliases": ["Stock Exchanges", "Recognised Stock Exchanges", "Recognized Stock Exchanges"]
+  },
+  "Depository": {
+    "children": [],
+    "aliases": ["Depositories", "NSDL", "CDSL"]
+  },
+  "Payment System Operator": {
+    "children": ["Payment Aggregator", "Prepaid Payment Instrument Issuer"],
+    "aliases": ["Payment System Operators", "PSOs", "PSO"]
+  },
+  "Payment Aggregator": {
+    "children": [],
+    "aliases": ["Payment Aggregators", "PAs", "PA"]
+  },
+  "Prepaid Payment Instrument Issuer": {
+    "children": [],
+    "aliases": ["PPI Issuers", "PPI Issuer"]
+  },
+  "Listed Company": {
+    "children": [],
+    "aliases": ["Listed Companies", "Listed Entities", "Listed Entity"]
+  },
+  "Mutual Fund": {
+    "children": [],
+    "aliases": ["Mutual Funds", "Asset Management Company", "Asset Management Companies", "AMC", "AMCs"]
+  },
+  "Stock Broker": {
+    "children": ["Trading Member", "Clearing Member"],
+    "aliases": ["Stock Brokers", "Stockbrokers", "Broker"]
+  },
+  "Trading Member": {
+    "children": [],
+    "aliases": ["Trading Members"]
+  },
+  "Clearing Member": {
+    "children": [],
+    "aliases": ["Clearing Members"]
+  },
+  "Depository Participant": {
+    "children": [],
+    "aliases": ["Depository Participants", "DPs", "DP"]
+  },
+  "Merchant Banker": {
+    "children": [],
+    "aliases": ["Merchant Bankers"]
+  },
+  "Credit Rating Agency": {
+    "children": [],
+    "aliases": ["Credit Rating Agencies", "CRA", "CRAs"]
+  }
+}

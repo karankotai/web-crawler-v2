@@ -72,13 +72,28 @@ If you discover that the wrong HS code has been applied:
    - Industry practice evidence
    - Any prior rulings on similar products
 
-### Limitations of Advance Ruling
+### Limitations of Advance Ruling (Section 103 of CGST Act)
 
 1. **Binding only on the applicant** and the jurisdictional officer — not on other taxpayers
 2. **State-specific**: Each state's AAR may rule differently (has happened frequently)
 3. **Appealable**: Both taxpayer and department can appeal to Appellate Authority for Advance Ruling (AAAR)
 4. **Validity**: Until the law changes or the ruling is voided by AAAR/GSTAT
 5. **Cannot be obtained for past transactions** — only for proposed transactions
+
+### Can the Department Demand Differential Tax Despite a Favourable Advance Ruling?
+
+**Section 103(1)** states that an advance ruling is **binding on the applicant and the concerned officer** only in respect of the **specific question** on which the ruling was sought.
+
+**Key limits of binding effect**:
+
+1. **Voiding by AAAR**: If the department appeals to AAAR and the ruling is reversed, the original ruling ceases to be binding from the date of the AAAR order
+2. **Change in law**: If the law or facts change, the ruling becomes void under Section 104 — the department CAN then demand differential tax prospectively
+3. **Fraud/misrepresentation**: Under Section 104, the ruling is void ab initio if obtained by fraud, suppression, or misrepresentation — the department can demand tax for the entire period including past years
+4. **Prospective override**: If the department reclassifies the product to a higher-rate heading after AAAR/GSTAT overturns the ruling, they can demand differential tax only **from the date of the AAAR/GSTAT order** — NOT retrospectively (unless fraud is proved)
+5. **Other taxpayers**: Since the ruling binds only the applicant, the department CAN demand differential tax from other taxpayers who relied on someone else's advance ruling without obtaining their own
+6. **Conflicting rulings**: If multiple AARs have given conflicting rulings on the same product, the department's position may prevail until the issue is settled by GSTAT or a High Court
+
+**Practical position**: A published advance ruling in the taxpayer's favour provides strong protection against retrospective demands. The department would need to first get the ruling overturned via AAAR before demanding differential tax. Until overturned, the ruling shields the taxpayer.
 
 ## Practical Steps for Reclassification
 
@@ -112,6 +127,46 @@ After the GST Council's recommendation, rate changes/clarifications are notified
 - Rate change notification (amendment to Schedule)
 - Clarification circular (resolving classification disputes)
 - These are published on cbic.gov.in and in official gazette
+
+## Customs Voluntary Compliance — Reassessment for Wrong HS Code
+
+### The Scheme
+
+The Customs voluntary compliance programme allows importers who discover classification errors on past Bills of Entry to proactively correct them and pay the differential duty with reduced penalties.
+
+### Eligibility
+
+1. The importer must **self-discover** the error — not after a show cause notice or audit
+2. Applicable to all goods classified under the wrong HS code resulting in **underpayment of duty**
+3. Can cover multiple past Bills of Entry
+4. Available for both BCD (Basic Customs Duty) and IGST/CVD differentials
+
+### Process for Voluntary Reassessment
+
+1. **Calculate the differential**: Compare duty at the correct HS code vs. duty paid at the wrong HS code for each Bill of Entry
+2. **File a voluntary disclosure**: Submit an application to the jurisdictional Commissioner of Customs
+   - Reference: **Section 149 of the Customs Act, 1962** (amendment of documents)
+   - Attach: List of affected Bills of Entry, differential duty calculation, correct HS code justification
+3. **Pay the differential duty**: Deposit the differential customs duty + applicable interest (under Section 28AA — currently 15% per annum)
+4. **Penalty implications**:
+   - If disclosed before any investigation: **No penalty** under Section 28(5) — voluntary payment before notice reduces penalty to NIL
+   - If disclosed after investigation begins: Standard penalty provisions apply
+5. **Assessment order**: The proper officer will issue a reassessment order confirming the revised classification and duty paid
+6. **IGST credit**: The additional IGST paid on import is available as ITC under GST (claim in the next GSTR-3B after reassessment)
+
+### Benefits of Voluntary Compliance
+
+- **No penalty** if disclosed before investigation (Section 28(5))
+- **Reduced interest** compared to post-notice scenario
+- Demonstrates good faith — reduces risk of future adverse action
+- Preserves relationship with Customs authorities
+- IGST component is recoverable as ITC
+
+### Limitations
+
+- Cannot use this route after receiving a show cause notice (Section 28) for the same issue
+- The correct HS code must be defensible — voluntary reclassification to a wrong code creates new problems
+- Interest is mandatory even for voluntary correction
 
 ## Key Principles for Classification
 
